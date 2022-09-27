@@ -2,6 +2,7 @@
 using System.Linq;
 using Config;
 using FrameWork;
+using GameData.Domains;
 using GameData.Domains.Character.Display;
 using GameData.Domains.CombatSkill;
 using GameData.Domains.Item.Display;
@@ -72,7 +73,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
     [HarmonyPatch]
     public static class UI_MapBlockCharListPatch
     {
-        
         /// <summary>
         /// 纯为了避免出错，设置一个直接跳过的条件
         /// </summary>
@@ -95,7 +95,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             EasyPool.Free(list);
             return true;
         }
-        
+
         [HarmonyPatch(typeof(UI_MapBlockCharList), "OnRenderChar")]
         [HarmonyPostfix]
         static void OnRenderCharPostfix(int index, Refers charRefers, bool ____canSeeDetail, CToggleGroup ____togGroup,
@@ -268,7 +268,13 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             list.Clear();
             list.Add(skillBookItem.CombatSkillTemplateId);
 
-            __instance.AsynchMethodCall(7, 0, SingletonObject.getInstance<BasicGameData>().TaiwuCharId, list,
+            var domainId = DomainHelper.DomainName2DomainId["CombatSkill"];
+            var methodId = MynahBaseModFrontend.MynahBaseModFrontend.GetMethodIdByName(
+                typeof(CombatSkillDomainHelper.MethodIds),
+                "GetCombatSkillDisplayData"
+            );
+
+            __instance.AsynchMethodCall(domainId, methodId, SingletonObject.getInstance<BasicGameData>().TaiwuCharId, list,
                 (offset, dataPool) =>
                 {
                     var combatSkillItem = CombatSkill.Instance[skillBookItem.CombatSkillTemplateId];
@@ -293,8 +299,10 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                     if (ShowLearningProgress)
                     {
                         string s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                        var pracStr = combatSkillDisplayData.PracticeLevel < 0 ? "未习得" : $"修习程度：{combatSkillDisplayData.PracticeLevel}%";
-                        
+                        var pracStr = combatSkillDisplayData.PracticeLevel < 0
+                            ? "未习得"
+                            : $"修习程度：{combatSkillDisplayData.PracticeLevel}%";
+
                         var desc = $"{skillBookItem.Desc}\n已读书页数：{s}\n{pracStr}";
                         MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
                     }
