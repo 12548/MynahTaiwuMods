@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MynahBaseModBase\MynahBaseModBase.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="GameData">
+        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\Backend\GameData.dll</HintPath>
+      </Reference>
+      <Reference Include="TaiwuModdingLib">
+        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

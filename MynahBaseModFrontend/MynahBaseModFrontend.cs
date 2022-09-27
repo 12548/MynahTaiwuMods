@@ -1,0 +1,65 @@
+﻿using System;
+using System.Reflection;
+using GameData.Domains;
+using MynahBaseModBase;
+using TaiwuModdingLib.Core.Plugin;
+
+namespace MynahBaseModFrontend;
+
+[PluginConfig("MynahBaseModFrontend", "myna12548", "0")]
+public class DummyModEntry : TaiwuRemakePlugin
+{
+    public override void Initialize()
+    {
+    }
+
+    public override void Dispose()
+    {
+    }
+}
+
+public class MynahBaseModFrontend
+{
+    public static ushort GetDomainIdByName(string name)
+    {
+        return DomainHelper.DomainName2DomainId[name];
+    }
+
+    public static ushort GetMethodIdByName(Type domain, string name)
+    {
+        return (ushort)domain.GetField(name)!.GetValue(null)!;
+    }
+
+    public static void OnModSettingUpdate(TaiwuRemakePlugin plugin)
+    {
+        var type = plugin.GetType();
+        foreach (var field in type.GetFields())
+        {
+            var setting = field.GetCustomAttribute(typeof(ModSetting), true);
+            if (setting != null)
+            {
+                var modSetting = (ModSetting)setting;
+                switch (modSetting.GetModSettingType(field))
+                {
+                    case "InputField":
+                        var strArg = "";
+                        ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref strArg);
+                        field.SetValue(plugin, strArg);
+                        break;
+
+                    case "Toggle":
+                        var boolArg = false;
+                        ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref boolArg);
+                        field.SetValue(plugin, boolArg);
+                        break;
+
+                    default: // ToggleGroup Slider Dropdown 全都是Int
+                        var intArg = 0;
+                        ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref intArg);
+                        field.SetValue(plugin, intArg);
+                        break;
+                }
+            }
+        }
+    }
+}
