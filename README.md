@@ -13,10 +13,12 @@ TODO: 基础mod使用文档
 
 ### MynahMoreInfo: 更多信息Mod
 
-已发布于NGA：[https://nga.178.com/read.php?tid=33599682](https://nga.178.com/read.php?tid=33599682)
+已发布于NGA：https://nga.178.com/read.php?tid=33599682
 
 左侧人物列表增加浮窗，显示功法正逆练效果、打点、学习进度和不传之秘，显示书籍所载功法正逆练
 
 ### ItemSubtypeFilter: 行囊二级筛选
+
+已发布于NGA：https://nga.178.com/read.php?tid=33652847
 
 为行囊界面增加二级分类筛选。

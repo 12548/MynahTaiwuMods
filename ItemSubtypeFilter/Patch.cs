@@ -38,9 +38,9 @@ public class Patch
     {
         __instance.OutputItemList.Clear();
 
+        // 有二级筛选切二级筛选不为“全”时进入
         if (____equipFilterTogGroup.gameObject.activeSelf && ____equipFilterTogGroup.GetActive().Key != 0)
         {
-            // 如果有细分，先按细分
             List<ItemSortAndFilter.EquipFilterType> typeList = __instance.SortFilterSetting.EquipFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.EquipFilterType.Invalid)
             {
@@ -48,6 +48,7 @@ public class Patch
             }
             else
             {
+                // 99以下为原版装备筛选，100以上为子类型筛选
                 var togKey = ____equipFilterTogGroup.GetActive().Key;
                 if (togKey < 99)
                 {
