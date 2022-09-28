@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Config;
 using FrameWork;
@@ -6,6 +7,7 @@ using GameData.Domains;
 using GameData.Domains.Character.Display;
 using GameData.Domains.CombatSkill;
 using GameData.Domains.Item.Display;
+using GameData.Domains.TaiwuEvent.DisplayEvent;
 using GameData.Serializer;
 using GameData.Utilities;
 using HarmonyLib;
@@ -13,6 +15,7 @@ using MynahBaseModBase;
 using TaiwuModdingLib.Core.Plugin;
 using TMPro;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MynahMoreInfo;
 
@@ -36,6 +39,9 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("学习进度", description: "开启正逆练显示时生效，显示功法、功法书籍的读书、修炼进度，目前显示位置不太好，不喜欢可以关闭")]
     public static readonly bool ShowLearningProgress = true;
+    
+    [ModSetting("对话人物浮窗", description: "为事件界面（人物对话互动等）的左右两个人物增加鼠标浮窗")]
+    public static readonly bool ShowEventUICharacterMouseTip = true;
 
     public override void OnModSettingUpdate()
     {
@@ -71,8 +77,69 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
     }
 
     [HarmonyPatch]
-    public static class UI_MapBlockCharListPatch
+    public static class MouseTipCharacterPatch
     {
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(UI_EventWindow), "UpdateMainCharacter")]
+        static void UpdateMainCharacterPostfix(UI_EventWindow __instance)
+        {
+            if(!ShowEventUICharacterMouseTip) return;
+            var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
+            CharacterDisplayData mainCharacter = data.MainCharacter;
+            Refers refers = __instance.CGet<Refers>("MainCharacter");
+            var transform = refers.transform.Find("MoveRoot/AvatarArea/ShowMainCharacterMenu");
+            if (transform == null) return;
+            var mouseTipObj = transform.gameObject;
+
+            if (mainCharacter == null || !HasCharacter(__instance))
+            {
+                if (refers != null)
+                {
+                    var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
+                    mouseTipDisplayer.enabled = false;
+                }
+            }
+            else
+            {
+                var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
+                EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+            }
+        }
+        
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(UI_EventWindow), "UpdateTargetCharacter")]
+        static void UpdateTargetCharacterPostfix(UI_EventWindow __instance)
+        {
+            if(!ShowEventUICharacterMouseTip) return;
+            var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
+            CharacterDisplayData mainCharacter = data.TargetCharacter;
+            Refers refers = __instance.CGet<Refers>("TargetCharacter");
+            var transform = refers.transform.Find("CanvasChanger/AvatarArea/ShowTargetCharacterMenu");
+            if(transform == null) return;
+            var mouseTipObj = transform.gameObject;
+
+            if (mainCharacter == null || !HasCharacter(__instance))
+            {
+                if (refers != null)
+                {
+                    var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
+                    mouseTipDisplayer.enabled = false;
+                }
+            }
+            else
+            {
+                var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
+                EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+            }
+        }
+        
+        [HarmonyReversePatch]
+        [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
+        static bool HasCharacter(UI_EventWindow instance)
+        {
+            throw new Exception("stub!");
+        }
+        
         /// <summary>
         /// 纯为了避免出错，设置一个直接跳过的条件
         /// </summary>
@@ -109,30 +176,19 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             if (key > 1) trigger = false;
 
             var cbutton = charRefers.CGet<CButton>("Button");
-            var mouseTipDisplayer = cbutton.GetComponent<MouseTipDisplayer>();
-            if (mouseTipDisplayer == null)
-            {
-                cbutton.gameObject.AddComponent<MouseTipDisplayer>();
-                mouseTipDisplayer = cbutton.GetComponent<MouseTipDisplayer>();
-            }
+            var obj = cbutton.gameObject;
+            
+            var mouseTipDisplayer = EnsureMouseTipDisplayer(obj);
 
             if (trigger)
             {
-                mouseTipDisplayer.Type = TipType.Character;
-                if (mouseTipDisplayer.RuntimeParam == null)
-                {
-                    mouseTipDisplayer.RuntimeParam = EasyPool.Get<ArgumentBox>();
-                    mouseTipDisplayer.RuntimeParam.Clear();
-                }
-
+                
                 var charDisplayData = ____charDataDict[
                     ((key == 0) ? ____normalCharList : ____infectedList)[
                         index]];
-
-                // var item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
-
-                mouseTipDisplayer.RuntimeParam.Set("charId", charDisplayData.CharacterId);
-                mouseTipDisplayer.enabled = true;
+                var characterId = charDisplayData.CharacterId;
+                
+                EnableMouseTipCharacter(mouseTipDisplayer, characterId);
             }
             else
             {
@@ -154,6 +210,32 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             // s += GetIdentityText(item, charDisplayData.OrgInfo);
             //
             // mouseTipDisplayer.PresetParam = new[] { s };
+        }
+
+        private static void EnableMouseTipCharacter(MouseTipDisplayer mouseTipDisplayer, int characterId)
+        {
+            mouseTipDisplayer.Type = TipType.Character;
+            if (mouseTipDisplayer.RuntimeParam == null)
+            {
+                mouseTipDisplayer.RuntimeParam = EasyPool.Get<ArgumentBox>();
+                mouseTipDisplayer.RuntimeParam.Clear();
+            }
+            // var item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
+
+            mouseTipDisplayer.RuntimeParam.Set("charId", characterId);
+            mouseTipDisplayer.enabled = true;
+        }
+
+        private static MouseTipDisplayer EnsureMouseTipDisplayer(GameObject obj)
+        {
+            var mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
+            if (mouseTipDisplayer == null)
+            {
+                obj.AddComponent<MouseTipDisplayer>();
+                mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
+            }
+
+            return mouseTipDisplayer;
         }
 
         // static string GetIdentityText(CharacterItem item, OrganizationInfo organizationInfo)
