@@ -303,7 +303,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                             ? "未习得"
                             : $"修习程度：{combatSkillDisplayData.PracticeLevel}%";
 
-                        var desc = $"{skillBookItem.Desc}\n已读书页数：{s}\n{pracStr}";
+                        var desc = $"{skillBookItem.Desc}\n{s}\n{pracStr}";
                         MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
                     }
                 });
@@ -370,7 +370,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 if (ShowLearningProgress)
                 {
                     string s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                    var desc = $"{____configData.Desc}\n已读书页数：{s}";
+                    var desc = $"{____configData.Desc}\n{s}";
                     MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
                 }
 
@@ -428,24 +428,29 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
         private static string GetCombatSkillReadingProgressString(CombatSkillDisplayData combatSkillDisplayData)
         {
-            var p1 = new List<sbyte>(new sbyte[] { 0, 1, 2, 3, 4 }).Sum(page =>
+            var s1 = "承合解异独";
+            var s2 = "修思源参藏";
+            var s3 = "用奇巧化绝";
+            
+            var p1 = new List<sbyte>(new sbyte[] { 0, 1, 2, 3, 4 }).Select(page =>
                 CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
-                    CombatSkillStateHelper.GetOutlinePageInternalIndex(page))
-                    ? 1
-                    : 0);
-            var p2 = new List<byte>(new byte[] { 0, 1, 2, 3, 4 }).Sum(page =>
+                    CombatSkillStateHelper.GetOutlinePageInternalIndex(page))).ToArray();
+            var p2 = new List<byte>(new byte[] { 1, 2, 3, 4, 5 }).Select(page =>
                 CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
-                    CombatSkillStateHelper.GetNormalPageInternalIndex(0, page))
-                    ? 1
-                    : 0);
-            var p3 = new List<byte>(new byte[] { 0, 1, 2, 3, 4 }).Sum(page =>
+                    CombatSkillStateHelper.GetNormalPageInternalIndex(0, page))).ToArray();
+            var p3 = new List<byte>(new byte[] { 1, 2, 3, 4, 5 }).Select(page =>
                 CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
-                    CombatSkillStateHelper.GetNormalPageInternalIndex(1, page))
-                    ? 1
-                    : 0);
+                    CombatSkillStateHelper.GetNormalPageInternalIndex(1, page))).ToArray();
 
-            var s = $"{p1}-<color=#00ffffff>{p2}</color>-<color=orange>{p3}</color>";
-            return s;
+            string ts1 = "", ts2 = "", ts3 = "";
+            for (int i = 0; i < 5; i++)
+            {
+                ts1 += p1[i] ? $"<color=#ffffffff>{s1[i]}</color>" : $"<color=#474747ff>{s1[i]}</color>";
+                ts2 += p2[i] ? $"<color=#00ffffff>{s2[i]}</color>" : $"<color=#004747ff>{s2[i]}</color>";
+                ts3 += p3[i] ? $"<color=#ffa500ff>{s3[i]}</color>" : $"<color=#5C3C00ff>{s3[i]}</color>";
+            }
+            // var s = $"{p1}-<color=#00ffffff>{p2}</color>-<color=orange>{p3}</color>";
+            return $"{ts1} {ts2} {ts3}";
         }
 
         private static void ShowAttackPartDistribution(MouseTipCombatSkill __instance,
