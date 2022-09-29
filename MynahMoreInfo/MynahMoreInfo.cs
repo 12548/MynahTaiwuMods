@@ -297,6 +297,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             {
                 specialEffectTrans =
                     Object.Instantiate(specialHolder.gameObject, dh, false).transform;
+                specialEffectTrans.name = "SpecialEffect";
             }
 
             var specialEffectObj = specialEffectTrans.gameObject;
