@@ -95,14 +95,14 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             {
                 if (refers != null)
                 {
-                    var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
+                    var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
                     mouseTipDisplayer.enabled = false;
                 }
             }
             else
             {
-                var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
-                EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+                var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
+                Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
             }
         }
         
@@ -122,14 +122,14 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             {
                 if (refers != null)
                 {
-                    var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
+                    var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
                     mouseTipDisplayer.enabled = false;
                 }
             }
             else
             {
-                var mouseTipDisplayer = EnsureMouseTipDisplayer(mouseTipObj);
-                EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+                var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
+                Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
             }
         }
         
@@ -178,7 +178,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             var cbutton = charRefers.CGet<CButton>("Button");
             var obj = cbutton.gameObject;
             
-            var mouseTipDisplayer = EnsureMouseTipDisplayer(obj);
+            var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(obj);
 
             if (trigger)
             {
@@ -187,8 +187,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                     ((key == 0) ? ____normalCharList : ____infectedList)[
                         index]];
                 var characterId = charDisplayData.CharacterId;
-                
-                EnableMouseTipCharacter(mouseTipDisplayer, characterId);
+
+                Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);
             }
             else
             {
@@ -210,32 +210,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             // s += GetIdentityText(item, charDisplayData.OrgInfo);
             //
             // mouseTipDisplayer.PresetParam = new[] { s };
-        }
-
-        private static void EnableMouseTipCharacter(MouseTipDisplayer mouseTipDisplayer, int characterId)
-        {
-            mouseTipDisplayer.Type = TipType.Character;
-            if (mouseTipDisplayer.RuntimeParam == null)
-            {
-                mouseTipDisplayer.RuntimeParam = EasyPool.Get<ArgumentBox>();
-                mouseTipDisplayer.RuntimeParam.Clear();
-            }
-            // var item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
-
-            mouseTipDisplayer.RuntimeParam.Set("charId", characterId);
-            mouseTipDisplayer.enabled = true;
-        }
-
-        private static MouseTipDisplayer EnsureMouseTipDisplayer(GameObject obj)
-        {
-            var mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
-            if (mouseTipDisplayer == null)
-            {
-                obj.AddComponent<MouseTipDisplayer>();
-                mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
-            }
-
-            return mouseTipDisplayer;
         }
 
         // static string GetIdentityText(CharacterItem item, OrganizationInfo organizationInfo)
