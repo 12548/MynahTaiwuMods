@@ -7,11 +7,11 @@ namespace ItemSubtypeFilter;
 public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     [ModSetting(displayName: "用于行囊")]
-    public static bool UseInInventory = true;
+    public static readonly bool UseInInventory = true;
     
     [ModSetting(displayName: "用于仓库")]
-    public static bool UseInWarehouse = true;
+    public static readonly bool UseInWarehouse = true;
     
     [ModSetting(displayName: "用于商店")]
-    public static bool UseInShop = true;
+    public static readonly bool UseInShop = true;
 }

@@ -12,8 +12,6 @@ namespace ItemSubtypeFilter;
 [HarmonyPatch]
 public class Patch
 {
-    private static bool togInited = false;
-
     /// <summary>
     /// 完全替换原来的UpdateItemList，优先细类划分。
     /// </summary>
@@ -200,7 +198,7 @@ public class Patch
             itemFilterType == ItemSortAndFilter.ItemFilterType.Equip)
         {
             equipTypeFilter.gameObject.SetActive(true);
-            if (!places.Init)
+            if (equipTypeFilter.transform.Find("Subtype701") == null)
             {
                 // 未初始化，第一次初始化
                 places.Init = true;
