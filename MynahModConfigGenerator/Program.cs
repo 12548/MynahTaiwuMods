@@ -8,18 +8,52 @@ using MynahBaseModBase;
 using Neo.IronLua;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TaiwuModdingLib.Core.Plugin;
 
 namespace MynahModConfigGenerator
 {
     static class Program
     {
+        static Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
+
+        static void LoadAssemblyReferences(Assembly selectedAssembly)
+        {
+            foreach (AssemblyName reference in selectedAssembly.GetReferencedAssemblies())
+            {
+                if (System.IO.File.Exists(
+                        System.IO.Path.GetDirectoryName(selectedAssembly.Location) +
+                        @"\" + reference.Name + ".dll"))
+                {
+                    System.Reflection.Assembly.LoadFrom(
+                        System.IO.Path.GetDirectoryName(selectedAssembly.Location) +
+                        @"\" + reference.Name + ".dll");
+                }
+                else
+                {
+                    var taiwuPath = System.Environment.GetEnvironmentVariable("TAIWU_PATH");
+
+                    if (taiwuPath != null)
+                    {
+                        var taiwuDllPath = Path.Join(taiwuPath, "The Scroll of Taiwu_Data", "Managed",
+                            reference.Name + ".dll");
+                        if (File.Exists(taiwuDllPath))
+                        {
+                            System.Reflection.Assembly.LoadFrom(taiwuDllPath);
+                        }
+                    }
+                    
+                }
+            }
+        }
+
         /// <summary>
         /// 将Lua文件中第一个左大括号和最后一个右大括号之间的内容作为表读取，改变其中的"DefaultSettings"内容并输出到文件。
         /// </summary>
         /// <param name="args">第一个是读取的lua文件，后面的参数是读取的dll文件，最后一个参数是输出的lua位置（不填则改变原lua，根据扩展名判断）</param>
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.AssemblyLoad += new AssemblyLoadEventHandler(CurrentDomain_AssemblyLoad);
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+
             if (args.Length >= 2)
             {
                 var luaFilePath = args[0];
@@ -27,6 +61,12 @@ namespace MynahModConfigGenerator
 
                 Console.WriteLine("Before: " + luastr);
                 var assemblies = args.Where(it => it.EndsWith(".dll")).Select(Assembly.LoadFrom);
+                
+                foreach (var assembly in assemblies)
+                {
+                    LoadAssemblyReferences(assembly);
+                }
+                
                 var result = ChangeLua(luastr, assemblies);
                 Console.WriteLine("After: " + result);
 
@@ -39,6 +79,21 @@ namespace MynahModConfigGenerator
                 l = ChangeLua(l, new[] { Assembly.GetExecutingAssembly() });
                 Console.WriteLine("After: " + l);
             }
+        }
+
+        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            Assembly assembly = null;
+
+            assemblies.TryGetValue(args.Name, out assembly);
+
+            return assembly;
+        }
+
+        static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+        {
+            Assembly assembly = args.LoadedAssembly;
+            assemblies[assembly.FullName] = assembly;
         }
 
         /// <summary>
