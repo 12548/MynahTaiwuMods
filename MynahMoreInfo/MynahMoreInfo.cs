@@ -256,7 +256,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     public static class Patch
     {
-        static GameObject _bookCombatSkillSpecialEffectObj;
         static GameObject _attackDistributionObj;
 
         public static void PostFixMouseTipBookInit(MouseTipBook __instance, bool ____isCombatSkill,
@@ -293,13 +292,14 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 return;
             }
 
-            if (_bookCombatSkillSpecialEffectObj == null)
+            var specialEffectTrans = dh.Find("SpecialEffect");
+            if (specialEffectTrans == null)
             {
-                _bookCombatSkillSpecialEffectObj =
-                    Object.Instantiate(specialHolder.gameObject, dh, false);
+                specialEffectTrans =
+                    Object.Instantiate(specialHolder.gameObject, dh, false).transform;
             }
 
-            var specialEffectObj = _bookCombatSkillSpecialEffectObj;
+            var specialEffectObj = specialEffectTrans.gameObject;
 
             if (!____isCombatSkill)
             {
@@ -520,11 +520,17 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             if (____configData.EquipType == 1)
             {
                 GameObject attackEffectObj = __instance.CGet<GameObject>("AttackProperty");
-                if (_attackDistributionObj == null)
+                var transform = attackEffectObj.transform.Find("AttackDisturbTips");
+                GameObject adt;
+                if (transform == null)
                 {
                     var t = attackEffectObj.transform.Find("AcupointTips").gameObject;
-                    _attackDistributionObj = Object.Instantiate(t, attackEffectObj.transform, false);
-                    _attackDistributionObj.name = "AttackDisturbTips";
+                    adt = Object.Instantiate(t, attackEffectObj.transform, false);
+                    adt.name = "AttackDisturbTips";
+                }
+                else
+                {
+                    adt = transform.gameObject;
                 }
 
                 var s = "打点：";
@@ -538,8 +544,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 if (d.Length > 5 && d[5] > 0) s += " 左腿" + d[5];
                 if (d.Length > 6 && d[6] > 0) s += " 右腿" + d[6];
 
-                _attackDistributionObj.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = s;
-                _attackDistributionObj.SetActive(true);
+                adt.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = s;
+                adt.SetActive(true);
             }
         }
     }
