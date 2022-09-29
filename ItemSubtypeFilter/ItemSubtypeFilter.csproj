@@ -71,6 +71,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ItemSortAndFilterType.cs" />
         <Compile Include="ItemSubtypeFilter.cs" />
         <Compile Include="Patch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

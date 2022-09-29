@@ -14,9 +14,6 @@ public class Patch
 {
     private static bool togInited = false;
 
-    private static float _scrollRectOriginalPositionY;
-    private static float _scrollRectOriginalSizeY;
-
     /// <summary>
     /// 完全替换原来的UpdateItemList，优先细类划分。
     /// </summary>
@@ -38,7 +35,7 @@ public class Patch
     {
         __instance.OutputItemList.Clear();
 
-        // 有二级筛选切二级筛选不为“全”时进入
+        // 有二级筛选且二级筛选不为“全”时进入
         if (____equipFilterTogGroup.gameObject.activeSelf && ____equipFilterTogGroup.GetActive().Key != 0)
         {
             List<ItemSortAndFilter.EquipFilterType> typeList = __instance.SortFilterSetting.EquipFilterType;
@@ -158,10 +155,42 @@ public class Patch
 
     private static bool TryInitSubtypeFilter(ItemSortAndFilter sortAndFilter, int currentTogKey)
     {
-        if (sortAndFilter.transform.parent.parent.parent.parent.name != "UI_CharacterMenuItems")
+        var parentTransform = sortAndFilter.transform.parent;
+        ItemSortAndFilterType sortAndFilterType;
+        if (parentTransform.parent.parent.parent.name == "UI_CharacterMenuItems")
+        {
+            sortAndFilterType = ItemSortAndFilterType.CharacterMenuItems;
+            if (!ModEntry.UseInInventory) return true;
+        }
+        else if (parentTransform.parent.name == "Inventory")
+        {
+            sortAndFilterType = ItemSortAndFilterType.WarehouseInventory;
+            if (!ModEntry.UseInWarehouse) return true;
+        }
+        else if (parentTransform.parent.name == "Warehouse")
+        {
+            sortAndFilterType = ItemSortAndFilterType.Warehouse;
+            if (!ModEntry.UseInWarehouse) return true;
+        }
+        else if (parentTransform.parent.name == "ShopItems")
+        {
+            sortAndFilterType = ItemSortAndFilterType.Shop;
+            if (!ModEntry.UseInShop) return true;
+        }
+        else if (parentTransform.parent.name == "SelfItems")
+        {
+            sortAndFilterType = ItemSortAndFilterType.ShopInventory;
+            if (!ModEntry.UseInShop) return true;
+        }
+        else
+        {
             return true;
+        }
 
-        var viewport = sortAndFilter.transform.parent.GetComponent<CScrollRect>().Viewport;
+        var places = Utils.SecondFilterPlaces[sortAndFilterType];
+        if (places == null) return true;
+
+        var viewport = parentTransform.GetComponent<CScrollRect>().Viewport;
         var equipTypeFilter = sortAndFilter.CGet<CToggleGroup>("EquipTypeFilter");
         if (viewport == null || equipTypeFilter == null) return true;
 
@@ -171,27 +200,24 @@ public class Patch
             itemFilterType == ItemSortAndFilter.ItemFilterType.Equip)
         {
             equipTypeFilter.gameObject.SetActive(true);
-            if (true)
+            if (!places.Init)
             {
-                if (!togInited)
-                {
-                    // 未初始化，第一次初始化
-                    togInited = true;
-                    var template = equipTypeFilter.transform.Find("All").gameObject;
+                // 未初始化，第一次初始化
+                places.Init = true;
+                var template = equipTypeFilter.transform.Find("All").gameObject;
 
-                    foreach (var keyValuePair in Utils.ItemFilterTypeToSubTypeString)
+                foreach (var keyValuePair in Utils.ItemFilterTypeToSubTypeString)
+                {
+                    foreach (var valuePair in keyValuePair.Value)
                     {
-                        foreach (var valuePair in keyValuePair.Value)
-                        {
-                            var obj = Object.Instantiate(template, equipTypeFilter.transform, false);
-                            var cToggle = obj.GetComponent<CToggle>();
-                            cToggle.Key = valuePair.Key + 100;
-                            cToggle.isOn = false;
-                            obj.GetComponentInChildren<TextMeshProUGUI>().text = valuePair.Value;
-                            equipTypeFilter.Add(cToggle);
-                            obj.name = "Subtype" + valuePair.Key;
-                            obj.SetActive(false);
-                        }
+                        var obj = Object.Instantiate(template, equipTypeFilter.transform, false);
+                        var cToggle = obj.GetComponent<CToggle>();
+                        cToggle.Key = valuePair.Key + 100;
+                        cToggle.isOn = false;
+                        obj.GetComponentInChildren<TextMeshProUGUI>().text = valuePair.Value;
+                        equipTypeFilter.Add(cToggle);
+                        obj.name = "Subtype" + valuePair.Key;
+                        obj.SetActive(false);
                     }
                 }
             }
@@ -225,19 +251,26 @@ public class Patch
 
             equipTypeFilter.gameObject.SetActive(true);
 
-            _scrollRectOriginalPositionY = viewport.position.y;
-            _scrollRectOriginalSizeY = viewport.sizeDelta.y;
+            if (places.OriginalViewportPos == null || places.OriginalViewportSize == null)
+            {
+                places.OriginalViewportPos = viewport.position;
+                places.OriginalViewportSize = viewport.sizeDelta;
+            }
 
-            equipTypeFilter.transform.position = new Vector3(-3.13f, 3.20f, 240.0f);
+            equipTypeFilter.transform.position = places.SecondFilterPos;
 
-            viewport.position = new Vector3(0.48f, 2.80f, 240f);
-            viewport.sizeDelta = new Vector2(10f, -158f);
+            viewport.position = places.NewViewportPos;
+            viewport.sizeDelta = places.NewViewportSize;
         }
         else
         {
             equipTypeFilter.gameObject.SetActive(false);
-            viewport.position = new Vector3(0.48f, 3.22f, 240f);
-            viewport.sizeDelta = new Vector2(10f, -98f);
+
+            if (places.OriginalViewportPos != null && places.OriginalViewportSize != null)
+            {
+                viewport.position = (Vector3)places.OriginalViewportPos;
+                viewport.sizeDelta = (Vector2)places.OriginalViewportSize;
+            }
         }
 
         return false;
