@@ -185,7 +185,7 @@ public class Patch
             return true;
         }
 
-        var places = Utils.SecondFilterPlaces[sortAndFilterType];
+        var places = SecondFilterHelper.SecondFilterPlaces[sortAndFilterType];
         if (places == null) return true;
 
         var viewport = parentTransform.GetComponent<CScrollRect>().Viewport;
@@ -194,7 +194,7 @@ public class Patch
 
         var itemFilterType = (ItemSortAndFilter.ItemFilterType)currentTogKey;
 
-        if (Utils.ItemFilterTypeToSubTypeString.ContainsKey(itemFilterType) ||
+        if (SecondFilterHelper.ItemFilterTypeToSubTypeString.ContainsKey(itemFilterType) ||
             itemFilterType == ItemSortAndFilter.ItemFilterType.Equip)
         {
             equipTypeFilter.gameObject.SetActive(true);
@@ -204,7 +204,7 @@ public class Patch
                 places.Init = true;
                 var template = equipTypeFilter.transform.Find("All").gameObject;
 
-                foreach (var keyValuePair in Utils.ItemFilterTypeToSubTypeString)
+                foreach (var keyValuePair in SecondFilterHelper.ItemFilterTypeToSubTypeString)
                 {
                     foreach (var valuePair in keyValuePair.Value)
                     {
@@ -221,7 +221,7 @@ public class Patch
             }
 
             Dictionary<int, string> subTypes = null;
-            Utils.ItemFilterTypeToSubTypeString.TryGetValue(itemFilterType, out subTypes);
+            SecondFilterHelper.ItemFilterTypeToSubTypeString.TryGetValue(itemFilterType, out subTypes);
 
             Debug.Log($"there are {equipTypeFilter.transform.childCount} toggles");
             for (int i = 0; i < equipTypeFilter.transform.childCount; i++)

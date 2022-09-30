@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ItemSubtypeFilter;
 
-public static class Utils
+public static class SecondFilterHelper
 {
     public static Dictionary<ItemSortAndFilterType, SecondFilterPlace> SecondFilterPlaces =
         new Dictionary<ItemSortAndFilterType, SecondFilterPlace>()
