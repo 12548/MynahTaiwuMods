@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Config;
 using GameData.Domains.Item;
 using GameData.Domains.Item.Display;
 using HarmonyLib;
@@ -23,7 +24,7 @@ public class Patch
     /// <returns></returns>
     [HarmonyPatch(typeof(ItemSortAndFilter), "UpdateItemList")]
     [HarmonyPrefix]
-    static bool UpdateItemListPrefix(
+    public static bool UpdateItemListPrefix(
         ItemSortAndFilter __instance,
         CToggleGroup ____filterTogGroup,
         CToggleGroup ____equipFilterTogGroup,
@@ -33,9 +34,49 @@ public class Patch
     {
         __instance.OutputItemList.Clear();
 
-        // 有二级筛选且二级筛选不为“全”时进入
-        if (____equipFilterTogGroup.gameObject.activeSelf && ____equipFilterTogGroup.GetActive().Key != 0)
+        if (__instance.transform == null) return true;
+
+        var thirdFilter = __instance.transform.Find("ThirdFilter");
+        if (thirdFilter != null && thirdFilter.gameObject.activeSelf &&
+            thirdFilter.GetComponent<CToggleGroup>().GetActive().Key != 0)
         {
+            // 有三级筛选且三级筛选不为“全”时进入
+            Debug.Log("thirdFilter!");
+
+            var togKey = thirdFilter.GetComponent<CToggleGroup>().GetActive().Key;
+            List<ItemSortAndFilter.EquipFilterType> typeList = __instance.SortFilterSetting.EquipFilterType;
+            if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.EquipFilterType.Invalid)
+            {
+                __instance.OutputItemList.AddRange(____itemList);
+            }
+            else
+            {
+                __instance.OutputItemList.AddRange(____itemList.FindAll(data =>
+                {
+                    var itemSubType = ItemTemplateHelper.GetItemSubType(data.Key.ItemType, data.Key.TemplateId);
+                    if (itemSubType == 1001)
+                    {
+                        var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
+                        var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
+                        Debug.Log(
+                            $"Combat skill: {skillBookItem.CombatSkillType} vs {thirdFilterInfo.combatSkillTypeOrLifeSkillType}");
+                        return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
+                                skillBookItem.CombatSkillType == thirdFilterInfo.combatSkillTypeOrLifeSkillType);
+                    }
+                    else if (itemSubType == 1000)
+                    {
+                        var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
+                        var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
+                        return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.LifeSkillBook &&
+                                skillBookItem.LifeSkillType == thirdFilterInfo.combatSkillTypeOrLifeSkillType);
+                    }
+                    else return false;
+                }));
+            }
+        }
+        else if (____equipFilterTogGroup.gameObject.activeSelf && ____equipFilterTogGroup.GetActive().Key != 0)
+        {
+            // 有二级筛选且二级筛选不为“全”时进入
             List<ItemSortAndFilter.EquipFilterType> typeList = __instance.SortFilterSetting.EquipFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.EquipFilterType.Invalid)
             {
@@ -124,11 +165,66 @@ public class Patch
     {
         if (____filterTogInitializing) return;
         var currentTogKey = togNew.Key;
+        
+        ThirdFilterHelper.TurnOffThirdFilter(SecondFilterHelper.GetItemSortAndFilterType(__instance),
+            __instance);
+        
         if (TryInitSubtypeFilter(__instance, currentTogKey)) return;
 
         if (____equipFilterTogGroup.isActiveAndEnabled)
         {
             ____equipFilterTogGroup.Set(0);
+        }
+
+        UpdateItemListPrefix(__instance, ____filterTogGroup, ____equipFilterTogGroup, ____itemList,
+            ____onItemListChanged);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ItemSortAndFilter), "OnEquipFilterTogChange")]
+    public static void OnEquipFilterTogChangePostfix(
+        ItemSortAndFilter __instance,
+        CToggleGroup ____filterTogGroup,
+        CToggleGroup ____equipFilterTogGroup,
+        List<ItemDisplayData> ____itemList,
+        Action ____onItemListChanged,
+        bool ____filterTogInitializing,
+        CToggle togNew, CToggle togOld)
+    {
+        if (____filterTogInitializing) return;
+
+        if (!ModEntry.BookThirdFilter) return;
+
+        ThirdFilterType thirdFilterType;
+
+        switch (togNew.gameObject.name)
+        {
+            case "Subtype1001":
+                thirdFilterType = ThirdFilterType.CombatSkillBook;
+                break;
+            case "Subtype1000":
+                thirdFilterType = ThirdFilterType.LifeSkillBook;
+                break;
+            default:
+                ThirdFilterHelper.TurnOffThirdFilter(SecondFilterHelper.GetItemSortAndFilterType(__instance),
+                    __instance);
+                return;
+        }
+
+        var sortAndFilterType = SecondFilterHelper.GetItemSortAndFilterType(__instance);
+        if (sortAndFilterType == null)
+        {
+            return;
+        }
+
+        var toggleGroup =
+            ThirdFilterHelper.EnsureThirdFilter((ItemSortAndFilterType)sortAndFilterType, __instance, thirdFilterType);
+
+        if (toggleGroup == null) return;
+
+        if (toggleGroup.isActiveAndEnabled)
+        {
+            toggleGroup.Set(0);
         }
 
         UpdateItemListPrefix(__instance, ____filterTogGroup, ____equipFilterTogGroup, ____itemList,
@@ -154,38 +250,59 @@ public class Patch
     private static bool TryInitSubtypeFilter(ItemSortAndFilter sortAndFilter, int currentTogKey)
     {
         var parentTransform = sortAndFilter.transform.parent;
-        ItemSortAndFilterType sortAndFilterType;
-        if (parentTransform.parent.parent.parent.name == "UI_CharacterMenuItems")
+        var sortAndFilterType = SecondFilterHelper.GetItemSortAndFilterType(sortAndFilter);
+
+        switch (sortAndFilterType)
         {
-            sortAndFilterType = ItemSortAndFilterType.CharacterMenuItems;
-            if (!ModEntry.UseInInventory) return true;
-        }
-        else if (parentTransform.parent.name == "Inventory")
-        {
-            sortAndFilterType = ItemSortAndFilterType.WarehouseInventory;
-            if (!ModEntry.UseInWarehouse) return true;
-        }
-        else if (parentTransform.parent.name == "Warehouse")
-        {
-            sortAndFilterType = ItemSortAndFilterType.Warehouse;
-            if (!ModEntry.UseInWarehouse) return true;
-        }
-        else if (parentTransform.parent.name == "ShopItems")
-        {
-            sortAndFilterType = ItemSortAndFilterType.Shop;
-            if (!ModEntry.UseInShop) return true;
-        }
-        else if (parentTransform.parent.name == "SelfItems")
-        {
-            sortAndFilterType = ItemSortAndFilterType.ShopInventory;
-            if (!ModEntry.UseInShop) return true;
-        }
-        else
-        {
-            return true;
+            case ItemSortAndFilterType.CharacterMenuItems:
+                if (!ModEntry.UseInInventory) return true;
+                break;
+
+            case ItemSortAndFilterType.WarehouseInventory:
+            case ItemSortAndFilterType.Warehouse:
+                if (!ModEntry.UseInWarehouse) return true;
+                break;
+
+            case ItemSortAndFilterType.Shop:
+            case ItemSortAndFilterType.ShopInventory:
+                if (!ModEntry.UseInShop) return true;
+                break;
+
+            default:
+                return true;
         }
 
-        var places = SecondFilterHelper.SecondFilterPlaces[sortAndFilterType];
+        // if (parentTransform.parent.parent.parent.name == "UI_CharacterMenuItems")
+        // {
+        //     sortAndFilterType = ItemSortAndFilterType.CharacterMenuItems;
+        //     if (!ModEntry.UseInInventory) return true;
+        // }
+        // else if (parentTransform.parent.name == "Inventory")
+        // {
+        //     sortAndFilterType = ItemSortAndFilterType.WarehouseInventory;
+        //     if (!ModEntry.UseInWarehouse) return true;
+        // }
+        // else if (parentTransform.parent.name == "Warehouse")
+        // {
+        //     sortAndFilterType = ItemSortAndFilterType.Warehouse;
+        //     if (!ModEntry.UseInWarehouse) return true;
+        // }
+        // else if (parentTransform.parent.name == "ShopItems")
+        // {
+        //     sortAndFilterType = ItemSortAndFilterType.Shop;
+        //     if (!ModEntry.UseInShop) return true;
+        // }
+        // else if (parentTransform.parent.name == "SelfItems")
+        // {
+        //     sortAndFilterType = ItemSortAndFilterType.ShopInventory;
+        //     if (!ModEntry.UseInShop) return true;
+        // }
+        // else
+        // {
+        //     return true;
+        // }
+
+        var places = SecondFilterHelper.SecondFilterPlaces[(ItemSortAndFilterType)sortAndFilterType];
         if (places == null) return true;
 
         var viewport = parentTransform.GetComponent<CScrollRect>().Viewport;
@@ -220,11 +337,9 @@ public class Patch
                 }
             }
 
-            Dictionary<int, string> subTypes = null;
-            SecondFilterHelper.ItemFilterTypeToSubTypeString.TryGetValue(itemFilterType, out subTypes);
-
+            SecondFilterHelper.ItemFilterTypeToSubTypeString.TryGetValue(itemFilterType, out var subTypes);
             Debug.Log($"there are {equipTypeFilter.transform.childCount} toggles");
-            for (int i = 0; i < equipTypeFilter.transform.childCount; i++)
+            for (var i = 0; i < equipTypeFilter.transform.childCount; i++)
             {
                 var child = equipTypeFilter.transform.GetChild(i);
                 var obj = child.gameObject;
@@ -234,14 +349,12 @@ public class Patch
                 {
                     obj.SetActive(tog.Key < 100 && itemFilterType == ItemSortAndFilter.ItemFilterType.Equip);
                 }
-
                 else if (subTypes.ContainsKey(tog.Key - 100))
                 {
                     obj.SetActive(true);
                 }
                 else if (tog.Key > 0)
                 {
-                    Debug.Log($"subtype{tog.Key - 100} not in {currentTogKey}");
                     tog.isOn = false;
                     obj.SetActive(false);
                 }
