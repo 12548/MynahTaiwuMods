@@ -16,7 +16,7 @@
 
     <ItemGroup>
       <Reference Include="TaiwuModdingLib">
-        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+        <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
       </Reference>
     </ItemGroup>
 
