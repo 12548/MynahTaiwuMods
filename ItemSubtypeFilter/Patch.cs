@@ -271,37 +271,7 @@ public class Patch
             default:
                 return true;
         }
-
-        // if (parentTransform.parent.parent.parent.name == "UI_CharacterMenuItems")
-        // {
-        //     sortAndFilterType = ItemSortAndFilterType.CharacterMenuItems;
-        //     if (!ModEntry.UseInInventory) return true;
-        // }
-        // else if (parentTransform.parent.name == "Inventory")
-        // {
-        //     sortAndFilterType = ItemSortAndFilterType.WarehouseInventory;
-        //     if (!ModEntry.UseInWarehouse) return true;
-        // }
-        // else if (parentTransform.parent.name == "Warehouse")
-        // {
-        //     sortAndFilterType = ItemSortAndFilterType.Warehouse;
-        //     if (!ModEntry.UseInWarehouse) return true;
-        // }
-        // else if (parentTransform.parent.name == "ShopItems")
-        // {
-        //     sortAndFilterType = ItemSortAndFilterType.Shop;
-        //     if (!ModEntry.UseInShop) return true;
-        // }
-        // else if (parentTransform.parent.name == "SelfItems")
-        // {
-        //     sortAndFilterType = ItemSortAndFilterType.ShopInventory;
-        //     if (!ModEntry.UseInShop) return true;
-        // }
-        // else
-        // {
-        //     return true;
-        // }
-
+        
         var places = SecondFilterHelper.SecondFilterPlaces[(ItemSortAndFilterType)sortAndFilterType];
         if (places == null) return true;
 

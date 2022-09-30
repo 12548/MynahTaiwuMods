@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Config;
-using GameData.Domains.Item;
 using GameData.Domains.Item.Display;
-using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -63,15 +60,12 @@ public class ThirdFilterHelper
     public static CToggleGroup EnsureThirdFilter(ItemSortAndFilterType uiType, ItemSortAndFilter parentSortAndFilter,
         ThirdFilterType filterType)
     {
-        Debug.Log("1");
         ThirdFilterPlaces.TryGetValue(uiType, out var places);
         if (places == null) return null;
 
         var parentTrans = parentSortAndFilter.transform;
         var viewport = parentTrans.parent.GetComponent<CScrollRect>().Viewport;
         var filterObj = parentTrans.Find("ThirdFilter");
-        
-        Debug.Log("2");
 
         if (filterObj == null)
         {
@@ -99,22 +93,16 @@ public class ThirdFilterHelper
             
             toggleGroup.OnActiveToggleChange = (_, _) =>
             {
-                Debug.Log("A");
                 var ____itemList = typeof(ItemSortAndFilter).GetField("_itemList", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                Debug.Log("B");
                 var ____filterTogGroup = typeof(ItemSortAndFilter).GetField("_filterTogGroup", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                Debug.Log("C");
                 var ____equipFilterTogGroup = typeof(ItemSortAndFilter).GetField("_equipFilterTogGroup", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                Debug.Log("D");
                 var ____onItemListChanged = typeof(ItemSortAndFilter).GetField("_onItemListChanged", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                Debug.Log("E");
 
-                ItemSubtypeFilter.Patch.UpdateItemListPrefix(parentSortAndFilter, ____filterTogGroup as CToggleGroup,
+                Patch.UpdateItemListPrefix(parentSortAndFilter, ____filterTogGroup as CToggleGroup,
                     ____equipFilterTogGroup as CToggleGroup, ____itemList as List<ItemDisplayData>, ____onItemListChanged as Action);
             };
         }
         
-        Debug.Log("3");
 
         for (int i = 0; i < filterObj.childCount; i++)
         {
@@ -126,7 +114,7 @@ public class ThirdFilterHelper
             }
             else
             {
-                Debug.Log($"{toggle.gameObject.name} {toggle.Key} not active");
+                // Debug.Log($"{toggle.gameObject.name} {toggle.Key} not active");
                 toggle.gameObject.SetActive(false);
             }
         }
@@ -139,7 +127,6 @@ public class ThirdFilterHelper
             places.OriginalViewportSize = viewport.sizeDelta;
         }
         
-        Debug.Log("4");
 
         filterObj.transform.position = places.SecondFilterPos;
 
