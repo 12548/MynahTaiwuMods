@@ -267,6 +267,9 @@ public class Patch
             case ItemSortAndFilterType.ShopInventory:
                 if (!ModEntry.UseInShop) return true;
                 break;
+            case ItemSortAndFilterType.Event:
+                if (!ModEntry.UseInEvent) return true;
+                break;
 
             default:
                 return true;

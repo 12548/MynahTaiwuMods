@@ -20,6 +20,14 @@ public class ThirdFilterHelper
                     new Vector2(10, -214),
                     new Vector3(-3.4f, 2.79f, 240f))
             },
+            {
+                ItemSortAndFilterType.Event,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(-0.17f, -1.03f, 240f),
+                    new Vector2(-20f, -180f),
+                    new Vector3(-3.8f, -0.65f, 240f)
+                )
+            },
         };
 
     public static List<ThirdFilterInfo> ThirdFilters = new()

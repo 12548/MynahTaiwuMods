@@ -44,6 +44,14 @@ public static class SecondFilterHelper
                     new Vector2(10f, -158f),
                     new Vector3(-3.13f, 3.20f, 240.0f))
             },
+            {
+                ItemSortAndFilterType.Event,
+                new SecondFilterPlace(
+                    new Vector3(-0.17f, -0.63f, 240f),
+                    new Vector2(-20f, -125f),
+                    new Vector3(-3.8f, -0.22f, 240f)
+                    )
+            },
         };
 
     public class SecondFilterPlace
@@ -158,6 +166,8 @@ public static class SecondFilterHelper
                 return ItemSortAndFilterType.Shop;
             case "SelfItems":
                 return ItemSortAndFilterType.ShopInventory;
+            case "OperateArea":
+                return ItemSortAndFilterType.Event;
             default:
                 return null;
         }

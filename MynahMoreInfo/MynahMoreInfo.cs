@@ -449,7 +449,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             effectText.text = effectStr;
         }
 
-
         private static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
             bool active, bool activeDirection)
         {

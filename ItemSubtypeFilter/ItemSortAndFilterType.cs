@@ -7,4 +7,5 @@ public enum ItemSortAndFilterType
     WarehouseInventory,
     Shop,
     ShopInventory,
+    Event,
 }
