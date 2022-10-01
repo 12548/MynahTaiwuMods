@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using LuaTableSerializer;
 using MynahBaseModBase;
+using MynahModConfigGenerator.EventViewerTest;
 using Neo.IronLua;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,7 +16,7 @@ namespace MynahModConfigGenerator
     {
         static Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 
-        static void LoadAssemblyReferences(Assembly selectedAssembly)
+        public static void LoadAssemblyReferences(Assembly selectedAssembly)
         {
             foreach (AssemblyName reference in selectedAssembly.GetReferencedAssemblies())
             {
@@ -35,9 +36,14 @@ namespace MynahModConfigGenerator
                     {
                         var taiwuDllPath = Path.Join(taiwuPath, "The Scroll of Taiwu_Data", "Managed",
                             reference.Name + ".dll");
+                        var taiwuDllPath2 = Path.Join(taiwuPath, "The Scroll of Taiwu_Data", "Managed",
+                            reference.Name + ".dll");
                         if (File.Exists(taiwuDllPath))
                         {
                             System.Reflection.Assembly.LoadFrom(taiwuDllPath);
+                        } else if (File.Exists(taiwuDllPath2))
+                        {
+                            System.Reflection.Assembly.LoadFrom(taiwuDllPath2);
                         }
                     }
                     
@@ -74,10 +80,7 @@ namespace MynahModConfigGenerator
             }
             else
             {
-                var l = "return {};";
-                Console.WriteLine("Before: " + l);
-                l = ChangeLua(l, new[] { Assembly.GetExecutingAssembly() });
-                Console.WriteLine("After: " + l);
+                EventDumper.Dump();
             }
         }
 
