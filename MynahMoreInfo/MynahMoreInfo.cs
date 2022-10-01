@@ -39,10 +39,10 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("学习进度", description: "开启正逆练显示时生效，显示功法、功法书籍的读书、修炼进度，目前显示位置不太好，不喜欢可以关闭")]
     public static readonly bool ShowLearningProgress = true;
-    
+
     [ModSetting("对话人物浮窗", description: "为事件界面（人物对话互动等）的左右两个人物增加鼠标浮窗")]
     public static readonly bool ShowEventUICharacterMouseTip = true;
-    
+
     [ModSetting("村民人物浮窗", description: "为居民信息块（工作派遣等）增加鼠标浮窗（头像边上的空白处）")]
     public static readonly bool ShowResidentCharacterMouseTip = true;
 
@@ -62,10 +62,10 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
         var postfix = typeof(Patch).GetMethod("Postfix");
         this.HarmonyInstance.Patch(original, postfix: new HarmonyMethod(postfix));
 
-        var original2 = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
-            it => it.Name.Contains("UpdateOnlyTemplateData"));
-        var postfix2 = typeof(Patch).GetMethod("PostFixUpdateOnlyTemplateData");
-        this.HarmonyInstance.Patch(original2, postfix: new HarmonyMethod(postfix2));
+        // var original2 = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
+        //     it => it.Name.Contains("UpdateOnlyTemplateData"));
+        // var postfix2 = typeof(Patch).GetMethod("PostFixUpdateOnlyTemplateData");
+        // this.HarmonyInstance.Patch(original2, postfix: new HarmonyMethod(postfix2));
 
         var o3 = AccessTools.FirstMethod(typeof(UI_CombatSkillTree), it => it.Name.Contains("RefreshSkillItem"));
         var prefix3 = typeof(Patch).GetMethod("PreFixRefreshSkillItem");
@@ -86,7 +86,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
         [HarmonyPatch(typeof(UI_EventWindow), "UpdateMainCharacter")]
         static void UpdateMainCharacterPostfix(UI_EventWindow __instance)
         {
-            if(!ShowEventUICharacterMouseTip) return;
+            if (!ShowEventUICharacterMouseTip) return;
             var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
             CharacterDisplayData mainCharacter = data.MainCharacter;
             Refers refers = __instance.CGet<Refers>("MainCharacter");
@@ -108,17 +108,17 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
             }
         }
-        
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(UI_EventWindow), "UpdateTargetCharacter")]
         static void UpdateTargetCharacterPostfix(UI_EventWindow __instance)
         {
-            if(!ShowEventUICharacterMouseTip) return;
+            if (!ShowEventUICharacterMouseTip) return;
             var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
             CharacterDisplayData mainCharacter = data.TargetCharacter;
             Refers refers = __instance.CGet<Refers>("TargetCharacter");
             var transform = refers.transform.Find("CanvasChanger/AvatarArea/ShowTargetCharacterMenu");
-            if(transform == null) return;
+            if (transform == null) return;
             var mouseTipObj = transform.gameObject;
 
             if (mainCharacter == null || !HasCharacter(__instance))
@@ -135,14 +135,14 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
             }
         }
-        
+
         [HarmonyReversePatch]
         [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
         static bool HasCharacter(UI_EventWindow instance)
         {
             throw new Exception("stub!");
         }
-        
+
         /// <summary>
         /// 纯为了避免出错，设置一个直接跳过的条件
         /// </summary>
@@ -180,12 +180,11 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
             var cbutton = charRefers.CGet<CButton>("Button");
             var obj = cbutton.gameObject;
-            
+
             var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(obj);
 
             if (trigger)
             {
-                
                 var charDisplayData = ____charDataDict[
                     ((key == 0) ? ____normalCharList : ____infectedList)[
                         index]];
@@ -256,8 +255,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     public static class Patch
     {
-        static GameObject _attackDistributionObj;
-
         public static void PostFixMouseTipBookInit(MouseTipBook __instance, bool ____isCombatSkill,
             ArgumentBox argsBox)
         {
@@ -334,7 +331,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 "GetCombatSkillDisplayData"
             );
 
-            __instance.AsynchMethodCall(domainId, methodId, SingletonObject.getInstance<BasicGameData>().TaiwuCharId, list,
+            __instance.AsynchMethodCall(domainId, methodId, SingletonObject.getInstance<BasicGameData>().TaiwuCharId,
+                list,
                 (offset, dataPool) =>
                 {
                     var combatSkillItem = CombatSkill.Instance[skillBookItem.CombatSkillTemplateId];
@@ -442,48 +440,39 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             }
         }
 
+        private static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
+        {
+            // effectStr = "     " + effectStr;
+            float x = effectText.rectTransform.sizeDelta.x;
+            Vector2 preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
+            effectText.rectTransform.sizeDelta = preferredValues.SetX(x);
+            effectText.text = effectStr;
+        }
+
+
         private static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
             bool active, bool activeDirection)
         {
             specialEffectObj.transform.Find("DirectEffectTitle").gameObject.SetActive(true); // flag4
-            specialEffectObj.transform.Find("DirectDesc").gameObject.SetActive(true);
+            var directDesc = specialEffectObj.transform.Find("DirectDesc");
+            directDesc.gameObject.SetActive(true);
             specialEffectObj.transform.Find("ReverseEffectTitle").gameObject.SetActive(true); // !flag4
-            specialEffectObj.transform.Find("ReverseDesc").gameObject.SetActive(true);
-
-            // specialEffectObj.CGet<GameObject>("DirectEffectTitle").SetActive(true); // flag4
-            // specialEffectObj.CGet<GameObject>("DirectDesc").SetActive(true);
-            // specialEffectObj.CGet<GameObject>("ReverseEffectTitle").SetActive(true); // !flag4
-            // specialEffectObj.CGet<GameObject>("ReverseDesc").SetActive(true);
+            var reverseDesc = specialEffectObj.transform.Find("ReverseDesc");
+            reverseDesc.gameObject.SetActive(true);
 
             var template1 = active && activeDirection ? "     当前：{0}" : "     如果正练：{0}".SetColor("lightgrey");
             var template2 = active && !activeDirection ? "     当前：{0}" : "     如果逆练：{0}".SetColor("lightgrey");
 
-            // var prefix1 = active && activeDirection ? "当前：" : "如果正练：";
-            // var prefix2 = active && !activeDirection ? "当前：" : "如果逆练：";
-
-            specialEffectObj.transform.Find("DirectDesc/DirectEffectDesc")
-                .GetComponent<TextMeshProUGUI>().text = string.Format(template1,
+            UpdateSpecialEffectText(specialEffectObj.transform.Find("DirectDesc/DirectEffectDesc")
+                .GetComponent<TextMeshProUGUI>(), string.Format(template1,
                 SpecialEffect
                     .Instance[combatSkillItem.DirectEffectID]
-                    .Desc[0]);
-            specialEffectObj.transform.Find("ReverseDesc/ReverseEffectDesc")
-                .GetComponent<TextMeshProUGUI>().text = string.Format(template2,
+                    .Desc[0]));
+            UpdateSpecialEffectText(specialEffectObj.transform.Find("ReverseDesc/ReverseEffectDesc")
+                .GetComponent<TextMeshProUGUI>(), string.Format(template2,
                 SpecialEffect
                     .Instance[combatSkillItem.ReverseEffectID]
-                    .Desc[0]);
-
-            // uiBase.CGet<TextMeshProUGUI>("DirectEffectDesc").text = string.Format(template1,
-            //     SpecialEffect.Instance[combatSkillItem.DirectEffectID].Desc[0]);
-            // uiBase.CGet<TextMeshProUGUI>("ReverseEffectDesc").text = string.Format(template2,
-            //     SpecialEffect.Instance[combatSkillItem.DirectEffectID].Desc[0]);
-
-            // uiBase.CGet<TextMeshProUGUI>("DirectEffectDesc").text =
-            //     ("     " + prefix1 + SpecialEffect.Instance[combatSkillItem.DirectEffectID].Desc[0]);
-            // uiBase.CGet<TextMeshProUGUI>("ReverseEffectDesc").text = ("     " +
-            //                                                           prefix2 + SpecialEffect
-            //                                                               .Instance[
-            //                                                                   combatSkillItem.ReverseEffectID]
-            //                                                               .Desc[0]);
+                    .Desc[0]));
         }
 
         private static string GetCombatSkillReadingProgressString(CombatSkillDisplayData combatSkillDisplayData)
@@ -491,7 +480,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
             var s1 = "承合解异独";
             var s2 = "修思源参藏";
             var s3 = "用奇巧化绝";
-            
+
             var p1 = new List<sbyte>(new sbyte[] { 0, 1, 2, 3, 4 }).Select(page =>
                 CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
                     CombatSkillStateHelper.GetOutlinePageInternalIndex(page))).ToArray();
@@ -509,6 +498,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
                 ts2 += p2[i] ? $"<color=#00ffffff>{s2[i]}</color>" : $"<color=#004747ff>{s2[i]}</color>";
                 ts3 += p3[i] ? $"<color=#ffa500ff>{s3[i]}</color>" : $"<color=#5C3C00ff>{s3[i]}</color>";
             }
+
             // var s = $"{p1}-<color=#00ffffff>{p2}</color>-<color=orange>{p3}</color>";
             return $"{ts1} {ts2} {ts3}";
         }
