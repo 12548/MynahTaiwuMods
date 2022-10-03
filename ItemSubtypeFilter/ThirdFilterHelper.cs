@@ -4,13 +4,14 @@ using System.Reflection;
 using GameData.Domains.Item.Display;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace ItemSubtypeFilter;
 
 public class ThirdFilterHelper
 {
-    public static Dictionary<ItemSortAndFilterType, SecondFilterHelper.SecondFilterPlace> ThirdFilterPlaces =
+    private static readonly Dictionary<ItemSortAndFilterType, SecondFilterHelper.SecondFilterPlace> ThirdFilterPlaces =
         new()
         {
             {
@@ -34,6 +35,63 @@ public class ThirdFilterHelper
                     new Vector3(3.61f, -1.6f, 240f),
                     new Vector2(988f, 190f),
                     new Vector3(0.24f, -1.2f, 240f)
+                )
+            },
+
+            {
+                ItemSortAndFilterType.ExchangeBookLeft,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(-3.97f, 1.6f, 240f),
+                    new Vector2(848f, 350f),
+                    new Vector3(-5.5f, 2.2f, 240f),
+                    doubleLine: true
+                )
+            },
+            {
+                ItemSortAndFilterType.ExchangeBookRight,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(3.93f, 1.6f, 240f),
+                    new Vector2(848f, 350f),
+                    new Vector3(2.38f, 2.2f, 240f),
+                    doubleLine: true
+                )
+            },
+
+            {
+                ItemSortAndFilterType.Shop,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(-1.5f, 2f, 240f),
+                    new Vector2(848f, -105f),
+                    new Vector3(-2.62f, 2.6f, 240f),
+                    doubleLine: true
+                )
+            },
+            {
+                ItemSortAndFilterType.ShopInventory,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(5.1f, 2f, 240f),
+                    new Vector2(848f, -105f),
+                    new Vector3(-3.77f, 2.6f, 240f),
+                    doubleLine: true
+                )
+            },
+
+            {
+                ItemSortAndFilterType.Warehouse,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(-4.02f, 1.62f, 240f),
+                    new Vector2(0, -130),
+                    new Vector3(-5.5f, 2.45f, 240f),
+                    doubleLine: true
+                )
+            },
+            {
+                ItemSortAndFilterType.WarehouseInventory,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(4.13f, 1.62f, 240f),
+                    new Vector2(0, -130),
+                    new Vector3(2.68f, 2.45f, 240f),
+                    doubleLine: true
                 )
             },
         };
@@ -89,6 +147,18 @@ public class ThirdFilterHelper
             filterObj.transform.name = "ThirdFilter";
             filterObj.position = places.SecondFilterPos;
 
+            if (places.DoubleLine)
+            {
+                var hlg = filterObj.GetComponent<HorizontalLayoutGroup>();
+                var spacing = hlg.spacing;
+                Object.DestroyImmediate(hlg);
+                var glg = filterObj.gameObject.AddComponent<GridLayoutGroup>();
+                glg.cellSize = new Vector2(50f, 50f);
+                glg.spacing = new Vector2(spacing, spacing);
+                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                glg.constraintCount = 9;
+            }
+
             var toggleGroup = filterObj.GetComponent<CToggleGroup>();
             // var originalToggles = filterObj.GetComponentsInChildren<CToggle>();
 
@@ -105,20 +175,32 @@ public class ThirdFilterHelper
                 obj.name = thirdFilterInfo.c;
                 obj.gameObject.SetActive(false);
             }
+
             toggleGroup.InitPreOnToggle();
-            
+
             toggleGroup.OnActiveToggleChange = (_, _) =>
             {
-                var ____itemList = typeof(ItemSortAndFilter).GetField("_itemList", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                var ____filterTogGroup = typeof(ItemSortAndFilter).GetField("_filterTogGroup", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                var ____equipFilterTogGroup = typeof(ItemSortAndFilter).GetField("_equipFilterTogGroup", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
-                var ____onItemListChanged = typeof(ItemSortAndFilter).GetField("_onItemListChanged", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(parentSortAndFilter);
+                var ____itemList = typeof(ItemSortAndFilter)
+                    .GetField("_itemList", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
+                    ?.GetValue(parentSortAndFilter);
+                var ____filterTogGroup = typeof(ItemSortAndFilter)
+                    .GetField("_filterTogGroup", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
+                    ?.GetValue(parentSortAndFilter);
+                var ____equipFilterTogGroup = typeof(ItemSortAndFilter)
+                    .GetField("_equipFilterTogGroup",
+                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
+                    ?.GetValue(parentSortAndFilter);
+                var ____onItemListChanged = typeof(ItemSortAndFilter)
+                    .GetField("_onItemListChanged",
+                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
+                    ?.GetValue(parentSortAndFilter);
 
                 Patch.UpdateItemListPrefix(parentSortAndFilter, ____filterTogGroup as CToggleGroup,
-                    ____equipFilterTogGroup as CToggleGroup, ____itemList as List<ItemDisplayData>, ____onItemListChanged as Action);
+                    ____equipFilterTogGroup as CToggleGroup, ____itemList as List<ItemDisplayData>,
+                    ____onItemListChanged as Action);
             };
         }
-        
+
 
         for (int i = 0; i < filterObj.childCount; i++)
         {
@@ -142,7 +224,7 @@ public class ThirdFilterHelper
             places.OriginalViewportPos = viewport.position;
             places.OriginalViewportSize = viewport.sizeDelta;
         }
-        
+
 
         filterObj.transform.position = places.SecondFilterPos;
 
@@ -154,14 +236,13 @@ public class ThirdFilterHelper
 
     public static void TurnOffThirdFilter(ItemSortAndFilterType? uiType, ItemSortAndFilter parentSortAndFilter)
     {
-
-        if(uiType == null) return;
+        if (uiType == null) return;
         var parentTrans = parentSortAndFilter.transform;
         var viewport = parentTrans.parent.GetComponent<CScrollRect>().Viewport;
         var filterObj = parentTrans.Find("ThirdFilter");
         if (filterObj == null) return;
-        if(!filterObj.gameObject.activeSelf) return; // 已经关了的不要再关一遍
-        
+        if (!filterObj.gameObject.activeSelf) return; // 已经关了的不要再关一遍
+
         filterObj.gameObject.SetActive(false);
         ThirdFilterPlaces.TryGetValue((ItemSortAndFilterType)uiType, out var places);
         if (places?.OriginalViewportPos == null || places.OriginalViewportSize == null) return;
