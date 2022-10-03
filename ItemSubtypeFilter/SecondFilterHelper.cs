@@ -60,6 +60,22 @@ public static class SecondFilterHelper
                     new Vector3(0.24f, -0.78f, 240f)
                     )
             },
+            {
+                ItemSortAndFilterType.ExchangeBookRight,
+                new SecondFilterPlace(
+                    new Vector3(3.93f, 1.92f, 240f),
+                    new Vector2(848f, 400f),
+                    new Vector3(0.9f, 2.37f, 240f)
+                    )
+            },
+            {
+                ItemSortAndFilterType.ExchangeBookLeft,
+                new SecondFilterPlace(
+                    new Vector3(-3.97f, 1.92f, 240f),
+                    new Vector2(848f, 400f),
+                    new Vector3(-6.96f, 2.37f, 240f)
+                    )
+            },
         };
 
     public class SecondFilterPlace
@@ -183,6 +199,10 @@ public static class SecondFilterHelper
                 return ItemSortAndFilterType.ShopInventory;
             case "OperateArea":
                 return ItemSortAndFilterType.Event;
+            case "TaiwuBooks":
+                return ItemSortAndFilterType.ExchangeBookRight;
+            case "NpcBooks":
+                return ItemSortAndFilterType.ExchangeBookLeft;
             default:
                 return null;
         }

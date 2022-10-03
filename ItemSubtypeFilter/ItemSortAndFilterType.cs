@@ -9,4 +9,6 @@ public enum ItemSortAndFilterType
     ShopInventory,
     Event,
     TeaHorse,
+    ExchangeBookLeft,
+    ExchangeBookRight,
 }
