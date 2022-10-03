@@ -12,6 +12,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting(displayName: "用于商店")] public static readonly bool UseInShop = true;
     
+    [ModSetting(displayName: "用于交换藏书")] public static readonly bool UseInBookEx = true;
+    
     [ModSetting(displayName: "用于茶马帮")] public static readonly bool UseInTeaHorse = true;
     
     [ModSetting(displayName: "用于事件", description: "事件界面选择物品，如偷窃等")] public static readonly bool UseInEvent = true;

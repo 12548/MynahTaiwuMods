@@ -273,6 +273,10 @@ public class Patch
             case ItemSortAndFilterType.TeaHorse:
                 if (!ModEntry.UseInTeaHorse) return true;
                 break;
+            case ItemSortAndFilterType.ExchangeBookLeft:
+            case ItemSortAndFilterType.ExchangeBookRight:
+                if (!ModEntry.UseInBookEx) return true;
+                break;
 
             default:
                 return true;
