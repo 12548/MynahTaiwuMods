@@ -28,6 +28,14 @@ public class ThirdFilterHelper
                     new Vector3(-3.8f, -0.65f, 240f)
                 )
             },
+            {
+                ItemSortAndFilterType.TeaHorse,
+                new SecondFilterHelper.SecondFilterPlace(
+                    new Vector3(3.61f, -1.6f, 240f),
+                    new Vector2(988f, 190f),
+                    new Vector3(0.24f, -1.2f, 240f)
+                )
+            },
         };
 
     public static List<ThirdFilterInfo> ThirdFilters = new()
@@ -164,15 +172,15 @@ public class ThirdFilterHelper
     public class ThirdFilterInfo
     {
         public ThirdFilterType ThirdFilterType;
-        public sbyte combatSkillTypeOrLifeSkillType;
+        public sbyte combatOrLifeSkillTypeOrSubtype;
         public string c;
         public int togKey;
 
-        public ThirdFilterInfo(ThirdFilterType thirdFilterType, sbyte combatSkillTypeOrLifeSkillType, string c,
+        public ThirdFilterInfo(ThirdFilterType thirdFilterType, sbyte combatOrLifeSkillTypeOrSubtype, string c,
             int togKey)
         {
             ThirdFilterType = thirdFilterType;
-            this.combatSkillTypeOrLifeSkillType = combatSkillTypeOrLifeSkillType;
+            this.combatOrLifeSkillTypeOrSubtype = combatOrLifeSkillTypeOrSubtype;
             this.c = c;
             this.togKey = togKey;
         }

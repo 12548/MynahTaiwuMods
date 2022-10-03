@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace ItemSubtypeFilter;
 
 public static class SecondFilterHelper
 {
-    public static Dictionary<ItemSortAndFilterType, SecondFilterPlace> SecondFilterPlaces =
+    public static readonly Dictionary<ItemSortAndFilterType, SecondFilterPlace> SecondFilterPlaces =
         new()
         {
             {
@@ -52,6 +51,15 @@ public static class SecondFilterHelper
                     new Vector3(-3.8f, -0.22f, 240f)
                     )
             },
+            
+            {
+                ItemSortAndFilterType.TeaHorse,
+                new SecondFilterPlace(
+                    new Vector3(3.61f, -1.19f, 240f),
+                    new Vector2(988f, 250f),
+                    new Vector3(0.24f, -0.78f, 240f)
+                    )
+            },
         };
 
     public class SecondFilterPlace
@@ -61,17 +69,17 @@ public static class SecondFilterHelper
         public Vector3 SecondFilterPos;
         public Vector3? OriginalViewportPos;
         public Vector2? OriginalViewportSize;
-
-        public bool Init = false;
+        public bool DoubleLine;
 
         public SecondFilterPlace(Vector3 newViewportPos, Vector2 newViewportSize, Vector3 secondFilterPos,
-            Vector3? originalViewportPos = null, Vector2? originalViewportSize = null)
+            Vector3? originalViewportPos = null, Vector2? originalViewportSize = null, bool doubleLine = false)
         {
             NewViewportPos = newViewportPos;
             NewViewportSize = newViewportSize;
             SecondFilterPos = secondFilterPos;
             OriginalViewportPos = originalViewportPos;
             OriginalViewportSize = originalViewportSize;
+            DoubleLine = doubleLine;
         }
     }
 
@@ -154,6 +162,13 @@ public static class SecondFilterHelper
         if (parentTransform.parent.parent.parent.name == "UI_CharacterMenuItems")
         {
             return ItemSortAndFilterType.CharacterMenuItems;
+        }
+        
+        // 茶马帮
+        // UI_TeaHorseCaravan/MainWindow/SelfPanelHolder/WarehouseItemsHolder/Warehouse/WarehouseItemScroll/ItemSortAndFilter
+        if (parentTransform.parent.parent.parent.name == "SelfPanelHolder")
+        {
+            return ItemSortAndFilterType.TeaHorse;
         }
 
         switch (parentTransform.parent.name)

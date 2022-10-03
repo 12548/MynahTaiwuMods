@@ -59,16 +59,16 @@ public class Patch
                         var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
                         var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
                         Debug.Log(
-                            $"Combat skill: {skillBookItem.CombatSkillType} vs {thirdFilterInfo.combatSkillTypeOrLifeSkillType}");
+                            $"Combat skill: {skillBookItem.CombatSkillType} vs {thirdFilterInfo.combatOrLifeSkillTypeOrSubtype}");
                         return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
-                                skillBookItem.CombatSkillType == thirdFilterInfo.combatSkillTypeOrLifeSkillType);
+                                skillBookItem.CombatSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSubtype);
                     }
                     else if (itemSubType == 1000)
                     {
                         var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
                         var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
                         return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.LifeSkillBook &&
-                                skillBookItem.LifeSkillType == thirdFilterInfo.combatSkillTypeOrLifeSkillType);
+                                skillBookItem.LifeSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSubtype);
                     }
                     else return false;
                 }));
@@ -270,6 +270,9 @@ public class Patch
             case ItemSortAndFilterType.Event:
                 if (!ModEntry.UseInEvent) return true;
                 break;
+            case ItemSortAndFilterType.TeaHorse:
+                if (!ModEntry.UseInTeaHorse) return true;
+                break;
 
             default:
                 return true;
@@ -291,7 +294,6 @@ public class Patch
             if (equipTypeFilter.transform.Find("Subtype701") == null)
             {
                 // 未初始化，第一次初始化
-                places.Init = true;
                 var template = equipTypeFilter.transform.Find("All").gameObject;
 
                 foreach (var keyValuePair in SecondFilterHelper.ItemFilterTypeToSubTypeString)
