@@ -71,7 +71,7 @@ public class ThirdFilterHelper
                 new SecondFilterHelper.SecondFilterPlace(
                     new Vector3(5.1f, 2f, 240f),
                     new Vector2(848f, -105f),
-                    new Vector3(-3.77f, 2.6f, 240f),
+                    new Vector3(3.7f, 2.63f, 240f),
                     doubleLine: true
                 )
             },
