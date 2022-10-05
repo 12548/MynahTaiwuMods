@@ -113,6 +113,24 @@ public class ThirdFilterHelper
         new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 12, "御", 112),
         new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 13, "乐", 113),
 
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 0, "无", 301),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 1, "少", 302),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 2, "峨", 303),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 3, "百", 304),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 4, "武", 305),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 5, "元", 306),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 6, "狮", 307),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 7, "然", 308),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 8, "璇", 309),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 9, "铸", 310),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 10, "空", 311),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 11, "金", 312),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 12, "五", 313),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 13, "界", 314),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 14, "伏", 315),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 15, "血", 316),
+        new ThirdFilterInfo(ThirdFilterType.CombatSkillBook, 16, "它", 317),
+
         new ThirdFilterInfo(ThirdFilterType.LifeSkillBook, 0, "音", 200),
         new ThirdFilterInfo(ThirdFilterType.LifeSkillBook, 1, "棋", 201),
         new ThirdFilterInfo(ThirdFilterType.LifeSkillBook, 2, "书", 202),
@@ -201,11 +219,12 @@ public class ThirdFilterHelper
             };
         }
 
-
         for (int i = 0; i < filterObj.childCount; i++)
         {
             var toggle = filterObj.GetChild(i).GetComponent<CToggle>();
-            if (toggle.Key == 0 || (filterType == ThirdFilterType.CombatSkillBook && toggle.Key is > 99 and < 200) ||
+            if (toggle.Key == 0 || (filterType == ThirdFilterType.CombatSkillBook &&
+                                    ((ModEntry.CombatSkillFilterType == 0 && toggle.Key is > 99 and < 200) ||
+                                     (ModEntry.CombatSkillFilterType == 1 && toggle.Key is > 299 and < 400))) ||
                 (filterType == ThirdFilterType.LifeSkillBook && toggle.Key is > 199 and < 300))
             {
                 toggle.gameObject.SetActive(true);
@@ -224,7 +243,6 @@ public class ThirdFilterHelper
             places.OriginalViewportPos = viewport.position;
             places.OriginalViewportSize = viewport.sizeDelta;
         }
-
 
         filterObj.transform.position = places.SecondFilterPos;
 
@@ -252,16 +270,16 @@ public class ThirdFilterHelper
 
     public class ThirdFilterInfo
     {
-        public ThirdFilterType ThirdFilterType;
-        public sbyte combatOrLifeSkillTypeOrSubtype;
-        public string c;
-        public int togKey;
+        public readonly ThirdFilterType ThirdFilterType;
+        public readonly sbyte combatOrLifeSkillTypeOrSectId;
+        public readonly string c;
+        public readonly int togKey;
 
-        public ThirdFilterInfo(ThirdFilterType thirdFilterType, sbyte combatOrLifeSkillTypeOrSubtype, string c,
+        public ThirdFilterInfo(ThirdFilterType thirdFilterType, sbyte combatOrLifeSkillTypeOrSectId, string c,
             int togKey)
         {
             ThirdFilterType = thirdFilterType;
-            this.combatOrLifeSkillTypeOrSubtype = combatOrLifeSkillTypeOrSubtype;
+            this.combatOrLifeSkillTypeOrSectId = combatOrLifeSkillTypeOrSectId;
             this.c = c;
             this.togKey = togKey;
         }

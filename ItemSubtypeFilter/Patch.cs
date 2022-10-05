@@ -57,18 +57,28 @@ public class Patch
                     if (itemSubType == 1001)
                     {
                         var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
+
                         var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
                         Debug.Log(
-                            $"Combat skill: {skillBookItem.CombatSkillType} vs {thirdFilterInfo.combatOrLifeSkillTypeOrSubtype}");
-                        return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
-                                skillBookItem.CombatSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSubtype);
+                            $"Combat skill: {skillBookItem.CombatSkillType} vs {thirdFilterInfo.combatOrLifeSkillTypeOrSectId}");
+                        if (ModEntry.CombatSkillFilterType == 0)
+                        {
+                            return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
+                                    skillBookItem.CombatSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
+                        }
+                        else
+                        {
+                            var sectId = CombatSkill.Instance[skillBookItem.CombatSkillTemplateId].SectId;
+                            return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
+                                    sectId == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
+                        }
                     }
                     else if (itemSubType == 1000)
                     {
                         var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
                         var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
                         return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.LifeSkillBook &&
-                                skillBookItem.LifeSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSubtype);
+                                skillBookItem.LifeSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
                     }
                     else return false;
                 }));
@@ -165,10 +175,10 @@ public class Patch
     {
         if (____filterTogInitializing) return;
         var currentTogKey = togNew.Key;
-        
+
         ThirdFilterHelper.TurnOffThirdFilter(SecondFilterHelper.GetItemSortAndFilterType(__instance),
             __instance);
-        
+
         if (TryInitSubtypeFilter(__instance, currentTogKey)) return;
 
         if (____equipFilterTogGroup.isActiveAndEnabled)
@@ -281,7 +291,7 @@ public class Patch
             default:
                 return true;
         }
-        
+
         var places = SecondFilterHelper.SecondFilterPlaces[(ItemSortAndFilterType)sortAndFilterType];
         if (places == null) return true;
 
