@@ -62,11 +62,13 @@ public class UI_EventWindowPatch
             }
         }
 
-        [HarmonyReversePatch]
-        [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
+        // [HarmonyReversePatch]
+        // [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
         static bool HasCharacter(UI_EventWindow instance)
         {
-            throw new Exception("stub!");
+            return (bool)AccessTools.Method(typeof(UI_EventWindow), "HasCharacter")
+                .Invoke(instance, new object[] { });
+            // throw new Exception("stub!");
         }
 
 }

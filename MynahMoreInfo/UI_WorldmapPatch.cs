@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Config;
 using FrameWork;
@@ -27,6 +28,14 @@ public class UI_WorldmapPatch
         if (!ModEntry.MapBlockMouseTip) return;
         __instance.MapClickReceiver.OnMapBlockPointEnter += (x, y) =>
         {
+            if (!ModEntry.MapBlockMouseTip) return;
+            var currMouseObj = (GameObject)typeof(MouseTipManager).GetField("_currMouseOverObj", (BindingFlags)(-1))!
+                .GetValue(SingletonObject.getInstance<MouseTipManager>());
+            if (currMouseObj != __instance.gameObject && !currMouseObj.transform.IsChildOf(__instance.transform))
+            {
+                return;
+            }
+
             MapBlockData blockData = FindBlockByLogicalPosition(x, y);
             MouseTipDisplayer mouseTips = __instance.MapClickReceiver.TipDisplayer;
             if (blockData == null || blockData.AreaId != ____mapModel.CurrentAreaId || !blockData.Visible)
@@ -41,8 +50,8 @@ public class UI_WorldmapPatch
 
             if (!blockData.IsCityTown())
             {
-                var names = new string[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
-                var colors = new string[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
+                var names = new[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
+                var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
                 for (int i = 0; i < 6; i++)
                 {
                     var curr = blockData.CurrResources.Get(i);
@@ -53,7 +62,7 @@ public class UI_WorldmapPatch
             }
 
             stringBuilder.AppendLine();
-            
+
             stringBuilder.AppendLine(string.Format("世界坐标(AreaId, BlockId): ({0},{1})", blockData.AreaId,
                 blockData.BlockId));
             stringBuilder.AppendLine(string.Format("区域坐标(x, y): ({0},{1})", x, y));

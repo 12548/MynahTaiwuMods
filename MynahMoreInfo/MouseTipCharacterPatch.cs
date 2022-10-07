@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
+using Config;
 using FrameWork;
+using GameData.Domains;
+using GameData.Domains.Character;
 using GameData.Domains.Character.Display;
 using GameData.Serializer;
 using GameData.Utilities;
 using HarmonyLib;
 using TMPro;
+using UnityEngine;
 
 namespace MynahMoreInfo;
 
@@ -85,7 +89,7 @@ public partial class ModEntry
             int ____charId,
             CharacterDisplayData ____displayData)
         {
-            if (!ModEntry.CharacterMouseTipShowRealName) return;
+            if (!CharacterMouseTipShowRealName) return;
             if (____charId < 0 || ____displayData == null)
                 return;
             bool isTaiwu = ____charId == SingletonObject.getInstance<BasicGameData>().TaiwuCharId;
@@ -98,6 +102,44 @@ public partial class ModEntry
             else
                 __instance.CGet<TextMeshProUGUI>("Title").text =
                     $"{(object)nameByDisplayData1}({(object)____charId})".SetColor(color);
+            //
+            // __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
+            //     CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList, new List<int>() { ____charId },
+            //     (offset, dataPool) =>
+            //     {
+            //         var item = EasyPool.Get<List<GroupCharDisplayData>>();
+            //         Serializer.Deserialize(dataPool, offset, ref item);
+            //         var groupCharDisplayData = item[0];
+            //         EasyPool.Free(item);
+            //
+            //         var highCombatSkills = new List<int>();
+            //         for (int i = 0; i < CombatSkillType.Instance.Count; i++)
+            //         {
+            //             highCombatSkills.Add(i);
+            //         }
+            //
+            //         highCombatSkills.Sort((a, b) =>
+            //             _getCSQValue(groupCharDisplayData, b) - _getCSQValue(groupCharDisplayData, a));
+            //
+            //         var cal = __instance.transform.Find("CharAttributeList");
+            //         var gameObject = new GameObject();
+            //         var tmp = gameObject.AddComponent<TextMeshProUGUI>();
+            //         tmp.text = "最高功法资质：" + CombatSkillType.Instance[highCombatSkills[0]].Name +
+            //                    _getCSQValue(groupCharDisplayData, highCombatSkills[0]);
+            //
+            //         GameObject.Instantiate(gameObject, cal, false);
+            //         // groupCharDisplayData.CombatSkillQualifications
+            //     });
+        }
+
+        private static unsafe int _getCSQValue(GroupCharDisplayData dd, int index)
+        {
+            return dd.CombatSkillQualifications.Items[index];
+        }
+
+        private static unsafe int _getLSQValue(GroupCharDisplayData dd, int index)
+        {
+            return dd.LifeSkillQualifications.Items[index];
         }
     }
 }
