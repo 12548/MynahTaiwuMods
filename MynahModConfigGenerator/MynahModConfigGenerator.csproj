@@ -5,6 +5,14 @@
         <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\MynahBaseModBase\MynahBaseModBase.csproj" />
     </ItemGroup>
@@ -16,7 +24,7 @@
 
     <ItemGroup>
       <Reference Include="GameData">
-        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\Backend\GameData.dll</HintPath>
+        <HintPath>$(TAIWU_PATH)\Backend\GameData.dll</HintPath>
       </Reference>
       <Reference Include="TaiwuModdingLib">
         <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>

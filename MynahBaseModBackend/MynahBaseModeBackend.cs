@@ -10,15 +10,8 @@ using TaiwuModdingLib.Core.Utils;
 namespace MynahBaseModBackend;
 
 [PluginConfig("MynahBaseModBackend", "myna12548", "0")]
-public class DummyModEntry: TaiwuRemakePlugin
+public class DummyModEntry : TaiwuRemakeHarmonyPlugin
 {
-    public override void Initialize()
-    {
-    }
-
-    public override void Dispose()
-    {
-    }
 }
 
 public class MynahBaseModBackend
@@ -27,12 +20,12 @@ public class MynahBaseModBackend
     {
         return DomainHelper.DomainName2DomainId[name];
     }
-    
+
     public static ushort GetMethodIdByName(Type domain, string name)
     {
-        return (ushort) domain.GetField(name)!.GetValue(null)!;
+        return (ushort)domain.GetField(name)!.GetValue(null)!;
     }
-    
+
     public static void OnModSettingUpdate(TaiwuRemakePlugin plugin)
     {
         var type = plugin.GetType();
