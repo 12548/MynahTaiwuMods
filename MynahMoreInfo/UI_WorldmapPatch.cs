@@ -36,23 +36,23 @@ public class UI_WorldmapPatch
                 return;
             }
 
-            MapBlockData blockData = FindBlockByLogicalPosition(x, y);
-            MouseTipDisplayer mouseTips = __instance.MapClickReceiver.TipDisplayer;
+            var blockData = FindBlockByLogicalPosition(x, y);
+            var mouseTips = __instance.MapClickReceiver.TipDisplayer;
             if (blockData == null || blockData.AreaId != ____mapModel.CurrentAreaId || !blockData.Visible)
                 return;
-            MapBlockItem mapBlockItem = MapBlock.Instance[blockData.TemplateId];
+            var mapBlockItem = MapBlock.Instance[blockData.TemplateId];
             mouseTips.enabled = true;
-            ArgumentBox argBox = new ArgumentBox();
+            var argBox = new ArgumentBox();
             argBox.Clear();
             argBox.Set("arg0", mapBlockItem.Name);
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(mapBlockItem.Desc);
 
             if (!blockData.IsCityTown())
             {
                 var names = new[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
                 var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
-                for (int i = 0; i < 6; i++)
+                for (var i = 0; i < 6; i++)
                 {
                     var curr = blockData.CurrResources.Get(i);
                     var max = blockData.MaxResources.Get(i);
@@ -69,7 +69,7 @@ public class UI_WorldmapPatch
             if (blockData.CharacterSet != null || blockData.InfectedCharacterSet != null)
             {
                 stringBuilder.AppendLine("地块人物:");
-                List<int> blockCharList = new List<int>();
+                var blockCharList = new List<int>();
                 if (blockData.CharacterSet != null)
                     blockCharList.AddRange(blockData.CharacterSet);
                 if (blockData.InfectedCharacterSet != null)
@@ -77,21 +77,24 @@ public class UI_WorldmapPatch
                 __instance.AsynchMethodCall(4, 7, blockCharList, (offset, dataPool) =>
                 {
                     Serializer.Deserialize(dataPool, offset, ref _nameRelatedDataList);
-                    for (int index = 0; index < _nameRelatedDataList.Count; ++index)
+                    _nameRelatedDataList.Sort((a, b) => b.OrgGrade - a.OrgGrade);
+                    for (var index = 0; index < _nameRelatedDataList.Count; ++index)
                     {
-                        int num = blockCharList[index];
-                        NameRelatedData nameRelatedData = _nameRelatedDataList[index];
-                        string byNameRelatedData =
+                        var num = blockCharList[index];
+                        var nameRelatedData = _nameRelatedDataList[index];
+                        var byNameRelatedData =
                             NameCenter.GetCharMonasticTitleAndNameByNameRelatedData(ref nameRelatedData, false, false);
-                        (string surname, string givenName) name = NameCenter.GetName(ref nameRelatedData, false, true);
-                        string str = name.surname + name.givenName;
-                        Color gradeColor = Colors.Instance.GradeColors[nameRelatedData.OrgGrade];
+                        var name = NameCenter.GetName(ref nameRelatedData, false, true);
+                        var str = name.surname + name.givenName;
+                        var gradeColor = Colors.Instance.GradeColors[nameRelatedData.OrgGrade];
                         if (byNameRelatedData == str)
-                            stringBuilder.AppendLine(string.Format("\t{0}({1})", byNameRelatedData.SetColor(gradeColor),
+                            stringBuilder.Append(string.Format("\t{0}({1})", byNameRelatedData.SetColor(gradeColor),
                                 num));
                         else
-                            stringBuilder.AppendLine(string.Format("\t{0}/{1}({2})",
+                            stringBuilder.Append(string.Format("\t{0}/{1}({2})",
                                 byNameRelatedData.SetColor(gradeColor), str.SetColor(gradeColor), num));
+
+                        if (index % 2 == 1) stringBuilder.AppendLine();
                     }
 
                     _nameRelatedDataList.Clear();
@@ -116,13 +119,13 @@ public class UI_WorldmapPatch
         {
             if (____mapModel == null || ____mapBlockSet == null)
                 return null;
-            short showingAreaId = ____mapModel.ShowingAreaId;
-            foreach (Location mapBlock in ____mapBlockSet)
+            var showingAreaId = ____mapModel.ShowingAreaId;
+            foreach (var mapBlock in ____mapBlockSet)
             {
                 if (mapBlock.AreaId == showingAreaId)
                 {
-                    MapBlockData blockData = ____mapModel.GetBlockData(mapBlock);
-                    ByteCoordinate blockPos = blockData.GetBlockPos();
+                    var blockData = ____mapModel.GetBlockData(mapBlock);
+                    var blockPos = blockData.GetBlockPos();
                     if (x == blockPos.X && y == blockPos.Y)
                         return blockData;
                 }
