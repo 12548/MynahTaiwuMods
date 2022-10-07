@@ -12,6 +12,7 @@ using MynahBaseModBase;
 using TaiwuModdingLib.Core.Plugin;
 using TMPro;
 using UnityEngine;
+using CombatSkillType = Config.CombatSkillType;
 using Object = UnityEngine.Object;
 
 namespace MynahMoreInfo;
@@ -33,6 +34,9 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("打点显示", description: "显示催破功法的打点分布")]
     public static readonly bool ShowAttackDistribution = true;
+    
+    [ModSetting("显示书籍五行属性", description: "显示功法书对应功法的五行属性")]
+    public static readonly bool ShowBookFiveElements = true;
 
     [ModSetting("学习进度", description: "开启正逆练显示时生效，显示功法、功法书籍的读书、修炼进度，目前显示位置不太好，不喜欢可以关闭")]
     public static readonly bool ShowLearningProgress = true;
@@ -42,11 +46,11 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("村民人物浮窗", description: "为居民信息块（工作派遣等）增加鼠标浮窗（头像边上的空白处）")]
     public static readonly bool ShowResidentCharacterMouseTip = true;
-    
+
     [ModSetting("人物浮窗显示真名", description: "从官方mod拿来的功能，在人物浮窗中显示法号对应的真实姓名")]
     public static readonly bool CharacterMouseTipShowRealName = true;
-    
-    [ModSetting("地块浮窗", description: "从官方mod拿来的功能")]
+
+    [ModSetting("地块浮窗", description: "从官方mod拿来的功能，额外增加了资源显示")]
     public static readonly bool MapBlockMouseTip = true;
 
     public override void OnModSettingUpdate()
@@ -170,6 +174,15 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
                     var combatSkillDisplayData = item[0];
                     EasyPool.Free(item);
                     var flag = combatSkillDisplayData.EffectType != -1;
+
+                    if (ShowBookFiveElements)
+                    {
+                        var fiveElementsStr = LocalStringManager.Get($"LK_FiveElements_Type_{combatSkillItem.FiveElements}")
+                            .SetColor(Colors.Instance.FiveElementsColors[combatSkillItem.FiveElements]);
+                        var bookTypeStr = CombatSkillType.Instance[skillBookItem.CombatSkillType].Name;
+                        var bookSubtypeStr = LocalStringManager.Get($"LK_ItemSubType_{(object)skillBookItem.ItemSubType}");
+                        __instance.CGet<TextMeshProUGUI>("SubType").text = fiveElementsStr + bookTypeStr + bookSubtypeStr;
+                    }
 
                     if (true) // flag
                     {
