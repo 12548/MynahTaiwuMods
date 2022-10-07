@@ -42,6 +42,12 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("村民人物浮窗", description: "为居民信息块（工作派遣等）增加鼠标浮窗（头像边上的空白处）")]
     public static readonly bool ShowResidentCharacterMouseTip = true;
+    
+    [ModSetting("人物浮窗显示真名", description: "从官方mod拿来的功能，在人物浮窗中显示法号对应的真实姓名")]
+    public static readonly bool CharacterMouseTipShowRealName = true;
+    
+    [ModSetting("地块浮窗", description: "从官方mod拿来的功能")]
+    public static readonly bool MapBlockMouseTip = true;
 
     public override void OnModSettingUpdate()
     {
