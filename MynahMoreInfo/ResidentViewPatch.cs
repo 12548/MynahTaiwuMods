@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using UICommon.Character.Elements;
-using UnityEngine.UI;
 
 namespace MynahMoreInfo;
 
@@ -25,7 +24,7 @@ public class ResidentViewPatch
 
     private static void EnsureCharMouseTip(ResidentView __instance, int charId)
     {
-        if (!MynahMoreInfo.ModEntry.ShowResidentCharacterMouseTip) return;
+        if (!ModEntry.ShowResidentCharacterMouseTip) return;
         var transform = __instance.transform.Find("CharInfoHolder");
         if (transform == null) return;
         var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(transform.gameObject);

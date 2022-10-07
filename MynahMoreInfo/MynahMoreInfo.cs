@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Config;
 using FrameWork;
 using GameData.Domains;
-using GameData.Domains.Character.Display;
 using GameData.Domains.CombatSkill;
 using GameData.Domains.Item.Display;
-using GameData.Domains.TaiwuEvent.DisplayEvent;
 using GameData.Serializer;
 using GameData.Utilities;
 using HarmonyLib;
@@ -20,7 +17,7 @@ using Object = UnityEngine.Object;
 namespace MynahMoreInfo;
 
 [PluginConfig("MynahMoreInfo", "myna12548", "1")]
-public class ModEntry : TaiwuRemakeHarmonyPlugin
+public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     [ModSetting("显示不传之秘", description: "显示门派武学列表中的不传之秘")]
     public static readonly bool ShowNonPublicSkill = true;
@@ -62,194 +59,20 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
         var postfix = typeof(Patch).GetMethod("Postfix");
         this.HarmonyInstance.Patch(original, postfix: new HarmonyMethod(postfix));
 
-        // var original2 = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
-        //     it => it.Name.Contains("UpdateOnlyTemplateData"));
-        // var postfix2 = typeof(Patch).GetMethod("PostFixUpdateOnlyTemplateData");
-        // this.HarmonyInstance.Patch(original2, postfix: new HarmonyMethod(postfix2));
+        var original2 = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
+            it => it.Name.Contains("UpdateOnlyTemplateData"));
+        var postfix2 = typeof(Patch).GetMethod("PostFixUpdateOnlyTemplateData");
+        this.HarmonyInstance.Patch(original2, postfix: new HarmonyMethod(postfix2));
 
         var o3 = AccessTools.FirstMethod(typeof(UI_CombatSkillTree), it => it.Name.Contains("RefreshSkillItem"));
         var prefix3 = typeof(Patch).GetMethod("PreFixRefreshSkillItem");
         this.HarmonyInstance.Patch(o3, prefix: new HarmonyMethod(prefix3));
-
 
         var o4 = AccessTools.FirstMethod(typeof(MouseTipBook), it => it.Name.Contains("Init"));
         var postfix4 = typeof(Patch).GetMethod("PostFixMouseTipBookInit");
         this.HarmonyInstance.Patch(o4, postfix: new HarmonyMethod(postfix4));
 
         Debug.Log("ShowSpecialEffect all patched");
-    }
-
-    [HarmonyPatch]
-    public static class MouseTipCharacterPatch
-    {
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(UI_EventWindow), "UpdateMainCharacter")]
-        static void UpdateMainCharacterPostfix(UI_EventWindow __instance)
-        {
-            if (!ShowEventUICharacterMouseTip) return;
-            var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
-            CharacterDisplayData mainCharacter = data.MainCharacter;
-            Refers refers = __instance.CGet<Refers>("MainCharacter");
-            var transform = refers.transform.Find("MoveRoot/AvatarArea/ShowMainCharacterMenu");
-            if (transform == null) return;
-            var mouseTipObj = transform.gameObject;
-
-            if (mainCharacter == null || !HasCharacter(__instance))
-            {
-                if (refers != null)
-                {
-                    var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                    mouseTipDisplayer.enabled = false;
-                }
-            }
-            else
-            {
-                var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
-            }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(UI_EventWindow), "UpdateTargetCharacter")]
-        static void UpdateTargetCharacterPostfix(UI_EventWindow __instance)
-        {
-            if (!ShowEventUICharacterMouseTip) return;
-            var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
-            CharacterDisplayData mainCharacter = data.TargetCharacter;
-            Refers refers = __instance.CGet<Refers>("TargetCharacter");
-            var transform = refers.transform.Find("CanvasChanger/AvatarArea/ShowTargetCharacterMenu");
-            if (transform == null) return;
-            var mouseTipObj = transform.gameObject;
-
-            if (mainCharacter == null || !HasCharacter(__instance))
-            {
-                if (refers != null)
-                {
-                    var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                    mouseTipDisplayer.enabled = false;
-                }
-            }
-            else
-            {
-                var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
-            }
-        }
-
-        [HarmonyReversePatch]
-        [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
-        static bool HasCharacter(UI_EventWindow instance)
-        {
-            throw new Exception("stub!");
-        }
-
-        /// <summary>
-        /// 纯为了避免出错，设置一个直接跳过的条件
-        /// </summary>
-        /// <param name="offset"></param>
-        /// <param name="dataPool"></param>
-        /// <returns></returns>
-        [HarmonyPatch(typeof(MouseTipCharacter), "OnGetCharDisplayData")]
-        [HarmonyPrefix]
-        static bool MouseTipOnGetDataPrefix(int offset, RawDataPool dataPool)
-        {
-            List<CharacterDisplayData> list = EasyPool.Get<List<CharacterDisplayData>>();
-            list.Clear();
-            Serializer.Deserialize(dataPool, offset, ref list);
-            if (list.Count != 1)
-            {
-                EasyPool.Free(list);
-                return false;
-            }
-
-            EasyPool.Free(list);
-            return true;
-        }
-
-        [HarmonyPatch(typeof(UI_MapBlockCharList), "OnRenderChar")]
-        [HarmonyPostfix]
-        static void OnRenderCharPostfix(int index, Refers charRefers, bool ____canSeeDetail, CToggleGroup ____togGroup,
-            List<int> ____infectedList, List<int> ____normalCharList,
-            Dictionary<int, CharacterDisplayData> ____charDataDict)
-        {
-            var trigger = ____canSeeDetail && ShowMouseTipMapBlockCharList;
-            var key = ____togGroup.GetActive().Key;
-            var showingRandomEnemy = key == 1 && index >= ____infectedList.Count;
-            if (showingRandomEnemy) trigger = false;
-            if (key > 1) trigger = false;
-
-            var cbutton = charRefers.CGet<CButton>("Button");
-            var obj = cbutton.gameObject;
-
-            var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(obj);
-
-            if (trigger)
-            {
-                var charDisplayData = ____charDataDict[
-                    ((key == 0) ? ____normalCharList : ____infectedList)[
-                        index]];
-                var characterId = charDisplayData.CharacterId;
-
-                Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);
-            }
-            else
-            {
-                mouseTipDisplayer.enabled = false;
-            }
-            // mouseTipDisplayer.Type = TipType.SingleDesc;
-            //
-
-            //
-            // CharacterItem item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
-            // var s = "";
-            // s += CommonUtils.GetGenderString(charDisplayData.Gender) + "·";
-            // s += CommonUtils.GetCharmLevelText(
-            //     item.BaseAttraction,
-            //     item.Gender,
-            //     20, 1) + "(基础值)·";
-            // s += CommonUtils.GetBehaviorString(charDisplayData.BehaviorType) + "·";
-            // s += SingletonObject.getInstance<WorldMapModel>().GetSettlementName(charDisplayData.OrgInfo);
-            // s += GetIdentityText(item, charDisplayData.OrgInfo);
-            //
-            // mouseTipDisplayer.PresetParam = new[] { s };
-        }
-
-        // static string GetIdentityText(CharacterItem item, OrganizationInfo organizationInfo)
-        // {
-        //     OrganizationItem organizationItem = Organization.Instance[organizationInfo.OrgTemplateId];
-        //
-        //     OrganizationMemberItem organizationMemberItem =
-        //         OrganizationMember.Instance[organizationItem.Members[(int)organizationInfo.Grade]];
-        //     bool flag4 = item.ActualAge >= 0 && item.ActualAge < organizationMemberItem.IdentityActiveAge;
-        //     if (flag4)
-        //     {
-        //         string text = LocalStringManager.Get((ushort)((AgeGroup.GetAgeGroup(item.ActualAge) == 0)
-        //             ? 2027
-        //             : ((item.Gender == 0) ? 2029 : 2028)));
-        //         text = string.Concat(new string[]
-        //         {
-        //             "<color=",
-        //             Colors.Instance.GradeColors[(int)organizationInfo.Grade].ColorToHexString("#"),
-        //             ">",
-        //             text,
-        //             "</color>"
-        //         });
-        //         return text;
-        //     }
-        //
-        //     string text2 = organizationInfo.Principal
-        //         ? organizationMemberItem.GradeName
-        //         : organizationMemberItem.SpouseAnonymousTitles[(int)item.Gender];
-        //     text2 = string.Concat(new string[]
-        //     {
-        //         "<color=",
-        //         Colors.Instance.GradeColors[organizationInfo.Grade].ColorToHexString("#"),
-        //         ">",
-        //         text2,
-        //         "</color>"
-        //     });
-        //     return text2;
-        // }
     }
 
 
@@ -381,16 +204,16 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
         public static void PostFixUpdateOnlyTemplateData(MouseTipCombatSkill __instance,
             CombatSkillItem ____configData)
         {
-            if (!ShowCombatSkillSpecialEffect) return;
-            __instance.CGet<GameObject>("DirectEffectTitle").SetActive(true);
-            __instance.CGet<GameObject>("DirectDesc").SetActive(true);
-            __instance.CGet<GameObject>("ReverseEffectTitle").SetActive(true);
-            __instance.CGet<GameObject>("ReverseDesc").SetActive(true);
-
-            __instance.CGet<TextMeshProUGUI>("DirectEffectDesc").text =
-                ("     " + SpecialEffect.Instance[____configData.DirectEffectID].Desc[0]);
-            __instance.CGet<TextMeshProUGUI>("ReverseEffectDesc").text =
-                ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
+            // if (!ShowCombatSkillSpecialEffect) return;
+            // __instance.CGet<GameObject>("DirectEffectTitle").SetActive(true);
+            // __instance.CGet<GameObject>("DirectDesc").SetActive(true);
+            // __instance.CGet<GameObject>("ReverseEffectTitle").SetActive(true);
+            // __instance.CGet<GameObject>("ReverseDesc").SetActive(true);
+            //
+            // __instance.CGet<TextMeshProUGUI>("DirectEffectDesc").text =
+            //     ("     " + SpecialEffect.Instance[____configData.DirectEffectID].Desc[0]);
+            // __instance.CGet<TextMeshProUGUI>("ReverseEffectDesc").text =
+            //     ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
 
             ShowAttackPartDistribution(__instance, ____configData);
         }
