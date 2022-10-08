@@ -56,7 +56,14 @@ public class UI_WorldmapPatch
                 {
                     var curr = blockData.CurrResources.Get(i);
                     var max = blockData.MaxResources.Get(i);
-                    stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color>   ");
+                    if (curr >= 100)
+                    {
+                        stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color> \t");
+                    }
+                    else
+                    {
+                        stringBuilder.Append($"{names[i]}:{curr}/{max}</color> \t");
+                    }
                     if (i % 2 == 1) stringBuilder.AppendLine();
                 }
             }
