@@ -31,12 +31,16 @@ public class UI_WorldmapPatch
             if (!ModEntry.MapBlockMouseTip) return;
             var currMouseObj = (GameObject)typeof(MouseTipManager).GetField("_currMouseOverObj", (BindingFlags)(-1))!
                 .GetValue(SingletonObject.getInstance<MouseTipManager>());
+            
+            if(currMouseObj == null) return;
+            
             if (currMouseObj != __instance.gameObject && !currMouseObj.transform.IsChildOf(__instance.transform))
             {
                 return;
             }
 
             var blockData = FindBlockByLogicalPosition(x, y);
+            
             var mouseTips = __instance.MapClickReceiver.TipDisplayer;
             if (blockData == null || blockData.AreaId != ____mapModel.CurrentAreaId || !blockData.Visible)
                 return;
