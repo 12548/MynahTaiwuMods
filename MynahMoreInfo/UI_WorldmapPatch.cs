@@ -135,6 +135,15 @@ public class UI_WorldmapPatch
 
                         if (index % 2 == 1) stringBuilder.AppendLine();
                         else stringBuilder.Append("<pos=40%>");
+
+                        if (index >= 11)
+                        {
+                            if (_nameRelatedDataList.Count - index > 1)
+                            {
+                                stringBuilder.AppendLine($"(还有{_nameRelatedDataList.Count - index - 1}人未显示)");
+                            }
+                            break;
+                        }
                     }
 
                     _nameRelatedDataList.Clear();
