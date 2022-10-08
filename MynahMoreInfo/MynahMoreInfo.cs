@@ -52,6 +52,12 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("地块浮窗", description: "从官方mod拿来的功能，额外增加了资源显示")]
     public static readonly bool MapBlockMouseTip = true;
+    
+    [ModSetting("浮窗显示坐标和人物ID", description: "")]
+    public static readonly bool ShowPosAndId = true;
+    
+    [ModSetting("按alt显示地块浮窗", description: "开启地块浮窗时生效，开启后需同时按住alt显示地块浮窗")]
+    public static readonly bool MapBlockMouseTipByAlt = true;
 
     public override void OnModSettingUpdate()
     {

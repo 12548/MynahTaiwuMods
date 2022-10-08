@@ -26,24 +26,43 @@ public class UI_WorldmapPatch
         HashSet<Location> ____mapBlockSet)
     {
         if (!ModEntry.MapBlockMouseTip) return;
-        __instance.MapClickReceiver.OnMapBlockPointEnter += (x, y) =>
+
+        var _OnMapBlockPointEnter = __instance.MapClickReceiver.OnMapBlockPointEnter;
+
+        __instance.MapClickReceiver.OnMapBlockPointEnter = (x, y) =>
         {
-            if (!ModEntry.MapBlockMouseTip) return;
+            if (!ModEntry.MapBlockMouseTip)
+            {
+                _OnMapBlockPointEnter(x, y);
+                return;
+            }
+
+            var altClicked = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+            if (ModEntry.MapBlockMouseTipByAlt && !altClicked)
+            {
+                __instance.MapClickReceiver.OnMapBlockPointExit(x, y);
+                return;
+            }
+
+            __instance.MapClickReceiver.ScaleListening = true;
             var currMouseObj = (GameObject)typeof(MouseTipManager).GetField("_currMouseOverObj", (BindingFlags)(-1))!
                 .GetValue(SingletonObject.getInstance<MouseTipManager>());
-            
-            if(currMouseObj == null) return;
-            
+
+            if (currMouseObj == null) return;
+
             if (currMouseObj != __instance.gameObject && !currMouseObj.transform.IsChildOf(__instance.transform))
             {
                 return;
             }
 
             var blockData = FindBlockByLogicalPosition(x, y);
-            
             var mouseTips = __instance.MapClickReceiver.TipDisplayer;
             if (blockData == null || blockData.AreaId != ____mapModel.CurrentAreaId || !blockData.Visible)
+            {
+                __instance.MapClickReceiver.OnMapBlockPointExit(x, y);
                 return;
+            }
+
             var mapBlockItem = MapBlock.Instance[blockData.TemplateId];
             mouseTips.enabled = true;
             var argBox = new ArgumentBox();
@@ -52,31 +71,39 @@ public class UI_WorldmapPatch
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(mapBlockItem.Desc);
 
-            if (!blockData.IsCityTown())
+            if (blockData.IsCityTown())
             {
-                var names = new[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
-                var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
-                for (var i = 0; i < 6; i++)
+                _OnMapBlockPointEnter(x, y);
+                return;
+            }
+
+            var names = new[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
+            var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
+            for (var i = 0; i < 6; i++)
+            {
+                var curr = blockData.CurrResources.Get(i);
+                var max = blockData.MaxResources.Get(i);
+                if (curr >= 100)
                 {
-                    var curr = blockData.CurrResources.Get(i);
-                    var max = blockData.MaxResources.Get(i);
-                    if (curr >= 100)
-                    {
-                        stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color> \t");
-                    }
-                    else
-                    {
-                        stringBuilder.Append($"{names[i]}:{curr}/{max}</color> \t");
-                    }
-                    if (i % 2 == 1) stringBuilder.AppendLine();
+                    stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color>");
                 }
+                else
+                {
+                    stringBuilder.Append($"{names[i]}:{curr}/{max}</color>");
+                }
+
+                if (i % 2 == 1) stringBuilder.AppendLine();
+                else stringBuilder.Append("<pos=30%>");
             }
 
             stringBuilder.AppendLine();
 
-            stringBuilder.AppendLine(string.Format("世界坐标(AreaId, BlockId): ({0},{1})", blockData.AreaId,
-                blockData.BlockId));
-            stringBuilder.AppendLine(string.Format("区域坐标(x, y): ({0},{1})", x, y));
+            if (ModEntry.ShowPosAndId)
+            {
+                stringBuilder.AppendLine($"世界坐标(AreaId, BlockId): ({blockData.AreaId},{blockData.BlockId})");
+                stringBuilder.AppendLine($"区域坐标(x, y): ({x},{y})");
+            }
+            
             if (blockData.CharacterSet != null || blockData.InfectedCharacterSet != null)
             {
                 stringBuilder.AppendLine("地块人物:");
@@ -99,13 +126,15 @@ public class UI_WorldmapPatch
                         var str = name.surname + name.givenName;
                         var gradeColor = Colors.Instance.GradeColors[nameRelatedData.OrgGrade];
                         if (byNameRelatedData == str)
-                            stringBuilder.Append(string.Format("\t{0}({1})", byNameRelatedData.SetColor(gradeColor),
-                                num));
+                            stringBuilder.Append($"{byNameRelatedData.SetColor(gradeColor)}");
                         else
-                            stringBuilder.Append(string.Format("\t{0}/{1}({2})",
-                                byNameRelatedData.SetColor(gradeColor), str.SetColor(gradeColor), num));
+                            stringBuilder.Append(
+                                $"{byNameRelatedData.SetColor(gradeColor)}/{str.SetColor(gradeColor)}");
+
+                        if (ModEntry.ShowPosAndId) stringBuilder.Append($"({num})");
 
                         if (index % 2 == 1) stringBuilder.AppendLine();
+                        else stringBuilder.Append("<pos=40%>");
                     }
 
                     _nameRelatedDataList.Clear();

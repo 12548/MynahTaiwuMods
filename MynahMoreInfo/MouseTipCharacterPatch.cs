@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
-using Config;
 using FrameWork;
-using GameData.Domains;
-using GameData.Domains.Character;
 using GameData.Domains.Character.Display;
 using GameData.Serializer;
 using GameData.Utilities;
 using HarmonyLib;
 using TMPro;
-using UnityEngine;
 
 namespace MynahMoreInfo;
 
@@ -96,12 +92,15 @@ public partial class ModEntry
             string nameByDisplayData1 = NameCenter.GetCharMonasticTitleOrNameByDisplayData(____displayData, isTaiwu);
             string nameByDisplayData2 = NameCenter.GetNameByDisplayData(____displayData, isTaiwu, true);
             string color = ____displayData.AliveState == 0 ? "white" : "red";
-            if (nameByDisplayData1 != nameByDisplayData2)
-                __instance.CGet<TextMeshProUGUI>("Title").text =
-                    $"{(object)nameByDisplayData1}/{(object)nameByDisplayData2}({(object)____charId})".SetColor(color);
-            else
-                __instance.CGet<TextMeshProUGUI>("Title").text =
-                    $"{(object)nameByDisplayData1}({(object)____charId})".SetColor(color);
+
+            var s = nameByDisplayData1 != nameByDisplayData2
+                ? $"{(object)nameByDisplayData1}/{(object)nameByDisplayData2}"
+                : nameByDisplayData1;
+
+            if (ShowPosAndId)
+                s += $"({(object)____charId})";
+
+            __instance.CGet<TextMeshProUGUI>("Title").text = s.SetColor(color);
             //
             // __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
             //     CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList, new List<int>() { ____charId },
