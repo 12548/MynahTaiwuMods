@@ -36,15 +36,15 @@ public class UI_WorldmapPatch
                 _OnMapBlockPointEnter(x, y);
                 return;
             }
+            
+            __instance.MapClickReceiver.ScaleListening = true;
 
             var altClicked = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             if (ModEntry.MapBlockMouseTipByAlt && !altClicked)
             {
-                __instance.MapClickReceiver.OnMapBlockPointExit(x, y);
                 return;
             }
-
-            __instance.MapClickReceiver.ScaleListening = true;
+            
             var currMouseObj = (GameObject)typeof(MouseTipManager).GetField("_currMouseOverObj", (BindingFlags)(-1))!
                 .GetValue(SingletonObject.getInstance<MouseTipManager>());
 

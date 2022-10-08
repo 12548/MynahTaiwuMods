@@ -44,8 +44,8 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("对话人物浮窗", description: "为事件界面（人物对话互动等）的左右两个人物增加鼠标浮窗")]
     public static readonly bool ShowEventUICharacterMouseTip = true;
 
-    [ModSetting("村民人物浮窗", description: "为居民信息块（工作派遣等）增加鼠标浮窗（头像边上的空白处）")]
-    public static readonly bool ShowResidentCharacterMouseTip = true;
+    // [ModSetting("村民人物浮窗", description: "为居民信息块（工作派遣等）增加鼠标浮窗（头像边上的空白处）")]
+    // public static readonly bool ShowResidentCharacterMouseTip = true;
 
     [ModSetting("人物浮窗显示真名", description: "从官方mod拿来的功能，在人物浮窗中显示法号对应的真实姓名")]
     public static readonly bool CharacterMouseTipShowRealName = true;
