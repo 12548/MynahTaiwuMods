@@ -74,7 +74,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     public override void Initialize()
     {
         base.Initialize();
-        OnModSettingUpdate();
+        // ResourcesPatch.Init();
 
         var original = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
             it => it.Name.Contains("OnGetSkillDisplayData"));

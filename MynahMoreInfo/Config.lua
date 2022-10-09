@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.193~",
+    Title = "~更多信息 v1.2~",
     FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
     Author = "myna12548",
     Source = 1,
@@ -38,6 +38,9 @@ return {
 增加了一个去除官方tips延迟的功能，开启之后可以明显变流畅，但还是请谨慎使用，毕竟官方加此延迟必有深意，我确实不懂\
 1.193更新：\
 修正上个版本可能与物品高级筛选冲突导致报错的问题\
+1.2更新：\
+- 增加了详细文字式人物浮窗，可显示详细数值和资质（可在设置中开启，目前仅限左侧人物列表）\
+- 重新显示了建筑地块的人物列表\
 \
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复",
     DefaultSettings = {
