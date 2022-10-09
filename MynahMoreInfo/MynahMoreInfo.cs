@@ -23,8 +23,11 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("显示不传之秘", description: "显示门派武学列表中的不传之秘")]
     public static readonly bool ShowNonPublicSkill = true;
 
-    [ModSetting("左侧人物浮窗", description: "为地图左侧人物列表增加鼠标浮窗")]
-    public static readonly bool ShowMouseTipMapBlockCharList = true;
+    // [ModSetting("左侧人物浮窗", description: "为地图左侧人物列表增加鼠标浮窗")]
+    // public static readonly bool ShowMouseTipMapBlockCharList = true;
+
+    [DropDownModSetting("左侧人物浮窗", new[] { "关闭", "原版", "详细文字" }, defaultValue: 2)]
+    public static int MouseTipMapBlockCharList = 2;
 
     [ModSetting("功法正逆练", description: "显示功法的正逆练效果")]
     public static readonly bool ShowCombatSkillSpecialEffect = true;
@@ -34,7 +37,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("打点显示", description: "显示催破功法的打点分布")]
     public static readonly bool ShowAttackDistribution = true;
-    
+
     [ModSetting("显示书籍五行属性", description: "显示功法书对应功法的五行属性")]
     public static readonly bool ShowBookFiveElements = true;
 
@@ -52,13 +55,13 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("地块浮窗", description: "从官方mod拿来的功能，额外增加了资源显示")]
     public static readonly bool MapBlockMouseTip = true;
-    
+
     [ModSetting("浮窗显示坐标和人物ID", description: "")]
     public static readonly bool ShowPosAndId = true;
-    
+
     [ModSetting("按alt显示地块浮窗", description: "开启地块浮窗时生效，开启后需同时按住alt显示地块浮窗")]
-    public static readonly bool MapBlockMouseTipByAlt = true;
-    
+    public static readonly bool MapBlockMouseTipByAlt = false;
+
     [ModSetting("延迟修正", description: "去除官方的tips延迟，谨慎使用，毕竟官方加此延迟必有深意，我确实不懂")]
     public static readonly bool DelayFix = true;
 
@@ -186,11 +189,14 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
                     if (ShowBookFiveElements)
                     {
-                        var fiveElementsStr = LocalStringManager.Get($"LK_FiveElements_Type_{combatSkillItem.FiveElements}")
+                        var fiveElementsStr = LocalStringManager
+                            .Get($"LK_FiveElements_Type_{combatSkillItem.FiveElements}")
                             .SetColor(Colors.Instance.FiveElementsColors[combatSkillItem.FiveElements]);
                         var bookTypeStr = CombatSkillType.Instance[skillBookItem.CombatSkillType].Name;
-                        var bookSubtypeStr = LocalStringManager.Get($"LK_ItemSubType_{(object)skillBookItem.ItemSubType}");
-                        __instance.CGet<TextMeshProUGUI>("SubType").text = fiveElementsStr + bookTypeStr + bookSubtypeStr;
+                        var bookSubtypeStr =
+                            LocalStringManager.Get($"LK_ItemSubType_{(object)skillBookItem.ItemSubType}");
+                        __instance.CGet<TextMeshProUGUI>("SubType").text =
+                            fiveElementsStr + bookTypeStr + bookSubtypeStr;
                     }
 
                     if (true) // flag

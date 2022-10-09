@@ -100,45 +100,9 @@ public partial class ModEntry
             if (ShowPosAndId)
                 s += $"({(object)____charId})";
 
-            __instance.CGet<TextMeshProUGUI>("Title").text = s.SetColor(color);
-            //
-            // __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
-            //     CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList, new List<int>() { ____charId },
-            //     (offset, dataPool) =>
-            //     {
-            //         var item = EasyPool.Get<List<GroupCharDisplayData>>();
-            //         Serializer.Deserialize(dataPool, offset, ref item);
-            //         var groupCharDisplayData = item[0];
-            //         EasyPool.Free(item);
-            //
-            //         var highCombatSkills = new List<int>();
-            //         for (int i = 0; i < CombatSkillType.Instance.Count; i++)
-            //         {
-            //             highCombatSkills.Add(i);
-            //         }
-            //
-            //         highCombatSkills.Sort((a, b) =>
-            //             _getCSQValue(groupCharDisplayData, b) - _getCSQValue(groupCharDisplayData, a));
-            //
-            //         var cal = __instance.transform.Find("CharAttributeList");
-            //         var gameObject = new GameObject();
-            //         var tmp = gameObject.AddComponent<TextMeshProUGUI>();
-            //         tmp.text = "最高功法资质：" + CombatSkillType.Instance[highCombatSkills[0]].Name +
-            //                    _getCSQValue(groupCharDisplayData, highCombatSkills[0]);
-            //
-            //         GameObject.Instantiate(gameObject, cal, false);
-            //         // groupCharDisplayData.CombatSkillQualifications
-            //     });
+            var tmp = __instance.CGet<TextMeshProUGUI>("Title");
+            tmp.text = s.SetColor(color);
         }
 
-        private static unsafe int _getCSQValue(GroupCharDisplayData dd, int index)
-        {
-            return dd.CombatSkillQualifications.Items[index];
-        }
-
-        private static unsafe int _getLSQValue(GroupCharDisplayData dd, int index)
-        {
-            return dd.LifeSkillQualifications.Items[index];
-        }
     }
 }
