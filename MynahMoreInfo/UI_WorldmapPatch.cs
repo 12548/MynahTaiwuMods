@@ -36,7 +36,7 @@ public class UI_WorldmapPatch
                 _OnMapBlockPointEnter(x, y);
                 return;
             }
-            
+
             __instance.MapClickReceiver.ScaleListening = true;
 
             var altClicked = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
@@ -44,7 +44,7 @@ public class UI_WorldmapPatch
             {
                 return;
             }
-            
+
             var currMouseObj = (GameObject)typeof(MouseTipManager).GetField("_currMouseOverObj", (BindingFlags)(-1))!
                 .GetValue(SingletonObject.getInstance<MouseTipManager>());
 
@@ -63,37 +63,54 @@ public class UI_WorldmapPatch
                 return;
             }
 
-            var mapBlockItem = MapBlock.Instance[blockData.TemplateId];
-            mouseTips.enabled = true;
-            var argBox = new ArgumentBox();
-            argBox.Clear();
-            argBox.Set("arg0", mapBlockItem.Name);
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(mapBlockItem.Desc);
-
-            if (blockData.IsCityTown())
+            if (blockData.BlockSubType == EMapBlockSubType.SwordTomb)
             {
                 _OnMapBlockPointEnter(x, y);
                 return;
             }
 
-            var names = new[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
-            var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
-            for (var i = 0; i < 6; i++)
-            {
-                var curr = blockData.CurrResources.Get(i);
-                var max = blockData.MaxResources.Get(i);
-                if (curr >= 100)
-                {
-                    stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color>");
-                }
-                else
-                {
-                    stringBuilder.Append($"{names[i]}:{curr}/{max}</color>");
-                }
+            var location = new Location(blockData.AreaId, blockData.BlockId);
+            var titleSb = new StringBuilder(blockData.BelongBlockId < 0 || blockData.TemplateId == 37
+                ? ____mapModel.GetAreaName(blockData.AreaId)
+                : ____mapModel.GetBlockName(____mapModel.CurrentAreaId, blockData.BelongBlockId,
+                    ____mapModel.GetBlockData(location).TemplateId));
 
-                if (i % 2 == 1) stringBuilder.AppendLine();
-                else stringBuilder.Append("<pos=30%>");
+            titleSb.Append(LocalStringManager.GetFormat(LanguageKey.LK_Quotation_Marks_Fix,
+                ____mapModel.GetBlockName(____mapModel.CurrentAreaId, blockData.BlockId,
+                    blockData.TemplateId,
+                    ____mapModel.GetBlockNameIndex(blockData,
+                        ____mapModel.GetAreaSize(blockData.AreaId)))));
+            if (blockData.Destroyed)
+                titleSb.Append(LocalStringManager.Get(LanguageKey.LK_Map_Block_Destroyed_Tip).SetColor("lightgrey"));
+
+            var mapBlockItem = MapBlock.Instance[blockData.TemplateId];
+            mouseTips.enabled = true;
+            var argBox = new ArgumentBox();
+            argBox.Clear();
+            argBox.Set("arg0", titleSb.ToString());
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(mapBlockItem.Desc);
+
+            if (!blockData.IsCityTown())
+            {
+                var names = new[] { "食物", "木材", "金铁", "玉石", "织物", "药材" };
+                var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
+                for (var i = 0; i < 6; i++)
+                {
+                    var curr = blockData.CurrResources.Get(i);
+                    var max = blockData.MaxResources.Get(i);
+                    if (curr >= 100)
+                    {
+                        stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color>");
+                    }
+                    else
+                    {
+                        stringBuilder.Append($"{names[i]}:{curr}/{max}</color>");
+                    }
+
+                    if (i % 2 == 1) stringBuilder.AppendLine();
+                    else stringBuilder.Append("<pos=30%>");
+                }
             }
 
             stringBuilder.AppendLine();
@@ -103,7 +120,7 @@ public class UI_WorldmapPatch
                 stringBuilder.AppendLine($"世界坐标(AreaId, BlockId): ({blockData.AreaId},{blockData.BlockId})");
                 stringBuilder.AppendLine($"区域坐标(x, y): ({x},{y})");
             }
-            
+
             if (blockData.CharacterSet != null || blockData.InfectedCharacterSet != null)
             {
                 stringBuilder.AppendLine("地块人物:");
@@ -142,6 +159,7 @@ public class UI_WorldmapPatch
                             {
                                 stringBuilder.AppendLine($"(还有{_nameRelatedDataList.Count - index - 1}人未显示)");
                             }
+
                             break;
                         }
                     }
