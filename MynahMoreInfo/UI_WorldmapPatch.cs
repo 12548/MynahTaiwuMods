@@ -99,14 +99,9 @@ public class UI_WorldmapPatch
                 {
                     var curr = blockData.CurrResources.Get(i);
                     var max = blockData.MaxResources.Get(i);
-                    if (curr >= 100)
-                    {
-                        stringBuilder.Append($"<color={colors[i]}>{names[i]}:{curr}/{max}</color>");
-                    }
-                    else
-                    {
-                        stringBuilder.Append($"{names[i]}:{curr}/{max}</color>");
-                    }
+                    stringBuilder.Append(curr >= 100
+                        ? $"<color={colors[i]}>{names[i]}:{curr}/{max}</color>"
+                        : $"{names[i]}:{curr}/{max}</color>");
 
                     if (i % 2 == 1) stringBuilder.AppendLine();
                     else stringBuilder.Append("<pos=30%>");

@@ -4,7 +4,6 @@ using Config;
 using FrameWork;
 using GameData.Domains;
 using GameData.Domains.Character;
-using GameData.Domains.Character.Creation;
 using GameData.Domains.Character.Display;
 using GameData.Serializer;
 using HarmonyLib;
@@ -135,14 +134,14 @@ public class UI_MapBlockCharListPatch
                 sb.Append("健康：" + healthInfo.Item1 +
                           $"({groupCharDisplayData.Health}/{groupCharDisplayData.MaxLeftHealth})");
 
-                sb.Append("<pos=33%>魅力：" + CommonUtils.GetCharmLevelText(
+                sb.Append("<pos=35%>魅力：" + CommonUtils.GetCharmLevelText(
                     groupCharDisplayData.Charm,
                     displayData.Gender,
                     displayData.AvatarRelatedData.DisplayAge,
                     displayData.AvatarRelatedData.ClothingDisplayId,
                     false, displayData.AvatarRelatedData.AvatarData.FaceVisible) + $"({groupCharDisplayData.Charm})");
                 var happinessType = HappinessType.GetHappinessType(groupCharDisplayData.Happiness);
-                sb.Append("<pos=66%>心情：" + CommonUtils.GetHappinessString(happinessType) +
+                sb.Append("<pos=72%>心情：" + CommonUtils.GetHappinessString(happinessType) +
                           $"({groupCharDisplayData.Happiness})");
 
                 sb.AppendLine();
@@ -151,16 +150,22 @@ public class UI_MapBlockCharListPatch
                           $"({groupCharDisplayData.FavorabilityToTaiwu})");
 
                 var fameType = FameType.GetFameType(groupCharDisplayData.Fame);
-                sb.Append("<pos=33%>声望：" + CommonUtils.GetFameString(fameType) + $"({groupCharDisplayData.Fame})");
+                sb.Append("<pos=35%>声望：" + CommonUtils.GetFameString(fameType) + $"({groupCharDisplayData.Fame})");
 
-                sb.AppendLine("<pos=66%>轮回：" + groupCharDisplayData.PreexistenceCharCount);
+                sb.AppendLine("<pos=72%>轮回：" + groupCharDisplayData.PreexistenceCharCount);
 
                 var attackMedal = groupCharDisplayData.AttackMedal;
                 var amSprite = attackMedal > 0
-                    ? "#72D4C8"
-                    : (attackMedal < 0 ? "#BA5B3C" : "#A3A2A3");
-
-                sb.Append($"进攻：<color={amSprite}>{Mathf.Abs(attackMedal)}</color>");
+                    ? "sp_icon_renwutexing_10"
+                    : (attackMedal < 0 ? "sp_icon_renwutexing_4" : "sp_icon_renwutexing_7");
+                
+                sb.Append($"进攻：<sprite name=\"{amSprite}\"> x{Mathf.Abs(attackMedal)}");
+                // var attackMedal = groupCharDisplayData.AttackMedal;
+                // var amSprite = attackMedal > 0
+                //     ? "#72D4C8"
+                //     : (attackMedal < 0 ? "#BA5B3C" : "#A3A2A3");
+                //
+                // sb.Append($"进攻：<color={amSprite}>{Mathf.Abs(attackMedal)}</color>");
 
                 var defenceMedal = groupCharDisplayData.DefenceMedal;
                 var dmSprite = defenceMedal > 0
