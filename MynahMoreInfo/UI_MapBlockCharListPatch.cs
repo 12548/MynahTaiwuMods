@@ -131,24 +131,37 @@ public class UI_MapBlockCharListPatch
 
                 var healthInfo =
                     CommonUtils.GetCharacterHealthInfo(groupCharDisplayData.Health, groupCharDisplayData.MaxLeftHealth);
-                sb.Append("健康：" + healthInfo.Item1 +
-                          $"({groupCharDisplayData.Health}/{groupCharDisplayData.MaxLeftHealth})");
+                sb.Append("健康：" + healthInfo.Item1.Replace("\n", ""));
+                if (!healthInfo.Item1.Contains("("))
+                {
+                    sb.Append($"({groupCharDisplayData.Health}/{groupCharDisplayData.MaxLeftHealth})");
+                }
 
-                sb.Append("<pos=35%>魅力：" + CommonUtils.GetCharmLevelText(
+                var charmLevelText = CommonUtils.GetCharmLevelText(
                     groupCharDisplayData.Charm,
                     displayData.Gender,
                     displayData.AvatarRelatedData.DisplayAge,
                     displayData.AvatarRelatedData.ClothingDisplayId,
-                    false, displayData.AvatarRelatedData.AvatarData.FaceVisible) + $"({groupCharDisplayData.Charm})");
+                    false, displayData.AvatarRelatedData.AvatarData.FaceVisible);
+                sb.Append("<pos=35%>魅力：" + charmLevelText.Replace("\n", ""));
+                if (!charmLevelText.Contains("\n"))
+                {
+                    sb.Append($"({groupCharDisplayData.Charm})");
+                }
+                
                 var happinessType = HappinessType.GetHappinessType(groupCharDisplayData.Happiness);
                 sb.Append("<pos=72%>心情：" + CommonUtils.GetHappinessString(happinessType) +
                           $"({groupCharDisplayData.Happiness})");
 
                 sb.AppendLine();
 
-                sb.Append("好感：" + CommonUtils.GetFavorString(groupCharDisplayData.FavorabilityToTaiwu) +
-                          $"({groupCharDisplayData.FavorabilityToTaiwu})");
-
+                var favorString = CommonUtils.GetFavorString(groupCharDisplayData.FavorabilityToTaiwu);
+                sb.Append("好感：" + favorString.Replace("\n", ""));
+                if (!favorString.Contains("\n"))
+                {
+                    sb.Append($"({groupCharDisplayData.FavorabilityToTaiwu})");
+                }
+                
                 var fameType = FameType.GetFameType(groupCharDisplayData.Fame);
                 sb.Append("<pos=35%>声望：" + CommonUtils.GetFameString(fameType) + $"({groupCharDisplayData.Fame})");
 
@@ -159,7 +172,7 @@ public class UI_MapBlockCharListPatch
                     ? "sp_icon_renwutexing_10"
                     : (attackMedal < 0 ? "sp_icon_renwutexing_4" : "sp_icon_renwutexing_7");
                 
-                sb.Append($"进攻：<sprite name=\"{amSprite}\"> x{Mathf.Abs(attackMedal)}");
+                sb.Append($"进攻：<sprite=\"mmiSprites\" name=\"{amSprite}\"> x{Mathf.Abs(attackMedal)}");
                 // var attackMedal = groupCharDisplayData.AttackMedal;
                 // var amSprite = attackMedal > 0
                 //     ? "#72D4C8"
@@ -169,17 +182,17 @@ public class UI_MapBlockCharListPatch
 
                 var defenceMedal = groupCharDisplayData.DefenceMedal;
                 var dmSprite = defenceMedal > 0
-                    ? "#72D4C8"
-                    : (defenceMedal < 0 ? "#BA5B3C" : "#A3A2A3");
+                    ? "sp_icon_renwutexing_9"
+                    : (defenceMedal < 0 ? "sp_icon_renwutexing_3" : "sp_icon_renwutexing_6");
 
-                sb.Append($"   守御：<color={dmSprite}>{Mathf.Abs(defenceMedal)}</color>");
+                sb.Append($"   守御：<sprite=\"mmiSprites\" name=\"{dmSprite}\"> x{Mathf.Abs(defenceMedal)}</color>");
 
                 var wisdomMedal = groupCharDisplayData.WisdomMedal;
                 var wmSprite = groupCharDisplayData.WisdomMedal > 0
-                    ? "#72D4C8"
-                    : (groupCharDisplayData.WisdomMedal < 0 ? "#BA5B3C" : "#A3A2A3");
+                    ? "sp_icon_renwutexing_11"
+                    : (groupCharDisplayData.WisdomMedal < 0 ? "sp_icon_renwutexing_5" : "sp_icon_renwutexing_8");
 
-                sb.Append($"   机略：<color={wmSprite}>{Mathf.Abs(wisdomMedal)}</color>");
+                sb.Append($"   机略：<sprite=\"mmiSprites\" name=\"{wmSprite}\"> x{Mathf.Abs(wisdomMedal)}</color>");
 
                 int birthMonth = displayData.BirthDate % 12;
                 if (birthMonth < 0)

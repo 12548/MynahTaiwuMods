@@ -130,6 +130,8 @@ public class UI_WorldmapPatch
                     _nameRelatedDataList.Sort((a, b) => b.OrgGrade - a.OrgGrade);
                     for (var index = 0; index < _nameRelatedDataList.Count; ++index)
                     {
+                        if(index >= blockCharList.Count) break;
+                        
                         var num = blockCharList[index];
                         var nameRelatedData = _nameRelatedDataList[index];
                         var byNameRelatedData =

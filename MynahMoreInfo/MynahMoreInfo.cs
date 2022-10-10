@@ -9,6 +9,7 @@ using GameData.Serializer;
 using GameData.Utilities;
 using HarmonyLib;
 using MynahBaseModBase;
+using MynahMoreInfo.SpriteSheet;
 using TaiwuModdingLib.Core.Plugin;
 using TMPro;
 using UnityEngine;
@@ -74,7 +75,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     public override void Initialize()
     {
         base.Initialize();
-        // ResourcesPatch.Init();
+        SpriteAssetManager.Init();
 
         var original = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
             it => it.Name.Contains("OnGetSkillDisplayData"));
