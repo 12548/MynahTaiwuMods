@@ -1,6 +1,7 @@
 return {
-    Title = "~更多信息 v1.23~",
+    Title = "~更多信息 v1.25~",
     FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
+    BackendPlugins = {"MynahBaseModBase.dll", "MynahBaseModBackend.dll", "MynahMoreInfoBackend.dll"},
     Author = "myna12548",
     Source = 1,
     FileId = 2871621277,
@@ -43,6 +44,10 @@ return {
 - 由于官方更新了延迟问题修正，删除本mod的延迟去除功能\
 1.23更新：\
 修正了一个红字报错问题（仍然会导致部分人物浮窗不显示，明天继续修）\
+1.24更新：\
+修正了详细文字式人物浮窗一定情况下不再显示的问题\
+1.25更新：\
+重做了延迟去除功能（默认关闭，请谨慎开启）\
 \
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复",
     DefaultSettings = {

@@ -84,7 +84,9 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="GroupCallBuilder.cs" />
+        <Compile Include="MiniJSON\Json.cs" />
         <Compile Include="MouseTipCharacterPatch.cs" />
+        <Compile Include="MouseTipManagerPatch.cs" />
         <Compile Include="MynahMoreInfo.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ResidentViewPatch.cs" />

@@ -8,67 +8,66 @@ namespace MynahMoreInfo;
 [HarmonyPatch]
 public class UI_EventWindowPatch
 {
-            [HarmonyPostfix]
-        [HarmonyPatch(typeof(UI_EventWindow), "UpdateMainCharacter")]
-        static void UpdateMainCharacterPostfix(UI_EventWindow __instance)
-        {
-            if (!ModEntry.ShowEventUICharacterMouseTip) return;
-            var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
-            CharacterDisplayData mainCharacter = data.MainCharacter;
-            Refers refers = __instance.CGet<Refers>("MainCharacter");
-            var transform = refers.transform.Find("MoveRoot/AvatarArea/ShowMainCharacterMenu");
-            if (transform == null) return;
-            var mouseTipObj = transform.gameObject;
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(UI_EventWindow), "UpdateMainCharacter")]
+    static void UpdateMainCharacterPostfix(UI_EventWindow __instance)
+    {
+        if (!ModEntry.ShowEventUICharacterMouseTip) return;
+        var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
+        CharacterDisplayData mainCharacter = data.MainCharacter;
+        Refers refers = __instance.CGet<Refers>("MainCharacter");
+        var transform = refers.transform.Find("MoveRoot/AvatarArea/ShowMainCharacterMenu");
+        if (transform == null) return;
+        var mouseTipObj = transform.gameObject;
 
-            if (mainCharacter == null || !HasCharacter(__instance))
-            {
-                if (refers != null)
-                {
-                    var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                    mouseTipDisplayer.enabled = false;
-                }
-            }
-            else
+        if (mainCharacter == null || !HasCharacter(__instance))
+        {
+            if (refers != null)
             {
                 var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+                mouseTipDisplayer.enabled = false;
             }
         }
-
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(UI_EventWindow), "UpdateTargetCharacter")]
-        static void UpdateTargetCharacterPostfix(UI_EventWindow __instance)
+        else
         {
-            if (!ModEntry.ShowEventUICharacterMouseTip) return;
-            var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
-            CharacterDisplayData mainCharacter = data.TargetCharacter;
-            Refers refers = __instance.CGet<Refers>("TargetCharacter");
-            var transform = refers.transform.Find("CanvasChanger/AvatarArea/ShowTargetCharacterMenu");
-            if (transform == null) return;
-            var mouseTipObj = transform.gameObject;
+            var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
+            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+        }
+    }
 
-            if (mainCharacter == null || !HasCharacter(__instance))
-            {
-                if (refers != null)
-                {
-                    var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                    mouseTipDisplayer.enabled = false;
-                }
-            }
-            else
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(UI_EventWindow), "UpdateTargetCharacter")]
+    static void UpdateTargetCharacterPostfix(UI_EventWindow __instance)
+    {
+        if (!ModEntry.ShowEventUICharacterMouseTip) return;
+        var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
+        CharacterDisplayData mainCharacter = data.TargetCharacter;
+        Refers refers = __instance.CGet<Refers>("TargetCharacter");
+        var transform = refers.transform.Find("CanvasChanger/AvatarArea/ShowTargetCharacterMenu");
+        if (transform == null) return;
+        var mouseTipObj = transform.gameObject;
+
+        if (mainCharacter == null || !HasCharacter(__instance))
+        {
+            if (refers != null)
             {
                 var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-                Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+                mouseTipDisplayer.enabled = false;
             }
         }
-
-        // [HarmonyReversePatch]
-        // [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
-        static bool HasCharacter(UI_EventWindow instance)
+        else
         {
-            return (bool)AccessTools.Method(typeof(UI_EventWindow), "HasCharacter")
-                .Invoke(instance, new object[] { });
-            // throw new Exception("stub!");
+            var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
+            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
         }
+    }
 
+    // [HarmonyReversePatch]
+    // [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
+    static bool HasCharacter(UI_EventWindow instance)
+    {
+        return (bool)AccessTools.Method(typeof(UI_EventWindow), "HasCharacter")
+            .Invoke(instance, new object[] { });
+        // throw new Exception("stub!");
+    }
 }

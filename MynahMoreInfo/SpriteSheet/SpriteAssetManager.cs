@@ -16,6 +16,9 @@ public static class SpriteAssetManager
     {
         var keys = new string[]
         {
+            "sp_icon_renwutexing_0",
+            "sp_icon_renwutexing_1",
+            "sp_icon_renwutexing_2",
             "sp_icon_renwutexing_3",
             "sp_icon_renwutexing_4",
             "sp_icon_renwutexing_5",
@@ -27,7 +30,6 @@ public static class SpriteAssetManager
             "sp_icon_renwutexing_11",
         };
 
-        var counter = 0;
         var sprites = new List<Sprite>();
         foreach (var key in keys)
         {

@@ -12,19 +12,15 @@ public class GroupCallBuilder
 
     public Action<Dictionary<string, (int, RawDataPool)>> OnAllOver = null;
 
-    public Action<(int, RawDataPool)> AddAction(string key)
+    public Action<int, RawDataPool> AddAction(string key)
     {
         _keys.Add(key);
-        return tuple =>
-        {
-            _resultMap[key] = tuple;
+        return (offset, dp) => {
+            _resultMap[key] = (offset, dp);
 
             if (_keys.Any(s => !_resultMap.ContainsKey(s)))
-            {
                 return;
-            }
-
-            OnAllOver?.Invoke(_resultMap);
+            OnAllOver?.Invoke(_resultMap); 
         };
     }
 
