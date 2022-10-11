@@ -80,10 +80,13 @@ public class UI_MapBlockCharListPatch
             {
                 var item = EasyPool.Get<List<GroupCharDisplayData>>();
                 Serializer.Deserialize(dataPool, offset, ref item);
+                if(item.Count < 1) return;
                 var groupCharDisplayData = item[0];
                 EasyPool.Free(item);
 
                 if (groupCharDisplayData == null) return;
+                
+                // Debug.Log("1");
 
                 var isTaiwu = displayData.CharacterId == SingletonObject.getInstance<BasicGameData>().TaiwuCharId;
                 var showName = NameCenter.GetCharMonasticTitleOrNameByDisplayData(displayData, isTaiwu);
@@ -126,6 +129,7 @@ public class UI_MapBlockCharListPatch
                 // bool isFixedCharacter =
                 //     CreatingType.IsFixedPresetType(Character.Instance.GetItem(displayData.TemplateId)
                 //         .CreatingType);
+                // Debug.Log("2");
 
                 var sb = new StringBuilder();
 
@@ -161,6 +165,8 @@ public class UI_MapBlockCharListPatch
                 {
                     sb.Append($"({groupCharDisplayData.FavorabilityToTaiwu})");
                 }
+                
+                // Debug.Log("3");
                 
                 var fameType = FameType.GetFameType(groupCharDisplayData.Fame);
                 sb.Append("<pos=35%>声望：" + CommonUtils.GetFameString(fameType) + $"({groupCharDisplayData.Fame})");
@@ -210,6 +216,8 @@ public class UI_MapBlockCharListPatch
 
                 AgeEffectItem ageEffectItem =
                     AgeEffect.Instance[Mathf.Min(groupCharDisplayData.CurrAge, AgeEffect.Instance.Count - 1)];
+                
+                // Debug.Log("4");
 
                 var s = "";
                 var num = 0;
@@ -299,6 +307,7 @@ public class UI_MapBlockCharListPatch
                 }
 
                 displayer.RuntimeParam.Set("arg1", sb.ToString());
+                displayer.enabled = true;
                 // var cal = __instance.transform.Find("CharAttributeList");
                 // var gameObject = new GameObject();
                 // var tmp = gameObject.AddComponent<TextMeshProUGUI>();

@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.21~",
+    Title = "~更多信息 v1.23~",
     FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
     Author = "myna12548",
     Source = 1,
@@ -38,6 +38,11 @@ return {
 1.21更新（详细人物浮窗）：\
 - 修正了进攻/守御/机略数的显示错误，现在可以正确显示图标了（感谢剑圣大佬）\
 - 尝试修正与其他显示数值mod的冲突导致界面错乱的问题\
+1.22更新：\
+- 修正了在非当前区域地图不能缩放的问题\
+- 由于官方更新了延迟问题修正，删除本mod的延迟去除功能\
+1.23更新：\
+修正了一个红字报错问题（仍然会导致部分人物浮窗不显示，明天继续修）\
 \
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复",
     DefaultSettings = {

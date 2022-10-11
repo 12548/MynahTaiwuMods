@@ -1,29 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameData.Utilities;
 
 namespace MynahMoreInfo;
 
 public class GroupCallBuilder
 {
-    private Dictionary<string, (int, RawDataPool)> resultMap = new();
-    private HashSet<string> keys = new();
+    private readonly Dictionary<string, (int, RawDataPool)> _resultMap = new();
+    private readonly HashSet<string> _keys = new();
 
     public Action<Dictionary<string, (int, RawDataPool)>> OnAllOver = null;
 
-    Action<(int, RawDataPool)> AddAction(string key)
+    public Action<(int, RawDataPool)> AddAction(string key)
     {
-        keys.Add(key);
+        _keys.Add(key);
         return tuple =>
         {
-            resultMap[key] = tuple;
+            _resultMap[key] = tuple;
 
-            foreach (var s in keys)
+            if (_keys.Any(s => !_resultMap.ContainsKey(s)))
             {
-                if(!resultMap.ContainsKey(s)) return;
+                return;
             }
 
-            OnAllOver?.Invoke(resultMap);
+            OnAllOver?.Invoke(_resultMap);
         };
     }
 

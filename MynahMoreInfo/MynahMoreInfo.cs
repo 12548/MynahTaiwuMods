@@ -63,8 +63,8 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("按alt显示地块浮窗", description: "开启地块浮窗时生效，开启后需同时按住alt显示地块浮窗")]
     public static readonly bool MapBlockMouseTipByAlt = false;
 
-    [ModSetting("延迟修正", description: "去除官方的tips延迟，谨慎使用，毕竟官方加此延迟必有深意，我确实不懂")]
-    public static readonly bool DelayFix = true;
+    // [ModSetting("延迟修正", description: "去除官方的tips延迟，谨慎使用，毕竟官方加此延迟必有深意，我确实不懂")]
+    // public static readonly bool DelayFix = true;
 
     public override void OnModSettingUpdate()
     {

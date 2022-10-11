@@ -59,7 +59,6 @@ public class UI_WorldmapPatch
             var mouseTips = __instance.MapClickReceiver.TipDisplayer;
             if (blockData == null || blockData.AreaId != ____mapModel.CurrentAreaId || !blockData.Visible)
             {
-                __instance.MapClickReceiver.OnMapBlockPointExit(x, y);
                 return;
             }
 
