@@ -16,21 +16,17 @@ public class ModDomainPatch
         // AdaptableLog.Info($"GetString: {modIdStr} {dataName} {isArchive}");
         if (modIdStr != ModEntry.StaticModIdStr) return true;
         if (isArchive) return true;
-        if (!dataName.StartsWith("GetCharacterData|")) return true;
+        if (!dataName.StartsWith("GetCharacterData|")) return false;
         var charId = int.Parse(dataName.Split("|")[1]);
         var retValue = new Dictionary<string, object>();
 
         var charGot = DomainManager.Character.TryGetElement_Objects(charId, out var character);
-        if (!charGot) return true;
+        if (!charGot) return false;
 
         retValue["FeatureIds"] = character.GetFeatureIds();
-
-        var hasMerchantType = DomainManager.Extra.TryGetMerchantCharToType(charId, out var merchantType);
-        if (hasMerchantType)
-        {
-            retValue["MerchantType"] = merchantType;
-        }
-
+        retValue["LovingItemSubType"] = character.GetLovingItemSubType();
+        retValue["HatingItemSubType"] = character.GetHatingItemSubType();
+        
         __result = Json.Serialize(retValue);
         
         // AdaptableLog.Info($"Result Set: {__result}");
