@@ -31,16 +31,25 @@ public static class EventDumper
                 foreach (var t in eventAssembly.GetExportedTypes()
                              .FindAll(it => it.IsSubclassOf(typeof(TaiwuEventItem))))
                 {
-                    count++;
-                    var taiwuEventItem = (TaiwuEventItem)System.Activator.CreateInstance(t)!;
-                    var eventDumpInfo = new EventDumpInfo(taiwuEventItem);
-
-                    if (!groups.ContainsKey(taiwuEventItem.EventGroup))
+                    try
                     {
-                        groups.Add(taiwuEventItem.EventGroup, new Dictionary<string, EventDumpInfo>());
-                    }
+                        count++;
+                        var taiwuEventItem = (TaiwuEventItem)Activator.CreateInstance(t)!;
+                        var eventDumpInfo = new EventDumpInfo(taiwuEventItem);
+
+                        if (!groups.ContainsKey(taiwuEventItem.EventGroup))
+                        {
+                            groups.Add(taiwuEventItem.EventGroup, new Dictionary<string, EventDumpInfo>());
+                        }
                     
-                    groups[taiwuEventItem.EventGroup].Add(eventDumpInfo.Guid, eventDumpInfo);
+                        groups[taiwuEventItem.EventGroup].Add(eventDumpInfo.Guid, eventDumpInfo);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Error dumping {t.Name} from {eventAssembly.Location}");
+                        Console.WriteLine(2);
+                        continue;
+                    }
                 }
             }
 

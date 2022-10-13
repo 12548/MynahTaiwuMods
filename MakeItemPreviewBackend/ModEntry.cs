@@ -15,7 +15,7 @@ public class ModEntry : TaiwuRemakePlugin
     {
         Patch.handleMethod(ModIdStr, "GetItemPreview", param =>
         {
-            AdaptableLog.Info("Handleing methos GetItemPreview");
+            AdaptableLog.Info("Handling method GetItemPreview");
             param.Get("itemType", out int itemType);
             param.Get("templateId", out int templateId);
 

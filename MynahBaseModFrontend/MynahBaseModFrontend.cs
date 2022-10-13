@@ -229,32 +229,30 @@ public class MynahBaseModFrontend
     public static void OnModSettingUpdate(TaiwuRemakePlugin plugin)
     {
         var type = plugin.GetType();
-        foreach (var field in type.GetFields())
+        foreach (var field in type.GetFields((BindingFlags)(-1)))
         {
             var setting = field.GetCustomAttribute(typeof(ModSetting), true);
-            if (setting != null)
+            if (setting == null) continue;
+            var modSetting = (ModSetting)setting;
+            switch (modSetting.GetModSettingType(field))
             {
-                var modSetting = (ModSetting)setting;
-                switch (modSetting.GetModSettingType(field))
-                {
-                    case "InputField":
-                        var strArg = "";
-                        ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref strArg);
-                        field.SetValue(plugin, strArg);
-                        break;
+                case "InputField":
+                    var strArg = "";
+                    ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref strArg);
+                    field.SetValue(plugin, strArg);
+                    break;
 
-                    case "Toggle":
-                        var boolArg = false;
-                        ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref boolArg);
-                        field.SetValue(plugin, boolArg);
-                        break;
+                case "Toggle":
+                    var boolArg = false;
+                    ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref boolArg);
+                    field.SetValue(plugin, boolArg);
+                    break;
 
-                    default: // ToggleGroup Slider Dropdown 全都是Int
-                        var intArg = 0;
-                        ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref intArg);
-                        field.SetValue(plugin, intArg);
-                        break;
-                }
+                default: // ToggleGroup Slider Dropdown 全都是Int
+                    var intArg = 0;
+                    ModManager.GetSetting(plugin.ModIdStr, modSetting.GetKey(field), ref intArg);
+                    field.SetValue(plugin, intArg);
+                    break;
             }
         }
     }

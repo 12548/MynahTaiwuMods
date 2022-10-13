@@ -55,34 +55,43 @@ public class MouseTipSimpleWidePatch
 
         gCall.OnAllOver = dict =>
         {
-            var (gcddOffset, gcddDatapool) = dict["GroupCharDisplayDataList"];
-            var (cdOffset, cdDatapool) = dict["CharacterData"];
-            var item = EasyPool.Get<List<GroupCharDisplayData>>();
-            Serializer.Deserialize(gcddDatapool, gcddOffset, ref item);
-            if (item.Count < 1) return;
+            try
+            {
+                var (gcddOffset, gcddDatapool) = dict["GroupCharDisplayDataList"];
+                var (cdOffset, cdDatapool) = dict["CharacterData"];
+                var item = EasyPool.Get<List<GroupCharDisplayData>>();
+                Serializer.Deserialize(gcddDatapool, gcddOffset, ref item);
+                if (item.Count < 1) return;
                 
-            var groupCharDisplayData = item[0];
-            EasyPool.Free(item);
+                var groupCharDisplayData = item[0];
+                EasyPool.Free(item);
 
-            var cdString = "";
-            Serializer.Deserialize(cdDatapool, cdOffset, ref cdString);
+                var cdString = "";
+                Serializer.Deserialize(cdDatapool, cdOffset, ref cdString);
 
-            var cdDict = (Dictionary<string, object>)Json.Deserialize(cdString);
-            if (cdDict != null)
-            {
-                var objects = (List<object>)cdDict["FeatureIds"];
-                var lovingItemSubType = Convert.ToInt32(cdDict["LovingItemSubType"]);
-                var hatingItemSubType = Convert.ToInt32(cdDict["HatingItemSubType"]);
-                SetContent(displayData, groupCharDisplayData,
-                    objects.Select(Convert.ToInt32).ToList(),
-                    lovingItemSubType,
-                    hatingItemSubType,
-                    titleText, contentText
-                );
+                var cdDict = (Dictionary<string, object>)Json.Deserialize(cdString);
+                if (cdDict != null)
+                {
+                    var objects = (List<object>)cdDict["FeatureIds"];
+                    var lovingItemSubType = Convert.ToInt32(cdDict["LovingItemSubType"]);
+                    var hatingItemSubType = Convert.ToInt32(cdDict["HatingItemSubType"]);
+                    SetContent(displayData, groupCharDisplayData,
+                        objects.Select(Convert.ToInt32).ToList(),
+                        lovingItemSubType,
+                        hatingItemSubType,
+                        titleText, contentText
+                    );
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to parse json: {cdString} on char: {displayData.CharacterId}");
+                }
             }
-            else
+            catch (Exception e)
             {
-                Debug.LogWarning($"Failed to parse json: {cdString} on char: {displayData.CharacterId}");
+                Debug.LogWarning(e);
+                // ignore
+                contentText.text = "详细人物浮窗加载失败";
             }
         };
     }

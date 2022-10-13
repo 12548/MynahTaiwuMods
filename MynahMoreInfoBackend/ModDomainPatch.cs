@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using GameData.Domains;
 using GameData.Domains.Mod;
+using GameData.Utilities;
 using HarmonyLib;
 using MiniJSON;
 
@@ -14,9 +15,9 @@ public class ModDomainPatch
     private static bool GetStringPrefix(string modIdStr, string dataName, bool isArchive, ref string __result)
     {
         // AdaptableLog.Info($"GetString: {modIdStr} {dataName} {isArchive}");
-        if (modIdStr != ModEntry.StaticModIdStr) return true;
-        if (isArchive) return true;
-        if (!dataName.StartsWith("GetCharacterData|")) return false;
+        // if (modIdStr != ModEntry.StaticModIdStr) return true;
+        // if (isArchive) return true;
+        if (!dataName.StartsWith("GetCharacterData|")) return true;
         var charId = int.Parse(dataName.Split("|")[1]);
         var retValue = new Dictionary<string, object>();
 

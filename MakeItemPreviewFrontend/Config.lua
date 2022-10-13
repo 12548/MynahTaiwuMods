@@ -11,7 +11,8 @@ return {
         [3] = "MakeItemPreviewFrontend.dll",
     },
     Author = "myna12548",
-    Description = "为制作物品增加浮窗预览",
+    Description = "为制作物品增加浮窗预览（预览为基础物品，不含属性加成）",
+    Source = 0,
     DefaultSettings = {
     }
 }

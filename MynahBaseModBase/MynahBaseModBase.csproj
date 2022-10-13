@@ -43,6 +43,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BaseUtils.cs" />
         <Compile Include="MynahBaseModBase.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

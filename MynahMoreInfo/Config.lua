@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.32~",
+    Title = "~更多信息 v1.34~",
     FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
     BackendPlugins = {"MynahBaseModBase.dll", "MynahBaseModBackend.dll", "MynahMoreInfoBackend.dll"},
     Author = "myna12548",
@@ -10,7 +10,7 @@ return {
 
 （切换设置项开关后请退出重进游戏，否则可能会不生效）
  (如果遇到书籍的额外信息不显示的情况，请先把鼠标放到一个功法上显示一下)
-    
+
 1.1-1.193更新：
 - 修正了在门派功法列表不显示打点的问题
 - 增加了显示书籍所载功法五行属性的功能
@@ -38,6 +38,10 @@ return {
 - 详细人物浮窗增加了显示人物喜恶
 1.33更新：
 - 调整了人物详细浮窗的显示机制并防止红字报错
+1.34更新：
+- 防止一些可能的红字错误
+
+接下来一段时间内都没时间更新了，目前只能先尽量把bug修好，功能优化都要延后了
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {
