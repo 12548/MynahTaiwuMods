@@ -1,21 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Config;
-using Config.ConfigCells.Character;
+﻿using System.Collections.Generic;
 using FrameWork;
-using GameData.Domains;
-using GameData.Domains.Character;
 using GameData.Domains.Character.Display;
-using GameData.Domains.Mod;
-using GameData.Serializer;
 using HarmonyLib;
-using MiniJSON;
-using UICommon.Character.Elements;
-using UnityEngine;
-using LifeSkillType = Config.LifeSkillType;
 
 namespace MynahMoreInfo;
 
@@ -50,7 +36,7 @@ public class UI_MapBlockCharListPatch
             switch (ModEntry.MouseTipMapBlockCharList)
             {
                 case 2:
-                    GetAlternateCharTipStr(__instance, mouseTipDisplayer, charDisplayData);
+                    GetAlternateCharTipStr(mouseTipDisplayer, charDisplayData);
                     break;
                 case 1:
                     Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);
@@ -61,25 +47,9 @@ public class UI_MapBlockCharListPatch
         {
             mouseTipDisplayer.enabled = false;
         }
-        // mouseTipDisplayer.Type = TipType.SingleDesc;
-        //
-
-        //
-        // CharacterItem item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
-        // var s = "";
-        // s += CommonUtils.GetGenderString(charDisplayData.Gender) + "·";
-        // s += CommonUtils.GetCharmLevelText(
-        //     item.BaseAttraction,
-        //     item.Gender,
-        //     20, 1) + "(基础值)·";
-        // s += CommonUtils.GetBehaviorString(charDisplayData.BehaviorType) + "·";
-        // s += SingletonObject.getInstance<WorldMapModel>().GetSettlementName(charDisplayData.OrgInfo);
-        // s += GetIdentityText(item, charDisplayData.OrgInfo);
-        //
-        // mouseTipDisplayer.PresetParam = new[] { s };
     }
 
-    static void GetAlternateCharTipStr(UIBase ui, MouseTipDisplayer displayer, CharacterDisplayData displayData)
+    static void GetAlternateCharTipStr(MouseTipDisplayer displayer, CharacterDisplayData displayData)
     {
         displayer.Type = TipType.SimpleWide;
         displayer.RuntimeParam = new ArgumentBox();
@@ -87,42 +57,6 @@ public class UI_MapBlockCharListPatch
         displayer.RuntimeParam.Set("arg1", "人物浮窗加载中");
         displayer.RuntimeParam.SetObject("_mmi_mtc_charDisplayData", displayData);
         displayer.enabled = true;
-        
-        // MynahBaseModFrontend.MynahBaseModFrontend.ModGetString(
-        //     ModEntry.StaticModIdStr,
-        //     ui,
-        //     $"GetCharacterData|{displayData.CharacterId}",
-        //     false,
-        //     data =>
-        //     {
-        //         var characterData = (Dictionary<string, object>)Json.Deserialize(data);
-        // List<int> featureIds = new();
-        // data.Get("featureIds", out string featureIdStr);
-        // if (featureIdStr != null)
-        // {
-        //     featureIds = featureIdStr.Split(',').ToList().Select(int.Parse).ToList();
-        // }
-        // data.Get("groupCharDisplayData", out GroupCharDisplayData groupCharDisplayData);
-        //
-        //     Title(displayData, characterData.GroupCharDisplayData, characterData.FeatureIds, displayer);
-        // });
-
-        // ui.AsynchMethodCall(DomainHelper.DomainIds.Character,
-        //     CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList, new List<int> { displayData.CharacterId },
-        //     (offset, dataPool) =>
-        //     {
-        //         var item = EasyPool.Get<List<GroupCharDisplayData>>();
-        //         Serializer.Deserialize(dataPool, offset, ref item);
-        //         if (item.Count < 1) return;
-        //         var groupCharDisplayData = item[0];
-        //         EasyPool.Free(item);
-        //
-        //         if (groupCharDisplayData == null) return;
-        //
-        //         var title = Title(displayData, groupCharDisplayData, out var sb);
-        //
-
-        //     });
     }
 
 }

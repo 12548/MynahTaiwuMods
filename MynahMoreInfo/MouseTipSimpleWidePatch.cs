@@ -62,7 +62,7 @@ public class MouseTipSimpleWidePatch
                 var item = EasyPool.Get<List<GroupCharDisplayData>>();
                 Serializer.Deserialize(gcddDatapool, gcddOffset, ref item);
                 if (item.Count < 1) return;
-                
+
                 var groupCharDisplayData = item[0];
                 EasyPool.Free(item);
 

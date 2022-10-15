@@ -66,14 +66,14 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("人物浮窗显示真名", description: "从官方mod拿来的功能，在人物浮窗中显示法号对应的真实姓名")]
     public static bool CharacterMouseTipShowRealName = true;
 
-    [ModSetting("地块浮窗", description: "从官方mod拿来的功能，额外增加了资源显示")]
-    public static bool MapBlockMouseTip = true;
+    [ModSetting("地块浮窗显示人物列表", description: "")]
+    public static bool MapBlockMouseTipCharList = true;
+    
+    [ModSetting("地块浮窗高亮较多资源", description: "在地块浮窗中将100以上的资源以不同颜色显示")]
+    public static bool MapBlockMouseTipHighlightResource = true;
 
     [ModSetting("浮窗显示坐标和人物ID", description: "")]
     public static bool ShowPosAndId = true;
-
-    [ModSetting("按alt显示地块浮窗", description: "开启地块浮窗时生效，开启后需按住alt再移动鼠标才能显示地块浮窗")]
-    public static bool MapBlockMouseTipByAlt = false;
 
     [ModSetting("延迟去除", description: "将官方的tips机制重写为无延迟的旧版本，请务必谨慎使用")]
     public static bool DelayFix = false;

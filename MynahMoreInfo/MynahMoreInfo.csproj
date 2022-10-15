@@ -87,6 +87,7 @@
         <Compile Include="MiniJSON\Json.cs" />
         <Compile Include="MouseTipCharacterPatch.cs" />
         <Compile Include="MouseTipManagerPatch.cs" />
+        <Compile Include="MouseTipMapBlockPatch.cs" />
         <Compile Include="MouseTipSimpleWidePatch.cs" />
         <Compile Include="MynahMoreInfo.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,7 +95,6 @@
         <Compile Include="SpriteSheet\SpriteAssetManager.cs" />
         <Compile Include="UI_EventWindowPatch.cs" />
         <Compile Include="UI_MapBlockCharListPatch.cs" />
-        <Compile Include="UI_WorldmapPatch.cs" />
         <Compile Include="Util.cs" />
     </ItemGroup>
     <ItemGroup>
