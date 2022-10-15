@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.34~",
+    Title = "~更多信息 v1.35~",
     FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
     BackendPlugins = {"MynahBaseModBase.dll", "MynahBaseModBackend.dll", "MynahMoreInfoBackend.dll"},
     Author = "myna12548",
@@ -40,8 +40,8 @@ return {
 - 调整了人物详细浮窗的显示机制并防止红字报错
 1.34更新：
 - 防止一些可能的红字错误
-
-接下来一段时间内都没时间更新了，目前只能先尽量把bug修好，功能优化都要延后了
+1.35更新：
+- 适配官方的地块浮窗变化，修复红字，去掉了alt显示地块浮窗功能，改为两个地块浮窗加强选项
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {

@@ -1,9 +1,13 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Linq;
+using System.Reflection;
 using Config;
 using FrameWork;
+using GameData.Domains;
 using GameData.Domains.Item;
 using GameData.Domains.Item.Display;
 using GameData.Domains.Mod;
+using GameData.Serializer;
 using HarmonyLib;
 using TaiwuModdingLib.Core.Utils;
 using UnityEngine;
@@ -23,6 +27,7 @@ public class UI_MakePatch
         var mouseTipDisplayer = __instance.CGet<MouseTipDisplayer>("PreviewTip");
         if (____currentTarget == null || ____curTab != UI_Make.UIMakeTab.Make)
         {
+            Debug.Log($"no preview: {____currentTarget} or {____curTab}!={UI_Make.UIMakeTab.Make}");
             mouseTipDisplayer.Type = TipType.MakeItem;
             return;
         }
@@ -31,18 +36,22 @@ public class UI_MakePatch
         var makeResult = (UI_Make.MakeResult)__instance.CallMethod("GetMakeResult");
         MakeItemSubTypeItem makeItemSubTypeItem = MakeItemSubType.Instance[____makeItemSubTypeId];
         MakeItemTypeItem makeItemTypeItem = MakeItemType.Instance[____makeItemTypeId];
-        
-        var args = new SerializableModData();
-        
-        args.Set("itemType", makeResult.ItemType);
-        args.Set("templateId", makeResult.TargetResultItem.TemplateId);
-        
-        MynahBaseModFrontend.MynahBaseModFrontend.CallMethodCustom(ModEntry.StaticModIdStr, __instance, "GetItemPreview", args,
-            result =>
-            {
-                var succ = result.Get("data", out ItemDisplayData data);
 
-                if (!succ)
+        var ik = new ItemKey
+        {
+            Id = -12548,
+            ItemType = makeResult.ItemType,
+            TemplateId = makeResult.TargetResultItem.TemplateId
+        };
+
+        Debug.Log("calling!");
+        __instance.AsynchMethodCall(DomainHelper.DomainIds.Item, ItemDomainHelper.MethodIds.GetItemDisplayData, ik, -12548,
+            (offset, datapool) =>
+            {
+                ItemDisplayData data = null;
+                Serializer.Deserialize(datapool, offset, ref data);
+
+                if (data == null)
                 {
                     Debug.Log("failed!");
                     return;
@@ -52,12 +61,22 @@ public class UI_MakePatch
 
                 mouseTipDisplayer.enabled = true;
                 mouseTipDisplayer.RuntimeParam = new ArgumentBox()
-                    .SetObject("MakeResult", makeResult)
+                    .SetObject("_mip_MakeResult", makeResult)
                     .SetObject("ItemData", data);
                 // .Set("Title", name)
                 // .Set("Desc", makeItemSubTypeItem.Desc);
             });
 
         return;
+    }
+    
+    [HarmonyPostfix, HarmonyPatch(typeof(UI_Make), "ChangeTab")]
+    public static void ChangeTabPostfix(UI_Make __instance, UI_Make.UIMakeTab newTab)
+    {
+        var mouseTipDisplayer = __instance.CGet<MouseTipDisplayer>("PreviewTip");
+        if (newTab != UI_Make.UIMakeTab.Make)
+        {
+            mouseTipDisplayer.enabled = false;
+        }
     }
 }

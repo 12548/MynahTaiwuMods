@@ -31,7 +31,7 @@ public class MouseTipBasePatch
         var mouseTip = __instance as MouseTipBase;
         if (mouseTip == null) return;
         
-        var b = argsBox.Get("MakeResult", out UI_Make.MakeResult makeResult);
+        var b = argsBox.Get("_mip_MakeResult", out UI_Make.MakeResult makeResult);
 
         if (!b) return;
 

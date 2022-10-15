@@ -150,7 +150,7 @@ namespace LuaTableSerializer
 		// Token: 0x06000011 RID: 17 RVA: 0x00002538 File Offset: 0x00000738
 		private static string EscapeString(string data)
 		{
-			string str = data.Replace("\\", "\\\\").Replace("\t", "\\t").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\"", "\\\"").Replace("'", "\\'").Replace("[", "\\[").Replace("]", "\\]");
+			string str = data.Replace("\\", "\\\\").Replace("\t", "\\t").Replace("\n", "\\\n").Replace("\r", "\\r").Replace("\"", "\\\"").Replace("'", "\\'").Replace("[", "\\[").Replace("]", "\\]");
 			return "\"" + str + "\"";
 		}
 	}
