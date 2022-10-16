@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Config;
 using FrameWork;
 using GameData.Domains;
 using GameData.Domains.Character;
@@ -18,6 +19,15 @@ public class MouseTipMapBlockPatch
     public static void Postfix(MouseTipMapBlock __instance, ArgumentBox argsBox)
     {
         argsBox.Get("MapBlockData", out MapBlockData blockData);
+        
+        if (ModEntry.ShowPosAndId)
+        {
+            var pos = blockData.GetBlockPos();
+            var str = $"\n世界坐标(AreaId, BlockId): ({blockData.AreaId},{blockData.BlockId})\n区域坐标(x, y): ({pos.X},{pos.Y})";
+         
+            var mapBlockItem = MapBlock.Instance[blockData.TemplateId];
+            __instance.CGet<TextMeshProUGUI>("Desc").text = (mapBlockItem.Desc + str).ColorReplace();
+        }
 
         if (ModEntry.MapBlockMouseTipHighlightResource && !blockData.IsCityTown())
         {
