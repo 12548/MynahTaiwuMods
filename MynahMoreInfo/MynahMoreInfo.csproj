@@ -86,6 +86,7 @@
         <Compile Include="GroupCallBuilder.cs" />
         <Compile Include="MiniJSON\Json.cs" />
         <Compile Include="MouseTipCharacterPatch.cs" />
+        <Compile Include="MouseTipDisplayerPatch.cs" />
         <Compile Include="MouseTipManagerPatch.cs" />
         <Compile Include="MouseTipMapBlockPatch.cs" />
         <Compile Include="MouseTipSimpleWidePatch.cs" />

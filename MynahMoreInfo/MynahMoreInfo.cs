@@ -35,6 +35,14 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     public static int MouseTipMapBlockCharList = 2;
 
     [DropDownModSetting(
+        "地块浮窗",
+        new[] { "不显示", "按住alt显示", "始终显示（原版）" },
+        description: "注意：如果选择按住alt显示，那么需要按住alt再移动鼠标到新的地块来显示浮窗",
+        defaultValue: 2
+    )]
+    public static int MapBlockMouseTipStat = 2;
+
+    [DropDownModSetting(
         "显示人物特性",
         description: "在详细文字式左侧人物浮窗中显示人物特性",
         options: new[] { "关闭", "显示可见特性", "显示全部特性" },
@@ -68,7 +76,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("地块浮窗显示人物列表", description: "")]
     public static bool MapBlockMouseTipCharList = true;
-    
+
     [ModSetting("地块浮窗高亮较多资源", description: "在地块浮窗中将100以上的资源以不同颜色显示")]
     public static bool MapBlockMouseTipHighlightResource = true;
 
