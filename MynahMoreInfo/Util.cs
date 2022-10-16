@@ -17,17 +17,32 @@ public class Util
         return mouseTipDisplayer;
     }
 
-    public static void EnableMouseTipCharacter(MouseTipDisplayer mouseTipDisplayer, int characterId)
+    public static void EnableMouseTipCharacter(MouseTipDisplayer mouseTipDisplayer, int characterId, int type = 1)
     {
-        mouseTipDisplayer.Type = TipType.Character;
-        if (mouseTipDisplayer.RuntimeParam == null)
+        if (type == 1)
         {
-            mouseTipDisplayer.RuntimeParam = EasyPool.Get<ArgumentBox>();
-            mouseTipDisplayer.RuntimeParam.Clear();
-        }
-        // var item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
+            mouseTipDisplayer.Type = TipType.Character;
+            if (mouseTipDisplayer.RuntimeParam == null)
+            {
+                mouseTipDisplayer.RuntimeParam = EasyPool.Get<ArgumentBox>();
+                mouseTipDisplayer.RuntimeParam.Clear();
+            }
+            // var item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
 
-        mouseTipDisplayer.RuntimeParam.Set("charId", characterId);
-        mouseTipDisplayer.enabled = true;
+            mouseTipDisplayer.RuntimeParam.Set("charId", characterId);
+            mouseTipDisplayer.enabled = true;
+        }
+        else
+        {
+            mouseTipDisplayer.Type = TipType.SimpleWide;
+            if (mouseTipDisplayer.RuntimeParam == null)
+            {
+                mouseTipDisplayer.RuntimeParam = EasyPool.Get<ArgumentBox>();
+                mouseTipDisplayer.RuntimeParam.Clear();
+            }
+            
+            mouseTipDisplayer.RuntimeParam.Set("_mmi_charId", characterId);
+            mouseTipDisplayer.enabled = true;
+        }
     }
 }

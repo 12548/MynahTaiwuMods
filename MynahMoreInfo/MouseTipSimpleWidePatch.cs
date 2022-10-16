@@ -11,8 +11,10 @@ using GameData.Domains.Character;
 using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
 using GameData.Serializer;
+using GameData.Utilities;
 using HarmonyLib;
 using MiniJSON;
+using MynahBaseModBase;
 using TMPro;
 using UICommon.Character.Elements;
 using UnityEngine;
@@ -33,25 +35,38 @@ public class MouseTipSimpleWidePatch
         // textMeshProUgui1.text = str;
         // textMeshProUgui2.text = srcString.ColorReplace();
         // textMeshProUgui2.GetComponent<TMPTextSpriteHelper>().Parse();
-        var isCharInfo = argsBox.Get("_mmi_mtc_charDisplayData", out CharacterDisplayData displayData);
-        if (!isCharInfo) return;
+        var hasCharId = argsBox.Get("_mmi_charId", out int charId);
+        var hasDisplayData = argsBox.Get("_mmi_mtc_charDisplayData", out CharacterDisplayData displayData);
+        if (!hasDisplayData && !hasCharId) return;
+        
+        if (hasDisplayData)
+        {
+            charId = displayData.CharacterId;
+        }
+        
         var titleText = __instance.CGet<TextMeshProUGUI>("Title");
         var contentText = __instance.CGet<TextMeshProUGUI>("Desc");
         var gCall = new GroupCallBuilder();
-        var a1 = gCall.AddAction("GroupCharDisplayDataList");
-        var a2 = gCall.AddAction("CharacterData");
+
+        if (!hasDisplayData)
+        {
+            __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
+                CharacterDomainHelper.MethodIds.GetCharacterDisplayDataList,
+                new List<int> { charId },
+                gCall.AddAction("CharacterDisplayDataList"));
+        }
 
         __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
             CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList,
-            new List<int> { displayData.CharacterId },
-            a1);
-
+            new List<int> { charId },
+            gCall.AddAction("GroupCharDisplayDataList"));
+ 
         __instance.AsynchMethodCall(DomainHelper.DomainIds.Mod,
             ModDomainHelper.MethodIds.GetString,
             ModEntry.StaticModIdStr,
-            $"GetCharacterData|{displayData.CharacterId}",
+            $"GetCharacterData|{charId}",
             false,
-            a2);
+            gCall.AddAction("CharacterData"));
 
         gCall.OnAllOver = dict =>
         {
@@ -62,9 +77,22 @@ public class MouseTipSimpleWidePatch
                 var item = EasyPool.Get<List<GroupCharDisplayData>>();
                 Serializer.Deserialize(gcddDatapool, gcddOffset, ref item);
                 if (item.Count < 1) return;
-
                 var groupCharDisplayData = item[0];
                 EasyPool.Free(item);
+
+                if (dict.ContainsKey("CharacterDisplayDataList"))
+                {
+                    var (cddOffset, cddDatapool) = dict["CharacterDisplayDataList"];
+                    var item2 = EasyPool.Get<List<CharacterDisplayData>>();
+                    Serializer.Deserialize(cddDatapool, cddOffset, ref item2);
+                    if (item2.Count < 1) return;
+                    displayData = item2[0];
+                    EasyPool.Free(item2); 
+                } else if (!hasDisplayData)
+                {
+                    Debug.Log("no display data!");
+                    return;
+                }
 
                 var cdString = "";
                 Serializer.Deserialize(cdDatapool, cdOffset, ref cdString);
@@ -84,7 +112,7 @@ public class MouseTipSimpleWidePatch
                 }
                 else
                 {
-                    Debug.LogWarning($"Failed to parse json: {cdString} on char: {displayData.CharacterId}");
+                    Debug.LogWarning($"Failed to parse json: {cdString} on char: {charId}");
                 }
             }
             catch (Exception e)
@@ -107,7 +135,7 @@ public class MouseTipSimpleWidePatch
         TextMeshProUGUI contentText
     )
     {
-        var isTaiwu = displayData.CharacterId == SingletonObject.getInstance<BasicGameData>().TaiwuCharId;
+        var isTaiwu = groupCharDisplayData.CharacterId == SingletonObject.getInstance<BasicGameData>().TaiwuCharId;
         var showName = NameCenter.GetCharMonasticTitleOrNameByDisplayData(displayData, isTaiwu);
         var realName = NameCenter.GetNameByDisplayData(displayData, isTaiwu, true);
         // var color = displayData.AliveState == 0 ? "white" : "red";

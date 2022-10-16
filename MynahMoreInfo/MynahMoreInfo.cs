@@ -34,6 +34,13 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [DropDownModSetting("左侧人物浮窗", new[] { "关闭", "原版", "详细文字" }, defaultValue: 2)]
     public static int MouseTipMapBlockCharList = 2;
 
+    [DropDownModSetting("居民人物浮窗",
+        new[] { "关闭", "原版", "详细文字" },
+        description: "居住、扩建等界面已安排的人物上",
+        defaultValue: 2
+    )]
+    public static int MouseTipResidentView = 2;
+
     [DropDownModSetting(
         "地块浮窗",
         new[] { "不显示", "按住alt显示", "始终显示（原版）" },

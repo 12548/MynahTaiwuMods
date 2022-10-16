@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.35~",
+    Title = "~更多信息 v1.36~",
     FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
     BackendPlugins = {"MynahBaseModBase.dll", "MynahBaseModBackend.dll", "MynahMoreInfoBackend.dll"},
     Author = "myna12548",
@@ -42,6 +42,9 @@ return {
 - 防止一些可能的红字错误
 1.35更新：
 - 适配官方的地块浮窗变化，修复红字，去掉了alt显示地块浮窗功能，改为两个地块浮窗加强选项
+1.36更新：
+- 恢复了地块浮窗显示坐标功能
+- 恢复了地块浮窗不显示/按alt显示的设置
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {
