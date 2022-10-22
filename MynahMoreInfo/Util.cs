@@ -8,11 +8,9 @@ public class Util
     public static MouseTipDisplayer EnsureMouseTipDisplayer(GameObject obj)
     {
         var mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
-        if (mouseTipDisplayer == null)
-        {
-            obj.AddComponent<MouseTipDisplayer>();
-            mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
-        }
+        if (mouseTipDisplayer != null) return mouseTipDisplayer;
+        obj.AddComponent<MouseTipDisplayer>();
+        mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
 
         return mouseTipDisplayer;
     }

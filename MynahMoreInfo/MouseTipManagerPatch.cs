@@ -20,7 +20,6 @@ public class MouseTipManagerPatch
         var _raycastResults = typeof(MouseTipManager).GetField("_raycastResults", (BindingFlags)(-1))!;
         var _currMouseTipDisplayerActive = typeof(MouseTipManager).GetField("_currMouseTipDisplayerActive", (BindingFlags)(-1))!;
 
-        Debug.Log("1");
         while (true)
         {
             var ____pointerEventData = (PointerEventData)pointerEventData.GetValue(__instance);
@@ -40,6 +39,10 @@ public class MouseTipManagerPatch
             var mouseTipDisplayerActive = hitObj != null && hitObj.GetComponent<MouseTipDisplayer>() != null && hitObj.GetComponent<MouseTipDisplayer>().enabled;
             if (hitObj != ____currMouseOverObj || mouseTipDisplayerActive != ____currMouseTipDisplayerActive)
             {
+                if (____currMouseOverObj != null)
+                {
+                    // Debug.Log($"curr: {_currMouseTipDisplayerActive}");
+                }
                 if (____currMouseTipDisplayerActive)
                     __instance.HideTips();
                 _currMouseOverObj.SetValue(__instance, hitObj);
