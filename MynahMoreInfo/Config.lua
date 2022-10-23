@@ -1,7 +1,7 @@
 return {
-    Title = "~更多信息 v1.36~",
-    FrontendPlugins = {"MynahBaseModBase.dll", "MynahBaseModFrontend.dll", "MynahMoreInfo.dll"},
-    BackendPlugins = {"MynahBaseModBase.dll", "MynahBaseModBackend.dll", "MynahMoreInfoBackend.dll"},
+    Title = "~更多信息 v1.42~",
+    FrontendPlugins = { "MynahMoreInfo.dll" },
+    BackendPlugins = { "MynahMoreInfoBackend.dll" },
     Author = "myna12548",
     Source = 1,
     FileId = 2871621277,
@@ -28,25 +28,22 @@ return {
 - 重新显示了建筑地块的人物列表
 - 修正了在非当前区域地图不能缩放的问题
 - 重做了延迟去除功能（默认关闭，请谨慎开启）
-
-1.3更新：
+1.3-1.36更新：
+- 调整了人物详细浮窗的显示机制
 - 增加了在详细人物浮窗中显示特性的功能（包括隐藏特性）
-1.31更新：
-- 修正一个可能的红字报错
-1.32更新：
-- 修正一个可能的红字报错
+- 修正可能的红字报错
 - 详细人物浮窗增加了显示人物喜恶
-1.33更新：
-- 调整了人物详细浮窗的显示机制并防止红字报错
-1.34更新：
-- 防止一些可能的红字错误
-1.35更新：
-- 适配官方的地块浮窗变化，修复红字，去掉了alt显示地块浮窗功能，改为两个地块浮窗加强选项
-1.36更新：
-- 恢复了地块浮窗显示坐标功能
-- 恢复了地块浮窗不显示/按alt显示的设置
+- 适配官方的地块浮窗变化
+
+1.4更新：
+- 修正最新测试版浮窗不消失的问题（不确定，如果没修好请告诉我）
+- 恢复了居民信息浮窗功能
+- 尝试使用mod依赖功能（
+1.42更新：
+- 修复错误
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {
-    }
+    },
+    Dependencies = { 2878665107 }
 }

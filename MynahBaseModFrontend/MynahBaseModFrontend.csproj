@@ -33,9 +33,13 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
+    <PropertyGroup>
+      <PostBuildEvent>pwsh AfterBuild.ps1 $(TargetDir)</PostBuildEvent>
+    </PropertyGroup>
     <ItemGroup>
         <Reference Include="Assembly-CSharp">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -43,12 +47,15 @@
         <Reference Include="System.Xml" />
         <Reference Include="TaiwuModdingLib">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\UnityEngine.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+          <Private>False</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -60,6 +67,14 @@
         <Project>{ca337ca5-83f1-447d-a72b-2588ad21045f}</Project>
         <Name>MynahBaseModBase</Name>
       </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="AfterBuild.ps1">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Config.lua">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

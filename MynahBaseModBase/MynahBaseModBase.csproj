@@ -40,6 +40,7 @@
         <Reference Include="System.Xml" />
         <Reference Include="TaiwuModdingLib">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+          <Private>False</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>

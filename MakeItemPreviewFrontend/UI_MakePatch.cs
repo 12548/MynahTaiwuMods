@@ -18,7 +18,7 @@ namespace MakeItemPreviewFrontend;
 public class UI_MakePatch
 {
     /// <summary>
-    /// 制作物品预览
+    /// 制作物品预览 
     /// </summary>
     [HarmonyPostfix, HarmonyPatch(typeof(UI_Make), "RefreshMakeTip")]
     public static void RefreshMakeTipPrefix(UI_Make __instance, ItemDisplayData ____currentTarget,

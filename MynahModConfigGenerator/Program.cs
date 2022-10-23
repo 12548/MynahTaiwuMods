@@ -20,17 +20,17 @@ namespace MynahModConfigGenerator
         {
             foreach (AssemblyName reference in selectedAssembly.GetReferencedAssemblies())
             {
-                if (System.IO.File.Exists(
-                        System.IO.Path.GetDirectoryName(selectedAssembly.Location) +
+                if (File.Exists(
+                        Path.GetDirectoryName(selectedAssembly.Location) +
                         @"\" + reference.Name + ".dll"))
                 {
-                    System.Reflection.Assembly.LoadFrom(
-                        System.IO.Path.GetDirectoryName(selectedAssembly.Location) +
+                    Assembly.LoadFrom(
+                        Path.GetDirectoryName(selectedAssembly.Location) +
                         @"\" + reference.Name + ".dll");
                 }
                 else
                 {
-                    var taiwuPath = System.Environment.GetEnvironmentVariable("TAIWU_PATH");
+                    var taiwuPath = Environment.GetEnvironmentVariable("TAIWU_PATH");
 
                     if (taiwuPath != null)
                     {
@@ -40,13 +40,13 @@ namespace MynahModConfigGenerator
                             reference.Name + ".dll");
                         if (File.Exists(taiwuDllPath))
                         {
-                            System.Reflection.Assembly.LoadFrom(taiwuDllPath);
-                        } else if (File.Exists(taiwuDllPath2))
+                            Assembly.LoadFrom(taiwuDllPath);
+                        }
+                        else if (File.Exists(taiwuDllPath2))
                         {
-                            System.Reflection.Assembly.LoadFrom(taiwuDllPath2);
+                            Assembly.LoadFrom(taiwuDllPath2);
                         }
                     }
-                    
                 }
             }
         }
@@ -57,8 +57,8 @@ namespace MynahModConfigGenerator
         /// <param name="args">第一个是读取的lua文件，后面的参数是读取的dll文件，最后一个参数是输出的lua位置（不填则改变原lua，根据扩展名判断）</param>
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.AssemblyLoad += new AssemblyLoadEventHandler(CurrentDomain_AssemblyLoad);
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             if (args.Length >= 2)
             {
@@ -66,14 +66,15 @@ namespace MynahModConfigGenerator
                 var luastr = File.ReadAllText(luaFilePath);
 
                 Console.WriteLine("Before: " + luastr);
-                var assemblies = args.Where(it => it.EndsWith(".dll")).Select(Assembly.LoadFrom);
-                
-                foreach (var assembly in assemblies)
+                var modAssemblies = args.Where(it => it.EndsWith(".dll")).Select(Assembly.LoadFrom);
+
+                var enumerable = modAssemblies as Assembly[] ?? modAssemblies.ToArray();
+                foreach (var assembly in enumerable)
                 {
                     LoadAssemblyReferences(assembly);
                 }
-                
-                var result = ChangeLua(luastr, assemblies);
+
+                var result = ChangeLua(luastr, enumerable);
                 Console.WriteLine("After: " + result);
 
                 File.WriteAllText(args.Last().EndsWith(".lua") ? args.Last() : luaFilePath, result);
@@ -86,9 +87,7 @@ namespace MynahModConfigGenerator
 
         static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            Assembly assembly = null;
-
-            assemblies.TryGetValue(args.Name, out assembly);
+            assemblies.TryGetValue(args.Name, out var assembly);
 
             return assembly;
         }
@@ -96,16 +95,16 @@ namespace MynahModConfigGenerator
         static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
             Assembly assembly = args.LoadedAssembly;
-            assemblies[assembly.FullName] = assembly;
+            assemblies[assembly.FullName!] = assembly;
         }
 
         /// <summary>
         /// 将Lua字符串中第一个左大括号和最后一个右大括号之间的内容作为表读取，改变其中的"DefaultSettings"内容并返回。
         /// </summary>
         /// <param name="luastr">Lua字符串</param>
-        /// <param name="assemblies">要读取ModSetting的程序集</param>
+        /// <param name="modAssemblies">要读取ModSetting的程序集</param>
         /// <returns></returns>
-        private static string ChangeLua(string luastr, IEnumerable<Assembly> assemblies)
+        private static string ChangeLua(string luastr, IEnumerable<Assembly> modAssemblies)
         {
             var leftBraceIndex = luastr.IndexOf("{", StringComparison.Ordinal);
             var rightBraceIndex = luastr.LastIndexOf("}", StringComparison.Ordinal);
@@ -122,14 +121,13 @@ namespace MynahModConfigGenerator
                 Console.WriteLine(table.ToJson());
 
                 var data = JsonConvert.DeserializeObject<JObject>(table.ToJson());
-
                 data!.TryGetValue("DefaultSettings", out JToken token);
 
                 var settings = (token) as JArray ?? new JArray();
                 settings.Clear();
 
                 var keyList = new HashSet<string>();
-                foreach (var assembly in assemblies)
+                foreach (var assembly in modAssemblies)
                 {
                     foreach (var type in assembly.ExportedTypes)
                     {
@@ -148,12 +146,11 @@ namespace MynahModConfigGenerator
                             if (modSetting == null) continue;
 
                             var key = modSetting.GetKey(fieldInfo); // 跳过重复的Key
-                            if (setting != null && !keyList.Contains(key))
-                            {
-                                settings.Add(JsonConvert.DeserializeObject(
-                                    JsonConvert.SerializeObject(modSetting.ToDictionary(fieldInfo))));
-                                keyList.Add(key);
-                            }
+                            if (keyList.Contains(key)) continue;
+
+                            settings.Add(JsonConvert.DeserializeObject(
+                                JsonConvert.SerializeObject(modSetting.ToDictionary(fieldInfo))));
+                            keyList.Add(key);
                         }
                     }
                 }
@@ -162,7 +159,7 @@ namespace MynahModConfigGenerator
 
                 var s = JObjToDict(data);
 
-                var result = luastr[0..leftBraceIndex] + LuaSerializer.Serialize(s) +
+                var result = luastr[..leftBraceIndex] + LuaSerializer.Serialize(s) +
                              luastr[(rightBraceIndex + 1)..];
 
                 return result;

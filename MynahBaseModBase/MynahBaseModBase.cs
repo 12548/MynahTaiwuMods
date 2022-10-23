@@ -1,21 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using TaiwuModdingLib.Core.Plugin;
 
 namespace MynahBaseModBase;
-
-[PluginConfig("MynahBaseModBase", "myna12548", "0")]
-public class DummyModEntry: TaiwuRemakePlugin
-{
-    public override void Initialize()
-    {
-    }
-
-    public override void Dispose()
-    {
-    }
-}
 
 [AttributeUsage(AttributeTargets.Field)]
 public class ModSetting : Attribute

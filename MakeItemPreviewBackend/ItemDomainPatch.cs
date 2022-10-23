@@ -36,7 +36,7 @@ public class ItemDomainPatch
         }
         else
         {
-            data = DomainManager.Item.GetItemDisplayData(new ItemKey(itemType, 0, (short)templateId, -1));
+            data = DomainManager.Item.GetItemDisplayData(new ItemKey(itemType, 0, templateId, -1));
             previewData.Set(key, data.Key);
             DomainManager.Mod.SetSerializableModData(
                 DomainManager.TaiwuEvent.MainThreadDataContext, ModEntry.StaticModIdStr, "ItemPreviews", true, previewData);
