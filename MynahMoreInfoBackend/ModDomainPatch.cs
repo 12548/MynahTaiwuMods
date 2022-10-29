@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameData.Domains;
 using GameData.Domains.Mod;
-using GameData.Utilities;
 using HarmonyLib;
 using MiniJSON;
 
@@ -27,11 +26,19 @@ public class ModDomainPatch
         retValue["FeatureIds"] = character.GetFeatureIds();
         retValue["LovingItemSubType"] = character.GetLovingItemSubType();
         retValue["HatingItemSubType"] = character.GetHatingItemSubType();
-        
+        retValue["IsBisexual"] = character.GetBisexual();
+        var location = character.GetLocation();
+        if (location.IsValid())
+        {
+            var pos = DomainManager.Map.GetBlock(location).GetBlockPos();
+            retValue["BlockFullName"] =
+                DomainManager.Map.GetBlockFullName(location, "", "", false)
+                + $"({pos.X}, {pos.Y})";
+        }
+
         __result = Json.Serialize(retValue);
-        
+
         // AdaptableLog.Info($"Result Set: {__result}");
         return false;
     }
-
 }

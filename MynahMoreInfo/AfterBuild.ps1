@@ -2,12 +2,30 @@ Set-Location $PSScriptRoot
 
 $ModName = "MynahMoreInfo"
 
-New-Item "$env:TAIWU_PATH\Mod\$ModName" -ItemType "directory"
-New-Item "$env:TAIWU_PATH\Mod\$ModName\Plugins" -ItemType "directory"
+$TargetDir = $args[1];
+$FileId = $args[0]
 
-& "../../../MynahModConfigGenerator/bin/Debug/net6.0/MynahModConfigGenerator.exe" Config.lua MynahMoreInfo.dll
+Write-Output "TargetDir: $TargetDir"
+Write-Output "FileId: $FileId"
 
-Copy-Item *.dll "$env:TAIWU_PATH\Mod\$ModName\Plugins" -Verbose
-Copy-Item Config.lua "$env:TAIWU_PATH\Mod\$ModName" -Verbose
+if($FileId) {
+    $ModPath = "$env:TAIWU_WORKSHOP_PATH\$FileId"
+} else {
+    $ModPath = "$env:TAIWU_PATH\Mod\$ModName"
+}
+
+New-Item $ModPath -ItemType "directory"
+New-Item "$ModPath\Plugins" -ItemType "directory"
+
+$ConfigLuaPath = "$TargetDir"+"Config.lua"
+
+Write-Output "ConfigLuaPath: $ConfigLuaPath"
+
+$Dll = "$TargetDir${ModName}Frontend.dll"
+
+& "../../../MynahModConfigGenerator/bin/Debug/net6.0/MynahModConfigGenerator.exe" $ConfigLuaPath $Dll
+
+Copy-Item $Dll "$ModPath\Plugins" -Verbose
+Copy-Item Config.lua $ModPath -Verbose
 
 Write-Output "copy over"

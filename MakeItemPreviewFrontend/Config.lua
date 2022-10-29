@@ -1,5 +1,5 @@
 return {
-    Title = "~制作物品预览 v0.6~",
+    Title = "~制作物品预览 v0.7~",
     ["BackendPlugins"] = { "MakeItemPreviewBackend.dll" },
     ["FrontendPlugins"] = {
         "MakeItemPreviewFrontend.dll" },
@@ -8,8 +8,12 @@ return {
     
 预览物品为基础物品，不含属性加成。
 
+0.7预览使用方法：先按ctrl固定原版预览浮窗，然后把鼠标放在原版浮窗的预览物品上，再按一下ctrl出mod预览浮窗。
+目前略显复杂，正在考虑如何简化
+
 0.5更新：修正部分已知问题
 0.6更新：适配最新版mod依赖系统
+0.7更新：适配新版更新，改变预览模式（看上面的使用方法）
 ]],
     Source = 1,
     FileId = 2875353985,

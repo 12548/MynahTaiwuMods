@@ -8,7 +8,7 @@
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>MynahMoreInfo</RootNamespace>
-        <AssemblyName>MynahMoreInfo</AssemblyName>
+        <AssemblyName>MynahMoreInfoFrontend</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>10</LangVersion>
@@ -34,7 +34,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup>
-      <PostBuildEvent>pwsh AfterBuild.ps1</PostBuildEvent>
+      <PostBuildEvent>pwsh AfterBuild.ps1 2871621277 $(TargetDir)</PostBuildEvent>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony">

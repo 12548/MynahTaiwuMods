@@ -52,7 +52,7 @@ namespace MynahModConfigGenerator
         }
 
         /// <summary>
-        /// 将Lua文件中第一个左大括号和最后一个右大括号之间的内容作为表读取，改变其中的"DefaultSettings"内容并输出到文件。
+        /// 将Lua文件的返回值作为表读取，改变其中的"DefaultSettings"内容并输出到文件。
         /// </summary>
         /// <param name="args">第一个是读取的lua文件，后面的参数是读取的dll文件，最后一个参数是输出的lua位置（不填则改变原lua，根据扩展名判断）</param>
         static void Main(string[] args)
@@ -63,9 +63,29 @@ namespace MynahModConfigGenerator
             if (args.Length >= 2)
             {
                 var luaFilePath = args[0];
-                var luastr = File.ReadAllText(luaFilePath);
+                var luaStr = File.ReadAllText(luaFilePath);
 
-                Console.WriteLine("Before: " + luastr);
+                using (Lua lua = new Lua()) // Create the Lua script engine
+                {
+                    dynamic env = lua.CreateEnvironment(); // Create a environment
+                    env.dochunk($"a = (function() {luaStr} end)();", "test.lua"); // Create a variable in Lua
+                    LuaTable table = env.a;
+
+                    var workshopPath = Environment.GetEnvironmentVariable("TAIWU_WORKSHOP_PATH");
+                    var fileId = table["FileId"];
+                    if (workshopPath != null && fileId != null)
+                    {
+                        var modPath = Path.Join(workshopPath, fileId.ToString());
+                        
+                    }
+
+                    Console.WriteLine(table["FileId"].GetType());
+                    
+                    Console.WriteLine(table.ToJson()); // Access a variable in C#
+                    
+                }
+
+                Console.WriteLine("Before: " + luaStr);
                 var modAssemblies = args.Where(it => it.EndsWith(".dll")).Select(Assembly.LoadFrom);
 
                 var enumerable = modAssemblies as Assembly[] ?? modAssemblies.ToArray();
@@ -74,7 +94,7 @@ namespace MynahModConfigGenerator
                     LoadAssemblyReferences(assembly);
                 }
 
-                var result = ChangeLua(luastr, enumerable);
+                var result = ChangeLua(luaStr, enumerable);
                 Console.WriteLine("After: " + result);
 
                 File.WriteAllText(args.Last().EndsWith(".lua") ? args.Last() : luaFilePath, result);

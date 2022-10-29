@@ -40,7 +40,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="pwsh AfterBuild.ps1 $(TargetDir)" />
+      <Exec Command="pwsh AfterBuild.ps1 2875353985 $(TargetDir)" />
     </Target>
 
 </Project>

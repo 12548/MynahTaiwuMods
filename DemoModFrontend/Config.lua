@@ -1,5 +1,6 @@
 return {
 	["Title"] = "12548演示Mod",
+	["FileId"] = 12342138492341,
 	["FrontendPlugins"] = {
 		[1] = "DemoMod.dll",
 		},

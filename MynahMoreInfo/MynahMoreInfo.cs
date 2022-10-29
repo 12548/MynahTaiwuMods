@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using Config;
 using FrameWork;
 using GameData.Domains;
@@ -87,14 +85,17 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("浮窗显示坐标和人物ID", description: "")]
     public static bool ShowPosAndId = true;
 
-    [ModSetting("延迟去除", description: "将官方的tips机制重写为无延迟的旧版本，请务必谨慎使用")]
-    public static bool DelayFix = false;
+    // [ModSetting("延迟去除", description: "将官方的tips机制重写为无延迟的旧版本，请务必谨慎使用")]
+    // public static bool DelayFix = false;
+    
+    [ModSetting("全部详细人物浮窗", description: "将全部的原版人物浮窗替换为详细文字形式")]
+    public static bool ReplaceAllCharacterTipToDetail = true;
 
     public static string StaticModIdStr;
 
-    private static bool _init;
-    private static IEnumerator _currDelayFix;
-    private static IEnumerator _origDelay;
+    // private static bool _init;
+    // private static IEnumerator _currDelayFix;
+    // private static IEnumerator _origDelay;
 
     public override void OnModSettingUpdate()
     {
@@ -109,7 +110,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
         base.Initialize();
         StaticModIdStr = ModIdStr;
         SpriteAssetManager.Init();
-        _init = true;
+        // _init = true; 
         InitDelayFix();
 
         var original = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
@@ -135,35 +136,35 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     private static void InitDelayFix()
     {
-        Debug.Log($"init delay fix: {_init} {DelayFix}");
-        if (_init)
-        {
-            if (DelayFix && _currDelayFix == null)
-            {
-                var yieldHelper = SingletonObject.getInstance<YieldHelper>();
-                var mouseTipManager = SingletonObject.getInstance<MouseTipManager>();
-                var fieldInfo = typeof(MouseTipManager).GetField("_updateMouseOverObjCoroutine", (BindingFlags)(-1));
-                if (fieldInfo == null) return;
-                _origDelay = (IEnumerator)fieldInfo.GetValue(mouseTipManager);
-                yieldHelper.StopCoroutine(_origDelay);
-                _currDelayFix = MouseTipManagerPatch.UpdateMouseOverObj();
-                fieldInfo.SetValue(mouseTipManager, _currDelayFix);
-                yieldHelper.StartYield(_currDelayFix);
-                Debug.Log("TipsCo Replaced!");
-            }
-            else if (!DelayFix && _origDelay != null && _currDelayFix != null)
-            {
-                var yieldHelper = SingletonObject.getInstance<YieldHelper>();
-                var mouseTipManager = SingletonObject.getInstance<MouseTipManager>();
-                var fieldInfo = typeof(MouseTipManager).GetField("_updateMouseOverObjCoroutine", (BindingFlags)(-1));
-                if (fieldInfo == null) return;
-                yieldHelper.StopCoroutine(_currDelayFix);
-                _currDelayFix = null;
-                fieldInfo.SetValue(mouseTipManager, _origDelay);
-                yieldHelper.StartYield(_origDelay);
-                Debug.Log("TipsCo Replaced!");
-            }
-        }
+        // Debug.Log($"init delay fix: {_init} {DelayFix}");
+        // if (_init)
+        // {
+        //     if (DelayFix && _currDelayFix == null)
+        //     {
+        //         var yieldHelper = SingletonObject.getInstance<YieldHelper>();
+        //         var mouseTipManager = SingletonObject.getInstance<MouseTipManager>();
+        //         var fieldInfo = typeof(MouseTipManager).GetField("_updateMouseOverObjCoroutine", (BindingFlags)(-1));
+        //         if (fieldInfo == null) return;
+        //         _origDelay = (IEnumerator)fieldInfo.GetValue(mouseTipManager);
+        //         yieldHelper.StopCoroutine(_origDelay);
+        //         _currDelayFix = MouseTipManagerPatch.UpdateMouseOverObj();
+        //         fieldInfo.SetValue(mouseTipManager, _currDelayFix);
+        //         yieldHelper.StartYield(_currDelayFix);
+        //         Debug.Log("TipsCo Replaced!");
+        //     }
+        //     else if (!DelayFix && _origDelay != null && _currDelayFix != null)
+        //     {
+        //         var yieldHelper = SingletonObject.getInstance<YieldHelper>();
+        //         var mouseTipManager = SingletonObject.getInstance<MouseTipManager>();
+        //         var fieldInfo = typeof(MouseTipManager).GetField("_updateMouseOverObjCoroutine", (BindingFlags)(-1));
+        //         if (fieldInfo == null) return;
+        //         yieldHelper.StopCoroutine(_currDelayFix);
+        //         _currDelayFix = null;
+        //         fieldInfo.SetValue(mouseTipManager, _origDelay);
+        //         yieldHelper.StartYield(_origDelay);
+        //         Debug.Log("TipsCo Replaced!");
+        //     }
+        // }
     }
 
 

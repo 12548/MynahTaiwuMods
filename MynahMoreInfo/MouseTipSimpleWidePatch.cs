@@ -11,10 +11,8 @@ using GameData.Domains.Character;
 using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
 using GameData.Serializer;
-using GameData.Utilities;
 using HarmonyLib;
 using MiniJSON;
-using MynahBaseModBase;
 using TMPro;
 using UICommon.Character.Elements;
 using UnityEngine;
@@ -36,14 +34,15 @@ public class MouseTipSimpleWidePatch
         // textMeshProUgui2.text = srcString.ColorReplace();
         // textMeshProUgui2.GetComponent<TMPTextSpriteHelper>().Parse();
         var hasCharId = argsBox.Get("_mmi_charId", out int charId);
+        var hasShowLocation = argsBox.Get("_mmi_locationShow", out bool showLocation);
         var hasDisplayData = argsBox.Get("_mmi_mtc_charDisplayData", out CharacterDisplayData displayData);
         if (!hasDisplayData && !hasCharId) return;
-        
+
         if (hasDisplayData)
         {
             charId = displayData.CharacterId;
         }
-        
+
         var titleText = __instance.CGet<TextMeshProUGUI>("Title");
         var contentText = __instance.CGet<TextMeshProUGUI>("Desc");
         var gCall = new GroupCallBuilder();
@@ -60,7 +59,7 @@ public class MouseTipSimpleWidePatch
             CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList,
             new List<int> { charId },
             gCall.AddAction("GroupCharDisplayDataList"));
- 
+
         __instance.AsynchMethodCall(DomainHelper.DomainIds.Mod,
             ModDomainHelper.MethodIds.GetString,
             ModEntry.StaticModIdStr,
@@ -87,8 +86,9 @@ public class MouseTipSimpleWidePatch
                     Serializer.Deserialize(cddDatapool, cddOffset, ref item2);
                     if (item2.Count < 1) return;
                     displayData = item2[0];
-                    EasyPool.Free(item2); 
-                } else if (!hasDisplayData)
+                    EasyPool.Free(item2);
+                }
+                else if (!hasDisplayData)
                 {
                     Debug.Log("no display data!");
                     return;
@@ -101,13 +101,16 @@ public class MouseTipSimpleWidePatch
                 if (cdDict != null)
                 {
                     var objects = (List<object>)cdDict["FeatureIds"];
-                    var lovingItemSubType = Convert.ToInt32(cdDict["LovingItemSubType"]);
-                    var hatingItemSubType = Convert.ToInt32(cdDict["HatingItemSubType"]);
+                    if (!hasShowLocation)
+                    {
+                        cdDict.Remove("BlockFullName");
+                    }
+                    
                     SetContent(displayData, groupCharDisplayData,
                         objects.Select(Convert.ToInt32).ToList(),
-                        lovingItemSubType,
-                        hatingItemSubType,
-                        titleText, contentText
+                        titleText, 
+                        contentText, 
+                        cdDict
                     );
                 }
                 else
@@ -129,10 +132,9 @@ public class MouseTipSimpleWidePatch
         CharacterDisplayData displayData,
         GroupCharDisplayData groupCharDisplayData,
         List<int> featureIds,
-        int _lovingItemSubType,
-        int _hatingItemSubType,
         TextMeshProUGUI titleText,
-        TextMeshProUGUI contentText
+        TextMeshProUGUI contentText,
+        Dictionary<string, object> otherData
     )
     {
         var isTaiwu = groupCharDisplayData.CharacterId == SingletonObject.getInstance<BasicGameData>().TaiwuCharId;
@@ -246,13 +248,23 @@ public class MouseTipSimpleWidePatch
         sb.AppendLine(
             $"    生于{monthItem.Name}({fiveElements})");
 
-        var loveItemStr = _lovingItemSubType >= 0
-            ? LocalStringManager.Get($"LK_ItemSubType_{(object)_lovingItemSubType}")
+        if (otherData.TryGetValue("BlockFullName", out var blockFullName))
+        {
+            sb.Append($"所在： {blockFullName}    ");
+        }
+
+        var lovingItemSubType = Convert.ToInt32(otherData["LovingItemSubType"]);
+        var hatingItemSubType = Convert.ToInt32(otherData["HatingItemSubType"]);
+        
+        var loveItemStr = lovingItemSubType >= 0
+            ? LocalStringManager.Get($"LK_ItemSubType_{lovingItemSubType}")
             : LocalStringManager.Get("LK_None");
-        sb.Append($"喜好： <color=#adc7de>{loveItemStr}</color>");
-        var hateItemStr = _hatingItemSubType >= 0
+
+        var bixStr = Convert.ToBoolean(otherData["IsBisexual"]) ? "(双)" : "";
+        sb.Append($"喜好： <color=#adc7de>{loveItemStr}</color> {bixStr}");
+        var hateItemStr = hatingItemSubType >= 0
             ? LocalStringManager.Get(
-                $"LK_ItemSubType_{(object)_hatingItemSubType}")
+                $"LK_ItemSubType_{hatingItemSubType}")
             : LocalStringManager.Get("LK_None");
         sb.AppendLine($"      厌恶： <color=#843029>{hateItemStr}</color>");
 

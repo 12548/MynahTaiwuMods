@@ -7,7 +7,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     public static string StaticModIdStr;
     public override void Initialize()
-    {
+    { 
         base.Initialize();
         StaticModIdStr = ModIdStr;
     }

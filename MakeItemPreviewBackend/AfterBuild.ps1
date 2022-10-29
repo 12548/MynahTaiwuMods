@@ -1,11 +1,22 @@
 Set-Location $PSScriptRoot
 
 $ModName = "MakeItemPreview"
-$TargetDir = $args[0]
 
-New-Item "$env:TAIWU_PATH\Mod\$ModName" -ItemType "directory"
-New-Item "$env:TAIWU_PATH\Mod\$ModName\Plugins" -ItemType "directory"
+$TargetDir = $args[1];
+$FileId = $args[0]
 
-Copy-Item "$TargetDir*.dll" "$env:TAIWU_PATH\Mod\$ModName\Plugins" -Verbose
+Write-Output "TargetDir: $TargetDir"
+Write-Output "FileId: $FileId"
+
+if($FileId) {
+    $ModPath = "$env:TAIWU_WORKSHOP_PATH\$FileId"
+} else {
+    $ModPath = "$env:TAIWU_PATH\Mod\$ModName"
+}
+
+New-Item $ModPath -ItemType "directory"
+New-Item "$ModPath\Plugins" -ItemType "directory"
+
+Copy-Item "$TargetDir*.dll" "$ModPath\Plugins" -Verbose
 
 Write-Output "copy over"

@@ -1,14 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using FrameWork;
+using GameData.Domains;
+using GameData.Domains.Map;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.EventSystems;
 // ReSharper disable RedundantAssignment
 
 namespace MynahMoreInfo;
 
+[HarmonyPatch]
 public class MouseTipManagerPatch
 {
+
+    [HarmonyPrefix, HarmonyPatch(typeof(MouseTipManager), "ShowTips")]
+    public static void ShowTipsPrefix(ref TipType type,
+        ref ArgumentBox argsBox)
+    {
+        if (!ModEntry.ReplaceAllCharacterTipToDetail || type != TipType.Character) return;
+        type = TipType.SimpleWide;
+        if(!argsBox.Get("charId", out int charId)) return;
+        argsBox.Set("_mmi_charId", charId);
+
+        argsBox.Set("_mmi_locationShow", true); // 始终显示位置
+        // if (argsBox.Get("locationShow", out bool showLocation))
+        // {
+        //     argsBox.Set("_mmi_locationShow", showLocation);
+        // }
+    }
+    
     /// <summary>
     /// 旧版MouseTipManager#UpdateMouseOverObj
     /// </summary>

@@ -34,7 +34,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup>
-      <PostBuildEvent>pwsh AfterBuild.ps1 $(TargetDir)</PostBuildEvent>
+      <PostBuildEvent>pwsh AfterBuild.ps1 2875353985 $(TargetDir)</PostBuildEvent>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony">
@@ -73,6 +73,7 @@
     <ItemGroup>
         <Compile Include="ModEntry.cs" />
         <Compile Include="MouseTipBasePatch.cs" />
+        <Compile Include="MouseTipMakeItemPatch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="UI_MakePatch.cs" />
     </ItemGroup>

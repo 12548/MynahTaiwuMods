@@ -12,12 +12,11 @@ namespace MakeItemPreviewBackend;
 public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     public static string StaticModIdStr;
-    
+
     public override void Initialize()
     {
         base.Initialize();
         StaticModIdStr = ModIdStr;
         AdaptableLog.Info("MakeItemPreview Backend Initialized!");
     }
-
 }
