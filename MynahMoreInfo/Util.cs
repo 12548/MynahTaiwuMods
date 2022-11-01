@@ -5,6 +5,12 @@ namespace MynahMoreInfo;
 
 public class Util
 {
+    public static string GetSpriteStr(string spriteName)
+    {
+        return TMPTextSpriteHelper.GetStringWithTextSpriteTag(spriteName);
+        // return $"<sprite=\"mmiSprites\" name=\"{spriteName}\">";
+    }
+    
     public static MouseTipDisplayer EnsureMouseTipDisplayer(GameObject obj)
     {
         var mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();

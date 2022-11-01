@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Config;
 using FrameWork;
 using FrameWork.Linq;
 using GameData.Domains;
+using GameData.Domains.Building;
 using GameData.Domains.Item;
 using GameData.Domains.Item.Display;
 using GameData.Serializer;
@@ -22,7 +22,7 @@ public class MouseTipMakeItemPatch
     [HarmonyPostfix, HarmonyPatch(typeof(MouseTipMakeItem), "Init")]
     static void InitPostfix(MouseTipMakeItem __instance, ArgumentBox argsBox, Dictionary<Refers, List<Refers>> ____stageToItemDict)
     {
-        argsBox.Get<UI_Make.MakeResult>("MakeResult", out var makeResult);
+        argsBox.Get<MakeResult>("MakeResult", out var makeResult);
         foreach (var pair in ____stageToItemDict)
         {
             var refers = pair.Value;
@@ -33,7 +33,7 @@ public class MouseTipMakeItemPatch
                 var replacement = "";
                 var input = tmp.text;
                 var result = Regex.Replace(input, pattern, replacement).Trim();
-                var itemType = makeResult.ItemType;
+                var itemType = makeResult.TargetResultStage.ItemType;
                 var templateId = FindItemByName(itemType, result);
                 
                 if (templateId <= -1) continue;
@@ -56,7 +56,7 @@ public class MouseTipMakeItemPatch
                         mouseTipDisplayer = refer.gameObject.AddComponent<MouseTipDisplayer>();
                     }
 
-                    mouseTipDisplayer.Type = MouseTipManager.ItemTypeToTipType[makeResult.ItemType];
+                    mouseTipDisplayer.Type = MouseTipManager.ItemTypeToTipType[makeResult.TargetResultStage.ItemType];
                     mouseTipDisplayer.enabled = true;
                     mouseTipDisplayer.RuntimeParam = new ArgumentBox()
                         // .SetObject("_mip_MakeResult", makeResult)
@@ -66,7 +66,7 @@ public class MouseTipMakeItemPatch
                 var ik = new ItemKey
                 {
                     Id = -12548,
-                    ItemType = makeResult.ItemType,
+                    ItemType = makeResult.TargetResultStage.ItemType,
                     TemplateId = templateId
                 };
 

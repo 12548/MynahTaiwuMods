@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FrameWork;
-using GameData.Domains;
-using GameData.Domains.Map;
+using GameData.Domains.Character.Display;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.EventSystems;
+
 // ReSharper disable RedundantAssignment
 
 namespace MynahMoreInfo;
@@ -20,10 +20,21 @@ public class MouseTipManagerPatch
         ref ArgumentBox argsBox)
     {
         if (!ModEntry.ReplaceAllCharacterTipToDetail || type != TipType.Character) return;
-        type = TipType.SimpleWide;
-        if(!argsBox.Get("charId", out int charId)) return;
-        argsBox.Set("_mmi_charId", charId);
+        
+        if (argsBox.Get<AvatarRelatedData>("avatar", out _))
+        {
+            return;
+        }
+        
+        if(!argsBox.Get("charId", out int charId) || charId < 0)
+        {
+            type = TipType.Character;
+            return;
+        }
+        Debug.Log("charId: " +  charId);
 
+        type = TipType.SimpleWide;
+        argsBox.Set("_mmi_charId", charId);
         argsBox.Set("_mmi_locationShow", true); // 始终显示位置
         // if (argsBox.Get("locationShow", out bool showLocation))
         // {

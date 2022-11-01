@@ -220,21 +220,21 @@ public class MouseTipSimpleWidePatch
             ? "sp_icon_renwutexing_10"
             : (attackMedal < 0 ? "sp_icon_renwutexing_4" : "sp_icon_renwutexing_7");
 
-        sb.Append($"进攻：<sprite=\"mmiSprites\" name=\"{amSprite}\"> x{Mathf.Abs(attackMedal)}");
+        sb.Append($"进攻：{Util.GetSpriteStr(amSprite)} x{Mathf.Abs(attackMedal)}");
 
         var defenceMedal = groupCharDisplayData.DefenceMedal;
         var dmSprite = defenceMedal > 0
             ? "sp_icon_renwutexing_9"
             : (defenceMedal < 0 ? "sp_icon_renwutexing_3" : "sp_icon_renwutexing_6");
 
-        sb.Append($"   守御：<sprite=\"mmiSprites\" name=\"{dmSprite}\"> x{Mathf.Abs(defenceMedal)}</color>");
+        sb.Append($"   守御：{Util.GetSpriteStr(dmSprite)} x{Mathf.Abs(defenceMedal)}</color>");
 
         var wisdomMedal = groupCharDisplayData.WisdomMedal;
         var wmSprite = groupCharDisplayData.WisdomMedal > 0
             ? "sp_icon_renwutexing_11"
             : (groupCharDisplayData.WisdomMedal < 0 ? "sp_icon_renwutexing_5" : "sp_icon_renwutexing_8");
 
-        sb.Append($"   机略：<sprite=\"mmiSprites\" name=\"{wmSprite}\"> x{Mathf.Abs(wisdomMedal)}</color>");
+        sb.Append($"   机略：{Util.GetSpriteStr(wmSprite)} x{Mathf.Abs(wisdomMedal)}</color>");
 
         var birthMonth = displayData.BirthDate % 12;
         if (birthMonth < 0)
@@ -295,7 +295,7 @@ public class MouseTipSimpleWidePatch
                                 (string[][])typeof(FeatureItem).GetField("FeatureIconConfig", (BindingFlags)(-1))!
                                     .GetValue(null);
                             var sprite = featureIconConfig[featureMedal.Values[index3]][index2];
-                            sb.Append($"<sprite=\"mmiSprites\" name=\"{sprite}\">");
+                            sb.Append(Util.GetSpriteStr(sprite));
                         }
                         else
                         {
