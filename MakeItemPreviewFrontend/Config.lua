@@ -1,5 +1,5 @@
 return {
-    Title = "~制作物品预览 v0.7~",
+    Title = "~制作物品预览 v0.8~",
     ["BackendPlugins"] = { "MakeItemPreviewBackend.dll" },
     ["FrontendPlugins"] = {
         "MakeItemPreviewFrontend.dll" },
@@ -14,6 +14,7 @@ return {
 0.5更新：修正部分已知问题
 0.6更新：适配最新版mod依赖系统
 0.7更新：适配新版更新，改变预览模式（看上面的使用方法）
+0.8更新：适配新版更新
 ]],
     Source = 1,
     FileId = 2875353985,

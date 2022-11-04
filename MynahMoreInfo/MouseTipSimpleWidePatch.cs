@@ -71,12 +71,16 @@ public class MouseTipSimpleWidePatch
         {
             try
             {
+                GroupCharDisplayData groupCharDisplayData = null;
                 var (gcddOffset, gcddDatapool) = dict["GroupCharDisplayDataList"];
-                var (cdOffset, cdDatapool) = dict["CharacterData"];
+                
                 var item = EasyPool.Get<List<GroupCharDisplayData>>();
                 Serializer.Deserialize(gcddDatapool, gcddOffset, ref item);
-                if (item.Count < 1) return;
-                var groupCharDisplayData = item[0];
+                if (item.Count > 0)
+                {
+                    groupCharDisplayData = item[0];
+                }
+                
                 EasyPool.Free(item);
 
                 if (dict.ContainsKey("CharacterDisplayDataList"))
@@ -84,22 +88,26 @@ public class MouseTipSimpleWidePatch
                     var (cddOffset, cddDatapool) = dict["CharacterDisplayDataList"];
                     var item2 = EasyPool.Get<List<CharacterDisplayData>>();
                     Serializer.Deserialize(cddDatapool, cddOffset, ref item2);
-                    if (item2.Count < 1) return;
-                    displayData = item2[0];
+                    if (item2.Count > 0)
+                    {
+                        displayData = item2[0];
+                    }
                     EasyPool.Free(item2);
                 }
-                else if (!hasDisplayData)
-                {
-                    Debug.Log("no display data!");
-                    return;
-                }
 
+                var (cdOffset, cdDatapool) = dict["CharacterData"];
                 var cdString = "";
                 Serializer.Deserialize(cdDatapool, cdOffset, ref cdString);
 
                 var cdDict = (Dictionary<string, object>)Json.Deserialize(cdString);
                 if (cdDict != null)
                 {
+                    if (cdDict.TryGetValue("IsDead", out var isDead))
+                    {
+                        contentText.text = "更多信息：详细人物浮窗暂不支持显示死人数据，敬请期待更新";
+                        return;
+                    }
+                    
                     var objects = (List<object>)cdDict["FeatureIds"];
                     if (!hasShowLocation)
                     {
@@ -137,6 +145,11 @@ public class MouseTipSimpleWidePatch
         Dictionary<string, object> otherData
     )
     {
+        if (displayData == null || groupCharDisplayData == null)
+        {
+            return;
+        }
+        
         var isTaiwu = groupCharDisplayData.CharacterId == SingletonObject.getInstance<BasicGameData>().TaiwuCharId;
         var showName = NameCenter.GetCharMonasticTitleOrNameByDisplayData(displayData, isTaiwu);
         var realName = NameCenter.GetNameByDisplayData(displayData, isTaiwu, true);
@@ -252,7 +265,11 @@ public class MouseTipSimpleWidePatch
         {
             sb.Append($"所在： {blockFullName}    ");
         }
-
+        
+        if (otherData.TryGetValue("XiangshuInfection", out var xiangshuInfection))
+        {
+            sb.Append($"入魔值: {xiangshuInfection}   ");
+        }
         var lovingItemSubType = Convert.ToInt32(otherData["LovingItemSubType"]);
         var hatingItemSubType = Convert.ToInt32(otherData["HatingItemSubType"]);
         
@@ -350,14 +367,15 @@ public class MouseTipSimpleWidePatch
             _ => ($"{(object)num}".SetColor("red"))
         };
 
-        sb.AppendLine($"功法资质（{s}）：");
+        sb.AppendLine($"功法造诣/资质（{s}）：");
 
         for (var i = 0; i < CombatSkillType.Instance.Count; i++)
         {
             var skillType = CombatSkillType.Instance[i];
             var sqValue = _getCSQValue(groupCharDisplayData, i);
+            var atValue = Convert.ToInt32(((List<object>)otherData["CombatSkillAttainments"])[i]);
             var sqColor = CommonUtils.GetCharacterSkillColorByValue((short)sqValue);
-            sb.Append($"{skillType.Name} {sqValue}".SetColor(sqColor));
+            sb.Append($"{skillType.Name} {atValue}/{sqValue.ToString().SetColor(sqColor)}");
             if (i % 4 == 3)
             {
                 sb.AppendLine();
@@ -393,21 +411,22 @@ public class MouseTipSimpleWidePatch
             _ => ($"{(object)num}".SetColor("red"))
         };
 
-        sb.AppendLine($"技艺资质（{s}）：");
+        sb.AppendLine($"技艺造诣/资质（{s}）：");
 
         for (var i = 0; i < LifeSkillType.Instance.Count; i++)
         {
             var skillType = LifeSkillType.Instance[i];
             var sqValue = _getLSQValue(groupCharDisplayData, i);
+            var atValue = Convert.ToInt32(((List<object>)otherData["LifeSkillAttainments"])[i]);
             var sqColor = CommonUtils.GetCharacterSkillColorByValue((short)sqValue);
-            sb.Append($"{skillType.Name} {sqValue}".SetColor(sqColor));
+            sb.Append($"{skillType.Name} {atValue}/{sqValue.ToString().SetColor(sqColor)}");
             if (i % 4 == 3)
             {
                 sb.AppendLine();
             }
             else
             {
-                sb.Append($"<pos={(i % 4 + 1) * 25}%>");
+                sb.Append($"<pos={(i % 4 + 1) * 25}%>"); 
             }
         }
 

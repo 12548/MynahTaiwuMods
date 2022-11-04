@@ -14,7 +14,7 @@ public static class SpriteAssetManager
 {
     public static void Init()
     {
-        var keys = new string[]
+        var keys = new[]
         {
             "sp_icon_renwutexing_0",
             "sp_icon_renwutexing_1",
@@ -43,11 +43,11 @@ public static class SpriteAssetManager
             });
         }
     }
-    
-    public static TMP_SpriteAsset CreateAndRegisterSpriteAsset(string assetName, List<Sprite> sprites)
+
+    private static TMP_SpriteAsset CreateAndRegisterSpriteAsset(string assetName, List<Sprite> sprites)
     {
         var textPack = new Texture2D[sprites.Count];
-        for (int i = 0; i < sprites.Count; i++)
+        for (var i = 0; i < sprites.Count; i++)
         {
             textPack[i] = DuplicateTexture(sprites[i]);
         }
@@ -124,16 +124,16 @@ public static class SpriteAssetManager
     private static Texture2D DuplicateTexture(Sprite sprite)
     {
         var source = sprite.texture;
-        RenderTexture renderTex = RenderTexture.GetTemporary(
+        var renderTex = RenderTexture.GetTemporary(
             source.width,
             source.height,
             0,
             RenderTextureFormat.Default,
             RenderTextureReadWrite.Default);
         Graphics.Blit(source, renderTex);
-        RenderTexture previous = RenderTexture.active;
+        var previous = RenderTexture.active;
         RenderTexture.active = renderTex;
-        Texture2D readableText = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
+        var readableText = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
         var rect = sprite.textureRect;
         rect.y = source.height - rect.y - rect.height;
         readableText.ReadPixels(rect, 0, 0, false);
@@ -153,25 +153,36 @@ public static class SpriteAssetManager
         var spriteInfoList = spriteAsset.spriteInfoList;
         m_SpriteCharacterTable.Clear();
         m_SpriteGlyphTable.Clear();
-        for (int i = 0; i < spriteInfoList.Count; i++)
+        for (var i = 0; i < spriteInfoList.Count; i++)
         {
-            TMP_Sprite oldSprite = spriteInfoList[i];
-            TMP_SpriteGlyph spriteGlyph = new TMP_SpriteGlyph();
-            spriteGlyph.index = (uint)i;
-            spriteGlyph.sprite = oldSprite.sprite;
-            spriteGlyph.metrics = new GlyphMetrics(oldSprite.width, oldSprite.height, oldSprite.xOffset,
-                oldSprite.yOffset, oldSprite.xAdvance);
-            spriteGlyph.glyphRect = new GlyphRect((int)oldSprite.x, (int)oldSprite.y, (int)oldSprite.width,
-                (int)oldSprite.height);
-            spriteGlyph.scale = 1f;
-            spriteGlyph.atlasIndex = 0;
+            var oldSprite = spriteInfoList[i];
+            var spriteGlyph = new TMP_SpriteGlyph
+            {
+                index = (uint)i,
+                sprite = oldSprite.sprite,
+                metrics = new GlyphMetrics(oldSprite.width, oldSprite.height, oldSprite.xOffset,
+                    oldSprite.yOffset, oldSprite.xAdvance),
+                glyphRect = new GlyphRect((int)oldSprite.x, (int)oldSprite.y, (int)oldSprite.width,
+                    (int)oldSprite.height),
+                scale = 1f,
+                atlasIndex = 0
+            };
             m_SpriteGlyphTable.Add(spriteGlyph);
-            TMP_SpriteCharacter spriteCharacter = new TMP_SpriteCharacter();
-            spriteCharacter.glyph = spriteGlyph;
-            spriteCharacter.glyphIndex = (uint)i;
-            spriteCharacter.unicode = (uint)((oldSprite.unicode == 0) ? 65534 : oldSprite.unicode);
-            spriteCharacter.name = oldSprite.name;
-            spriteCharacter.scale = oldSprite.scale;
+            
+            var spriteName = oldSprite.name;
+            if (spriteName.EndsWith("(Clone)"))
+            {
+                spriteName = spriteName.Substring(0, spriteName.Length - 7);
+            }
+            
+            var spriteCharacter = new TMP_SpriteCharacter
+            {
+                glyph = spriteGlyph,
+                glyphIndex = (uint)i,
+                unicode = (uint)((oldSprite.unicode == 0) ? 65534 : oldSprite.unicode),
+                name = spriteName,
+                scale = oldSprite.scale
+            };
             m_SpriteCharacterTable.Add(spriteCharacter);
         }
 

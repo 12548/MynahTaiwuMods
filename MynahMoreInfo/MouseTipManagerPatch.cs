@@ -31,7 +31,7 @@ public class MouseTipManagerPatch
             type = TipType.Character;
             return;
         }
-        Debug.Log("charId: " +  charId);
+        // Debug.Log("charId: " +  charId);
 
         type = TipType.SimpleWide;
         argsBox.Set("_mmi_charId", charId);

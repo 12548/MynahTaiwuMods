@@ -25,7 +25,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     [ModSetting("显示不传之秘", description: "显示门派武学列表中的不传之秘")]
     public static bool ShowNonPublicSkill = true;
- 
+
     // [ModSetting("左侧人物浮窗", description: "为地图左侧人物列表增加鼠标浮窗")]
     // public static readonly bool ShowMouseTipMapBlockCharList = true;
 
@@ -87,7 +87,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     // [ModSetting("延迟去除", description: "将官方的tips机制重写为无延迟的旧版本，请务必谨慎使用")]
     // public static bool DelayFix = false;
-    
+
     [ModSetting("全部详细人物浮窗", description: "将全部的原版人物浮窗替换为详细文字形式")]
     public static bool ReplaceAllCharacterTipToDetail = true;
 
@@ -228,7 +228,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
                 return;
             }
 
-            SkillBookItem skillBookItem = SkillBook.Instance[arg.Key.TemplateId];
+            var skillBookItem = SkillBook.Instance[arg.Key.TemplateId];
 
             if (skillBookItem == null)
             {
@@ -236,7 +236,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
                 return;
             }
 
-            List<short> list = EasyPool.Get<List<short>>();
+            var list = EasyPool.Get<List<short>>();
             list.Clear();
             list.Add(skillBookItem.CombatSkillTemplateId);
 
@@ -283,7 +283,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
                     if (ShowLearningProgress)
                     {
-                        string s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
+                        var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
                         var pracStr = combatSkillDisplayData.PracticeLevel < 0
                             ? "未习得"
                             : $"修习程度：{combatSkillDisplayData.PracticeLevel}%";
@@ -328,7 +328,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
             if (!ShowCombatSkillSpecialEffect) return;
             if (__instance != null)
             {
-                GameObject specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
+                var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
 
                 var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
 
@@ -337,16 +337,16 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
                     return;
                 }
 
-                List<CombatSkillDisplayData> item = EasyPool.Get<List<CombatSkillDisplayData>>();
+                var item = EasyPool.Get<List<CombatSkillDisplayData>>();
                 Serializer.Deserialize(dataPool, offset, ref item);
-                CombatSkillDisplayData combatSkillDisplayData = item[0];
+                var combatSkillDisplayData = item[0];
                 EasyPool.Free(item);
-                bool flag = combatSkillDisplayData.EffectType != -1;
+                var flag = combatSkillDisplayData.EffectType != -1;
 
                 specialEffectGameObject.SetActive(true);
                 if (true) // flag
                 {
-                    bool flag4 = combatSkillDisplayData.EffectType == 0;
+                    var flag4 = combatSkillDisplayData.EffectType == 0;
                     ShowAllSpecialEffects(specialEffectGameObject, ____configData, flag, flag4);
                 }
 
@@ -354,12 +354,12 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
                 if (ShowLearningProgress)
                 {
-                    string s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
+                    var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
                     var desc = $"{____configData.Desc}\n{s}";
                     MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
                 }
 
-                UIElement element = __instance.Element;
+                var element = __instance.Element;
                 if (element != null)
                 {
                     element.ShowAfterRefresh();
@@ -370,8 +370,8 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
         private static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
         {
             // effectStr = "     " + effectStr;
-            float x = effectText.rectTransform.sizeDelta.x;
-            Vector2 preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
+            var x = effectText.rectTransform.sizeDelta.x;
+            var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
             effectText.rectTransform.sizeDelta = preferredValues.SetX(x);
             effectText.text = effectStr;
         }
@@ -418,7 +418,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
                     CombatSkillStateHelper.GetNormalPageInternalIndex(1, page))).ToArray();
 
             string ts1 = "", ts2 = "", ts3 = "";
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 ts1 += p1[i] ? $"<color=#ffffffff>{s1[i]}</color>" : $"<color=#474747ff>{s1[i]}</color>";
                 ts2 += p2[i] ? $"<color=#00ffffff>{s2[i]}</color>" : $"<color=#004747ff>{s2[i]}</color>";
@@ -434,16 +434,53 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
         {
             if (!ShowAttackDistribution) return;
 
+            Debug.Log($"{____configData.Name} - {____configData.PrepareTotalProgress}");
+
+
+            {
+                var typeTrans = __instance.transform.Find("DescriptionHolder/Type");
+                var secondTypeTrans = typeTrans.Find("Type");
+
+                var adtName = "PrepareTotalProgressTips";
+                var transform = typeTrans.Find(adtName);
+                GameObject adt;
+                if (transform == null)
+                {
+                    adt = Object.Instantiate(secondTypeTrans.gameObject, typeTrans, false);
+                    adt.name = adtName;
+                }
+                else
+                {
+                    adt = transform.gameObject;
+                }
+
+                if (____configData.PrepareTotalProgress > 0)
+                {
+                    // var s = $"基础施展时间: {____configData.PrepareTotalProgress}\n";
+
+                    adt.transform.Find("TextHolder/Tips").GetComponent<TextMeshProUGUI>().text = "基础施展时间";
+                    adt.transform.Find("TextHolder/TypeIcon").gameObject.SetActive(false);
+                    adt.transform.Find("TextHolder/Type").GetComponent<TextMeshProUGUI>().text =
+                        $"{(____configData.PrepareTotalProgress / 7200.0):0.##}秒";
+                    adt.SetActive(true);
+                }
+                else
+                {
+                    adt.SetActive(false);
+                }
+            }
+
             if (____configData.EquipType == 1)
             {
-                GameObject attackEffectObj = __instance.CGet<GameObject>("AttackProperty");
-                var transform = attackEffectObj.transform.Find("AttackDisturbTips");
+                var attackEffectObj = __instance.CGet<GameObject>("AttackProperty");
+                var adtName = "AttackDisturbTips";
+                var transform = attackEffectObj.transform.Find(adtName);
                 GameObject adt;
                 if (transform == null)
                 {
                     var t = attackEffectObj.transform.Find("AcupointTips").gameObject;
                     adt = Object.Instantiate(t, attackEffectObj.transform, false);
-                    adt.name = "AttackDisturbTips";
+                    adt.name = adtName;
                 }
                 else
                 {
