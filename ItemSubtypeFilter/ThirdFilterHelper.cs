@@ -79,18 +79,18 @@ public class ThirdFilterHelper
             {
                 ItemSortAndFilterType.Warehouse,
                 new SecondFilterHelper.SecondFilterPlace(
-                    new Vector3(-4.02f, 1.62f, 240f),
-                    new Vector2(0, -130),
-                    new Vector3(-5.5f, 2.45f, 240f),
+                    new Vector3(-4.02f, 1.02f, 240f),
+                    new Vector2(0, -140),
+                    new Vector3(-5.2f, 1.8f, 240f),
                     doubleLine: true
                 )
             },
             {
                 ItemSortAndFilterType.WarehouseInventory,
                 new SecondFilterHelper.SecondFilterPlace(
-                    new Vector3(4.13f, 1.62f, 240f),
-                    new Vector2(0, -130),
-                    new Vector3(2.68f, 2.45f, 240f),
+                    new Vector3(4.13f, 1.02f, 240f),
+                    new Vector2(0, -140),
+                    new Vector3(2.98f, 1.8f, 240f),
                     doubleLine: true
                 )
             },

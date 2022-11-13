@@ -1,5 +1,5 @@
 return {
-    Title = "~物品高级筛选 v0.7~",
+    Title = "~物品高级筛选 v0.81~",
     FrontendPlugins = { "ItemSubtypeFilter.dll" },
     Author = "myna12548",
     FileId = 2871616225,
@@ -9,6 +9,8 @@ return {
    （首次打开界面时无效，切换一下一级筛选即可出现二级筛选）
    
    0.7更新：适配新版mod依赖系统
+   0.8更新：适配新版仓库界面
+   0.81更新：修正0.8使上架选择物品界面错乱的问题
    ]],
     DefaultSettings = {
     },

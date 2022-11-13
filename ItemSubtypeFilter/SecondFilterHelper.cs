@@ -25,16 +25,16 @@ public static class SecondFilterHelper
             {
                 ItemSortAndFilterType.Warehouse,
                 new SecondFilterPlace(
-                    new Vector3(-4.02f, 2.02f, 240f),
-                    new Vector2(0, -80),
-                    new Vector3(-6.9f, 2.45f, 240f))
+                    new Vector3(-4.02f, 1.39f, 240f),
+                    new Vector2(0, -90),
+                    new Vector3(-6.65f, 1.8f, 240f))
             },
             {
                 ItemSortAndFilterType.WarehouseInventory,
                 new SecondFilterPlace(
-                    new Vector3(4.13f, 2.02f, 240f),
-                    new Vector2(0, -80),
-                    new Vector3(1.25f, 2.45f, 240f))
+                    new Vector3(4.13f, 1.39f, 240f),
+                    new Vector2(0, -90),
+                    new Vector3(1.5f, 1.8f, 240f))
             },
             {
                 ItemSortAndFilterType.CharacterMenuItems,
@@ -186,25 +186,29 @@ public static class SecondFilterHelper
         {
             return ItemSortAndFilterType.TeaHorse;
         }
+        
+        // 多选物品： UI_MultiSelectItem/PopupWindowBase/ElementsRoot/InventoryItemScroll
+        // 仓库： UI_Warehouse/MainWindow/Warehouse/ScrollBack/WarehouseItemScroll
 
-        switch (parentTransform.parent.name)
+        if (parentTransform.parent.parent.parent.parent.name == "UI_Warehouse")
         {
-            case "Inventory":
-                return ItemSortAndFilterType.WarehouseInventory;
-            case "Warehouse":
-                return ItemSortAndFilterType.Warehouse;
-            case "ShopItems":
-                return ItemSortAndFilterType.Shop;
-            case "SelfItems":
-                return ItemSortAndFilterType.ShopInventory;
-            case "OperateArea":
-                return ItemSortAndFilterType.Event;
-            case "TaiwuBooks":
-                return ItemSortAndFilterType.ExchangeBookRight;
-            case "NpcBooks":
-                return ItemSortAndFilterType.ExchangeBookLeft;
-            default:
-                return null;
+            switch (parentTransform.name)
+            {
+                case "InventoryItemScroll":
+                    return ItemSortAndFilterType.WarehouseInventory;
+                case "WarehouseItemScroll":
+                    return ItemSortAndFilterType.Warehouse;
+            }
         }
+        
+        return parentTransform.parent.name switch
+        {
+            "ShopItems" => ItemSortAndFilterType.Shop,
+            "SelfItems" => ItemSortAndFilterType.ShopInventory,
+            "OperateArea" => ItemSortAndFilterType.Event,
+            "TaiwuBooks" => ItemSortAndFilterType.ExchangeBookRight,
+            "NpcBooks" => ItemSortAndFilterType.ExchangeBookLeft,
+            _ => null
+        };
     }
 }

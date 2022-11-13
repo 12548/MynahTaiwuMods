@@ -34,7 +34,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup>
-      <PostBuildEvent>pwsh AfterBuild.ps1</PostBuildEvent>
+      <PostBuildEvent>pwsh AfterBuild.ps1 2871616225 $(TargetDir)</PostBuildEvent>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony">
