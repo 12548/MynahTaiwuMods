@@ -19,9 +19,14 @@ public class MouseTipManagerPatch
     public static void ShowTipsPrefix(ref TipType type,
         ref ArgumentBox argsBox)
     {
-        if (!ModEntry.ReplaceAllCharacterTipToDetail || type != TipType.Character) return;
+        if (!ModEntry.ReplaceAllCharacterTipToDetail || (type != TipType.Character && type != TipType.LifeCombatSkillValue)) return;
         
         if (argsBox.Get<AvatarRelatedData>("avatar", out _))
+        {
+            return;
+        }
+        
+        if (argsBox.Get("_mmi_no_replace", out bool _))
         {
             return;
         }
@@ -35,7 +40,7 @@ public class MouseTipManagerPatch
 
         type = TipType.SimpleWide;
         argsBox.Set("_mmi_charId", charId);
-        argsBox.Set("_mmi_locationShow", true); // 始终显示位置
+        argsBox.Set("_mmi_locationShow", type != TipType.LifeCombatSkillValue); // 石屋不显示位置
         // if (argsBox.Get("locationShow", out bool showLocation))
         // {
         //     argsBox.Set("_mmi_locationShow", showLocation);

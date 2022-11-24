@@ -34,6 +34,7 @@ public class Util
             // var item = Character.Instance.GetItem(Character.Instance[charDisplayData.TemplateId].TemplateId);
 
             mouseTipDisplayer.RuntimeParam.Set("charId", characterId);
+            mouseTipDisplayer.RuntimeParam.Set("_mmi_no_replace", true);
             mouseTipDisplayer.enabled = true;
         }
         else

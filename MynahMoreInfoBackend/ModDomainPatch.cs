@@ -21,6 +21,8 @@ public class ModDomainPatch
         if (!dataName.StartsWith("GetCharacterData|")) return true;
         var charId = int.Parse(dataName.Split("|")[1]);
         var retValue = new Dictionary<string, object>();
+        
+        var list = new List<short>();
 
         var charGot = DomainManager.Character.TryGetElement_Objects(charId, out var character);
         // DomainManager.Character.GetDeadCharacter(charId);
@@ -30,7 +32,32 @@ public class ModDomainPatch
             if (deadGuy != null)
             {
                 retValue["IsDead"] = true;
+
+                // retValue["FullName"] = deadGuy.FullName;
+                retValue["Gender"] = deadGuy.Gender;
+                retValue["Happiness"] = deadGuy.Happiness;
+                retValue["Morality"] = deadGuy.Morality;
+
+                retValue["FameType"] = deadGuy.FameType;
+                retValue["Attraction"] = deadGuy.Attraction;
+                
+                retValue["LiveAge"] = deadGuy.GetActualAge();
+                retValue["DeathDate"] = deadGuy.DeathDate;
+                retValue["BirthDate"] = deadGuy.BirthDate;
+                
+                retValue["PreexistenceCharCount"] = deadGuy.PreexistenceCharIds.Count;
+                
                 retValue["FeatureIds"] = deadGuy.FeatureIds;
+                
+                var loc = DomainManager.Character.GetCharacterDisplayData(charId).Location;
+                if (loc.IsValid())
+                {
+                    var pos = DomainManager.Map.GetBlock(loc).GetBlockPos();
+                    retValue["BlockFullName"] =
+                        MapDomainUtils.GetBlockFullName(loc, "", "", false)
+                        + $"({pos.X}, {pos.Y})";
+                }
+                
             }
 
             __result = Json.Serialize(retValue);
@@ -43,7 +70,6 @@ public class ModDomainPatch
         retValue["IsBisexual"] = character.GetBisexual();
         retValue["XiangshuInfection"] = character.GetXiangshuInfection(); // 入魔值
 
-        // 等他更新到正式版
         var location = character.GetLocation();
         if (location.IsValid())
         {
@@ -52,8 +78,6 @@ public class ModDomainPatch
                 MapDomainUtils.GetBlockFullName(location, "", "", false)
                 + $"({pos.X}, {pos.Y})";
         }
-
-        var list = new List<short>();
 
         for (sbyte i = 0; i < LifeSkillType.Instance.Count; i++)
         {

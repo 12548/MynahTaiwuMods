@@ -61,7 +61,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("书籍正逆练", description: "显示书籍所载功法的正逆练效果")]
     public static bool ShowBookSpecialEffect = true;
 
-    [ModSetting("打点显示", description: "显示催破功法的打点分布")]
+    [ModSetting("显示打点和施展时间", description: "显示催破功法的打点分布和可施展功法的基本施展时间（施展速度为100%时的施展时间）")]
     public static bool ShowAttackDistribution = true;
 
     [ModSetting("显示书籍五行属性", description: "显示功法书对应功法的五行属性")]
