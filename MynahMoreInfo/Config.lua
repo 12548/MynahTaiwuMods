@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.7~",
+    Title = "~更多信息 v1.71~",
     FrontendPlugins = { "MynahMoreInfoFrontend.dll" },
     BackendPlugins = { "MynahMoreInfoBackend.dll" },
     Author = "myna12548",
@@ -40,6 +40,8 @@ return {
 - 增加了显示功法基本施展时间的功能
 - 全部替换详细人物浮窗现在也替换石屋的浮窗了
 - 显示死人信息
+1.71更新：
+- 修正了对话界面不显示详细信息的问题
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {

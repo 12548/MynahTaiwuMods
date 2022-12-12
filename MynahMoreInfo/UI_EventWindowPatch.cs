@@ -1,5 +1,4 @@
-﻿using System;
-using GameData.Domains.Character.Display;
+﻿using GameData.Domains.Character.Display;
 using GameData.Domains.TaiwuEvent.DisplayEvent;
 using HarmonyLib;
 
@@ -31,7 +30,8 @@ public class UI_EventWindowPatch
         else
         {
             var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId,
+                ModEntry.ReplaceAllCharacterTipToDetail ? 2 : 1);
         }
     }
 
@@ -58,7 +58,8 @@ public class UI_EventWindowPatch
         else
         {
             var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId);
+            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId,
+                ModEntry.ReplaceAllCharacterTipToDetail ? 2 : 1);
         }
     }
 

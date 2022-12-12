@@ -51,13 +51,13 @@ public class MouseTipSimpleWidePatch
         if (!hasDisplayData)
         {
             __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
-                CharacterDomainHelper.MethodIds.GetCharacterDisplayDataList,
+                CharacterDomainHelper.MethodName2MethodId["GetCharacterDisplayDataList"],
                 new List<int> { charId },
                 gCall.AddAction("CharacterDisplayDataList"));
         }
 
         __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
-            CharacterDomainHelper.MethodIds.GetGroupCharDisplayDataList,
+            CharacterDomainHelper.MethodName2MethodId["GetGroupCharDisplayDataList"],
             new List<int> { charId },
             gCall.AddAction("GroupCharDisplayDataList"));
 
@@ -475,12 +475,33 @@ public class MouseTipSimpleWidePatch
                     sb.Append($"<pos={(i % 4 + 1) * 25}%>");
                 }
             }
+
+            sb.AppendLine();
+
+
+            if (otherData.ContainsKey("AvailableLifeSkills"))
+            {
+                var list = (List<object>) otherData["AvailableLifeSkills"];
+                if (list.Count > 0)
+                {
+                    var str = list.Select(Convert.ToInt32)
+                        .Select(it => SkillBook.Instance[it])
+                        .Select(it => it.Name.SetGradeColor(it.Grade))
+                        .Join(null, " ");
+                    sb.AppendLine("可请教技艺：" + str);
+                }
+            }
         }
 
         if (!titleText.isActiveAndEnabled || !contentText.isActiveAndEnabled) return;
         titleText.text = title;
         contentText.text = sb.ToString().ColorReplace();
         contentText.GetComponent<TMPTextSpriteHelper>().Parse();
+        //
+        // foreach (var skillBookItem in SkillBook.Instance)
+        // {
+        //     Debug.Log($"{skillBookItem.TemplateId}: {skillBookItem.Name}");
+        // }
     }
 
     private static unsafe int _getCSQValue(GroupCharDisplayData dd, int index)
