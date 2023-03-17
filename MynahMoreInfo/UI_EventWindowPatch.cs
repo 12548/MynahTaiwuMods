@@ -19,7 +19,7 @@ public class UI_EventWindowPatch
         if (transform == null) return;
         var mouseTipObj = transform.gameObject;
 
-        if (mainCharacter == null || !HasCharacter(__instance))
+        if (mainCharacter == null || !HasCharacter(__instance, true))
         {
             if (refers != null)
             {
@@ -41,13 +41,13 @@ public class UI_EventWindowPatch
     {
         if (!ModEntry.ShowEventUICharacterMouseTip) return;
         var data = (TaiwuEventDisplayData)Traverse.Create(__instance).Property("Data").GetValue();
-        CharacterDisplayData mainCharacter = data.TargetCharacter;
+        CharacterDisplayData targetCharacter = data.TargetCharacter;
         Refers refers = __instance.CGet<Refers>("TargetCharacter");
         var transform = refers.transform.Find("CanvasChanger/AvatarArea/ShowTargetCharacterMenu");
         if (transform == null) return;
         var mouseTipObj = transform.gameObject;
 
-        if (mainCharacter == null || !HasCharacter(__instance))
+        if (targetCharacter == null || !HasCharacter(__instance, false))
         {
             if (refers != null)
             {
@@ -58,17 +58,17 @@ public class UI_EventWindowPatch
         else
         {
             var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(mouseTipObj);
-            Util.EnableMouseTipCharacter(mouseTipDisplayer, mainCharacter.CharacterId,
+            Util.EnableMouseTipCharacter(mouseTipDisplayer, targetCharacter.CharacterId,
                 ModEntry.ReplaceAllCharacterTipToDetail ? 2 : 1);
         }
     }
 
     // [HarmonyReversePatch]
     // [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
-    static bool HasCharacter(UI_EventWindow instance)
+    static bool HasCharacter(UI_EventWindow instance, bool left)
     {
         return (bool)AccessTools.Method(typeof(UI_EventWindow), "HasCharacter")
-            .Invoke(instance, new object[] { });
+            .Invoke(instance, new object[] { left });
         // throw new Exception("stub!");
     }
 }
