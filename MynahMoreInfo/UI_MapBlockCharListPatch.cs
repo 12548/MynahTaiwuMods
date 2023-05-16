@@ -67,18 +67,25 @@ public class UI_MapBlockCharListPatch
 
         var charIndex = charList[index];
         var charDisplayData = key == 3 ? null : ____charDataDict[charIndex];
-        var characterId = charDisplayData?.CharacterId ?? ____graveDataDict[charIndex].Id;
-
-        // Debug.Log($"charId: {characterId}, disp: {(charDisplayData?.FullName ?? ____graveDataDict[charIndex].NameData.FullName).GetName(charDisplayData?.Gender ?? ____graveDataList[charIndex].NameData.Gender, new Dictionary<int, string>())}");
-
-        switch (ModEntry.MouseTipMapBlockCharList)
+        try
         {
-            case 2:
-                GetAlternateCharTipStr(mouseTipDisplayer, charDisplayData, characterId);
-                break;
-            case 1:
-                Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);
-                break;
+            var characterId = charDisplayData?.CharacterId ?? ____graveDataDict[charIndex].Id;
+
+            // Debug.Log($"charId: {characterId}, disp: {(charDisplayData?.FullName ?? ____graveDataDict[charIndex].NameData.FullName).GetName(charDisplayData?.Gender ?? ____graveDataList[charIndex].NameData.Gender, new Dictionary<int, string>())}");
+
+            switch (ModEntry.MouseTipMapBlockCharList)
+            {
+                case 2:
+                    GetAlternateCharTipStr(mouseTipDisplayer, charDisplayData, characterId);
+                    break;
+                case 1:
+                    Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
         }
     }
 

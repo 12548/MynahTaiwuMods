@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v1.81~",
+    Title = "~更多信息 v1.82~",
     FrontendPlugins = { "MynahMoreInfoFrontend.dll" },
     BackendPlugins = { "MynahMoreInfoBackend.dll" },
     Author = "myna12548",
@@ -42,7 +42,7 @@ return {
 1.8更新：
 - 详细人物浮窗显示当前可请教的技艺
 
-230213 1.81更新：
+230512 1.82更新：
 - 修正适配新版
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],

@@ -10,7 +10,7 @@ namespace MynahMoreInfo;
 
 public partial class ModEntry
 {
-    [HarmonyPatch]
+    [HarmonyPatch] 
     public static class MouseTipCharacterPatch
     {
         /// <summary>
