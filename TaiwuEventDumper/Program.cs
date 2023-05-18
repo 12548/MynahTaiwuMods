@@ -48,8 +48,7 @@ static class Program
         {
             TaiwuPath = args[1];
         }
-
-        Console.WriteLine("Hello, World!");
+        EventDumper.Dump();
     }
 }
 

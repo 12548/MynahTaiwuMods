@@ -100,18 +100,27 @@ namespace LuaTableSerializer
 			{
 			}
 			string result;
-			if (!(key is string))
+			if (key is string)
 			{
-				if (!(key is int))
+				if (int.TryParse((string)key, out int intKey))
 				{
-					throw new ArgumentOutOfRangeException("key", string.Format("Not expected key Type value: {0}", key));
+					// 这里对于数字字符串就直接当数字用了
+					result = string.Format("[{0}]", key);
 				}
-				result = string.Format("[{0}]", key);
+				else
+				{
+					result = string.Format("[\"{0}\"]", key);
+				}
 			}
 			else
 			{
-				result = string.Format("[\"{0}\"]", key);
+				if (key is int)
+					result = string.Format("[{0}]", key);
+				else
+					throw new ArgumentOutOfRangeException("key",
+						string.Format("Not expected key Type value: {0}", key));
 			}
+
 			if (!true)
 			{
 			}
