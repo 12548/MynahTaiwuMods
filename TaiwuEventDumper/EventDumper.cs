@@ -13,7 +13,7 @@ public static class EventDumper
 {
     public static void Dump()
     {
-        var taiwuPath = System.Environment.GetEnvironmentVariable("TAIWU_PATH");
+        var taiwuPath = Program.TaiwuPath;
 
         if (taiwuPath != null)
         {

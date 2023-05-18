@@ -4,6 +4,7 @@ using System.Reflection;
 
 static class Program
 {
+    public static string TaiwuPath = Environment.GetEnvironmentVariable("TAIWU_PATH");
     static Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 
     public static void LoadAssemblyReferences(Assembly selectedAssembly)
@@ -20,7 +21,7 @@ static class Program
             }
             else
             {
-                var taiwuPath = Environment.GetEnvironmentVariable("TAIWU_PATH");
+                var taiwuPath = TaiwuPath;
 
                 if (taiwuPath != null)
                 {
@@ -43,6 +44,11 @@ static class Program
 
     static void Main(string[] args)
     {
+        if (args.Length > 1)
+        {
+            TaiwuPath = args[1];
+        }
+
         Console.WriteLine("Hello, World!");
     }
 }
