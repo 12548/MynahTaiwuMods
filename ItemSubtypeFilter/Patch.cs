@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Config;
 using GameData.Domains.Item;
 using GameData.Domains.Item.Display;
@@ -11,6 +12,7 @@ using Object = UnityEngine.Object;
 namespace ItemSubtypeFilter;
 
 [HarmonyPatch]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class Patch
 {
     /// <summary>
@@ -21,7 +23,7 @@ public class Patch
     /// <param name="____equipFilterTogGroup"></param>
     /// <param name="____itemList"></param>
     /// <param name="____onItemListChanged"></param>
-    /// <returns></returns>
+    /// <returns>false</returns>
     [HarmonyPatch(typeof(ItemSortAndFilter), "UpdateItemList")]
     [HarmonyPrefix]
     public static bool UpdateItemListPrefix(
@@ -33,8 +35,9 @@ public class Patch
     )
     {
         __instance.OutputItemList.Clear();
-
         if (__instance.transform == null) return true;
+        
+        var items = new List<ItemDisplayData>(____itemList);
 
         var thirdFilter = __instance.transform.Find("ThirdFilter");
         if (thirdFilter != null && thirdFilter.gameObject.activeSelf &&
@@ -42,16 +45,29 @@ public class Patch
         {
             // 有三级筛选且三级筛选不为“全”时进入
             Debug.Log("thirdFilter!");
+            
+            var extraFilter = __instance.transform.Find("ExtraFilter");
+            if (extraFilter != null && extraFilter.gameObject.activeSelf &&
+                extraFilter.GetComponent<CToggleGroup>().GetActive().Key != 0)
+            {
+                // 额外筛选 已读
+                items = items.FindAll(data =>
+                {
+                    var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
+
+                    return false;
+                });
+            }
 
             var togKey = thirdFilter.GetComponent<CToggleGroup>().GetActive().Key;
             List<ItemSortAndFilter.EquipFilterType> typeList = __instance.SortFilterSetting.EquipFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.EquipFilterType.Invalid)
             {
-                __instance.OutputItemList.AddRange(____itemList);
+                __instance.OutputItemList.AddRange(items);
             }
             else
             {
-                __instance.OutputItemList.AddRange(____itemList.FindAll(data =>
+                __instance.OutputItemList.AddRange(items.FindAll(data =>
                 {
                     var itemSubType = ItemTemplateHelper.GetItemSubType(data.Key.ItemType, data.Key.TemplateId);
                     if (itemSubType == 1001)
@@ -90,7 +106,7 @@ public class Patch
             List<ItemSortAndFilter.EquipFilterType> typeList = __instance.SortFilterSetting.EquipFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.EquipFilterType.Invalid)
             {
-                __instance.OutputItemList.AddRange(____itemList);
+                __instance.OutputItemList.AddRange(items);
             }
             else
             {
@@ -98,13 +114,13 @@ public class Patch
                 var togKey = ____equipFilterTogGroup.GetActive().Key;
                 if (togKey < 99)
                 {
-                    __instance.OutputItemList.AddRange(____itemList.FindAll(data =>
+                    __instance.OutputItemList.AddRange(items.FindAll(data =>
                         typeList.Contains(ItemSortAndFilter.GetEquipFilterType(data.Key))));
                 }
                 else
                 {
                     var subType = togKey - 100;
-                    __instance.OutputItemList.AddRange(____itemList.FindAll(data =>
+                    __instance.OutputItemList.AddRange(items.FindAll(data =>
                         ItemTemplateHelper.GetItemSubType(data.Key.ItemType, data.Key.TemplateId) == subType));
                 }
             }
@@ -115,18 +131,18 @@ public class Patch
             List<ItemSortAndFilter.ItemFilterType> typeList = __instance.SortFilterSetting.ItemFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.ItemFilterType.Invalid)
             {
-                __instance.OutputItemList.AddRange(____itemList);
+                __instance.OutputItemList.AddRange(items);
             }
             else
             {
-                __instance.OutputItemList.AddRange(____itemList.FindAll(data =>
+                __instance.OutputItemList.AddRange(items.FindAll(data =>
                     typeList.Contains(ItemSortAndFilter.GetFilterType(data.Key.ItemType))));
             }
         }
         else
         {
             // 否则不分
-            __instance.OutputItemList.AddRange(____itemList);
+            __instance.OutputItemList.AddRange(items);
         }
 
         bool sortEnabled = __instance.SortEnabled;

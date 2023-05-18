@@ -11,19 +11,19 @@ namespace ItemSubtypeFilter;
 
 public class ThirdFilterHelper
 {
-    private static readonly Dictionary<ItemSortAndFilterType, SecondFilterHelper.SecondFilterPlace> ThirdFilterPlaces =
+    private static readonly Dictionary<ItemSortAndFilterType, ExtraFilterPlace> ThirdFilterPlaces =
         new()
         {
             {
                 ItemSortAndFilterType.CharacterMenuItems,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(0.48f, 2.42f, 240f),
                     new Vector2(10, -214),
                     new Vector3(-3.4f, 2.79f, 240f))
             },
             {
                 ItemSortAndFilterType.Event,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-0.17f, -1.03f, 240f),
                     new Vector2(-20f, -180f),
                     new Vector3(-3.8f, -0.65f, 240f)
@@ -31,7 +31,7 @@ public class ThirdFilterHelper
             },
             {
                 ItemSortAndFilterType.TeaHorse,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(3.61f, -1.6f, 240f),
                     new Vector2(988f, 190f),
                     new Vector3(0.24f, -1.2f, 240f)
@@ -40,7 +40,7 @@ public class ThirdFilterHelper
 
             {
                 ItemSortAndFilterType.ExchangeBookLeft,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-3.97f, 1.6f, 240f),
                     new Vector2(848f, 350f),
                     new Vector3(-5.5f, 2.2f, 240f),
@@ -49,7 +49,7 @@ public class ThirdFilterHelper
             },
             {
                 ItemSortAndFilterType.ExchangeBookRight,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(3.93f, 1.6f, 240f),
                     new Vector2(848f, 350f),
                     new Vector3(2.38f, 2.2f, 240f),
@@ -59,7 +59,7 @@ public class ThirdFilterHelper
 
             {
                 ItemSortAndFilterType.Shop,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-1.5f, 2f, 240f),
                     new Vector2(848f, -105f),
                     new Vector3(-2.62f, 2.6f, 240f),
@@ -68,7 +68,7 @@ public class ThirdFilterHelper
             },
             {
                 ItemSortAndFilterType.ShopInventory,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(5.1f, 2f, 240f),
                     new Vector2(848f, -105f),
                     new Vector3(3.7f, 2.63f, 240f),
@@ -78,7 +78,7 @@ public class ThirdFilterHelper
 
             {
                 ItemSortAndFilterType.Warehouse,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-4.02f, 1.02f, 240f),
                     new Vector2(0, -140),
                     new Vector3(-5.2f, 1.8f, 240f),
@@ -87,7 +87,7 @@ public class ThirdFilterHelper
             },
             {
                 ItemSortAndFilterType.WarehouseInventory,
-                new SecondFilterHelper.SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(4.13f, 1.02f, 240f),
                     new Vector2(0, -140),
                     new Vector3(2.98f, 1.8f, 240f),
@@ -219,6 +219,7 @@ public class ThirdFilterHelper
             };
         }
 
+        // 只显示适用的按钮
         for (int i = 0; i < filterObj.childCount; i++)
         {
             var toggle = filterObj.GetChild(i).GetComponent<CToggle>();
@@ -248,6 +249,26 @@ public class ThirdFilterHelper
 
         viewport.position = places.NewViewportPos;
         viewport.sizeDelta = places.NewViewportSize;
+
+        if (places.ExtraFilterPos != null)
+        {
+            var extraFilterObj = parentTrans.Find("ThirdFilter");
+            if (extraFilterObj == null)
+            {
+                extraFilterObj = Object.Instantiate(parentTrans.Find("Filter"), parentTrans, false);
+                extraFilterObj.transform.name = "ThirdFilter";
+                extraFilterObj.position = places.SecondFilterPos;
+                var toggleGroup = extraFilterObj.GetComponent<CToggleGroup>();
+                var template = filterObj.GetChild(0);
+                
+                var plist = new List<string>() {
+                    "未", "阅"
+                };
+                
+                var filterComponent = parentSortAndFilter.gameObject.AddComponent<ReadStateFilterComponent>();
+                filterComponent.ToggleGroup = toggleGroup;
+            }
+        }
 
         return filterObj.GetComponent<CToggleGroup>();
     }

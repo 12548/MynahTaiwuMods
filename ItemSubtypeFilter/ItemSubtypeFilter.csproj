@@ -71,10 +71,12 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ExtraFilterPlace.cs" />
         <Compile Include="ItemSortAndFilterType.cs" />
         <Compile Include="ItemSubtypeFilter.cs" />
         <Compile Include="Patch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="ReadStateFilterComponent.cs" />
         <Compile Include="ThirdFilterHelper.cs" />
         <Compile Include="ThirdFilterType.cs" />
         <Compile Include="SecondFilterHelper.cs" />

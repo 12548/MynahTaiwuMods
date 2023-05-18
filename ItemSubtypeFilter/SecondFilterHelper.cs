@@ -5,47 +5,47 @@ namespace ItemSubtypeFilter;
 
 public static class SecondFilterHelper
 {
-    public static readonly Dictionary<ItemSortAndFilterType, SecondFilterPlace> SecondFilterPlaces =
+    public static readonly Dictionary<ItemSortAndFilterType, ExtraFilterPlace> SecondFilterPlaces =
         new()
         {
             {
                 ItemSortAndFilterType.Shop,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-1.46f, 2.35f, 240f),
                     new Vector2(0, -45),
                     new Vector3(-4.4f, 2.8f, 240f))
             },
             {
                 ItemSortAndFilterType.ShopInventory,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(5.19f, 2.35f, 240f),
                     new Vector2(0, -45),
                     new Vector3(2.25f, 2.8f, 240f))
             },
             {
                 ItemSortAndFilterType.Warehouse,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-4.02f, 1.39f, 240f),
                     new Vector2(0, -90),
                     new Vector3(-6.65f, 1.8f, 240f))
             },
             {
                 ItemSortAndFilterType.WarehouseInventory,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(4.13f, 1.39f, 240f),
                     new Vector2(0, -90),
                     new Vector3(1.5f, 1.8f, 240f))
             },
             {
                 ItemSortAndFilterType.CharacterMenuItems,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(0.48f, 2.80f, 240f),
                     new Vector2(10f, -158f),
                     new Vector3(-3.13f, 3.20f, 240.0f))
             },
             {
                 ItemSortAndFilterType.Event,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-0.17f, -0.63f, 240f),
                     new Vector2(-20f, -125f),
                     new Vector3(-3.8f, -0.22f, 240f)
@@ -54,7 +54,7 @@ public static class SecondFilterHelper
             
             {
                 ItemSortAndFilterType.TeaHorse,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(3.61f, -1.19f, 240f),
                     new Vector2(988f, 250f),
                     new Vector3(0.24f, -0.78f, 240f)
@@ -62,7 +62,7 @@ public static class SecondFilterHelper
             },
             {
                 ItemSortAndFilterType.ExchangeBookRight,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(3.93f, 1.92f, 240f),
                     new Vector2(848f, 400f),
                     new Vector3(0.9f, 2.37f, 240f)
@@ -70,34 +70,13 @@ public static class SecondFilterHelper
             },
             {
                 ItemSortAndFilterType.ExchangeBookLeft,
-                new SecondFilterPlace(
+                new ExtraFilterPlace(
                     new Vector3(-3.97f, 1.92f, 240f),
                     new Vector2(848f, 400f),
                     new Vector3(-6.96f, 2.37f, 240f)
                     )
             },
         };
-
-    public class SecondFilterPlace
-    {
-        public Vector3 NewViewportPos;
-        public Vector2 NewViewportSize;
-        public Vector3 SecondFilterPos;
-        public Vector3? OriginalViewportPos;
-        public Vector2? OriginalViewportSize;
-        public bool DoubleLine;
-
-        public SecondFilterPlace(Vector3 newViewportPos, Vector2 newViewportSize, Vector3 secondFilterPos,
-            Vector3? originalViewportPos = null, Vector2? originalViewportSize = null, bool doubleLine = false)
-        {
-            NewViewportPos = newViewportPos;
-            NewViewportSize = newViewportSize;
-            SecondFilterPos = secondFilterPos;
-            OriginalViewportPos = originalViewportPos;
-            OriginalViewportSize = originalViewportSize;
-            DoubleLine = doubleLine;
-        }
-    }
 
     public static readonly Dictionary<ItemSortAndFilter.ItemFilterType, Dictionary<int, string>>
         ItemFilterTypeToSubTypeString =
