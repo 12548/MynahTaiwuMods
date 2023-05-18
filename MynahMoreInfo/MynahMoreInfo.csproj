@@ -74,7 +74,7 @@
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-          <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\The Scroll of Taiwu_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+          <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.TextCoreModule">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\UnityEngine.TextCoreModule.dll</HintPath>

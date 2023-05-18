@@ -29,11 +29,11 @@
         <Private>False</Private>
       </Reference>
       <Reference Include="Taiwu_EventPackage_CharacterInteraction_Main">
-        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Main.dll</HintPath>
+        <HintPath>$(TAIWU_PATH)\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Main.dll</HintPath>
         <Private>False</Private>
       </Reference>
       <Reference Include="Taiwu_EventPackage_CharacterInteraction_Study">
-        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Study.dll</HintPath>
+        <HintPath>$(TAIWU_PATH)\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Study.dll</HintPath>
       </Reference>
     </ItemGroup>
 
