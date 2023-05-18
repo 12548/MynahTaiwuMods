@@ -4,7 +4,7 @@ using System.Reflection;
 
 static class Program
 {
-    public static string TaiwuPath = Environment.GetEnvironmentVariable("TAIWU_PATH");
+    public static string TaiwuPath = Path.Join(Environment.CurrentDirectory, "..");
     static Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 
     public static void LoadAssemblyReferences(Assembly selectedAssembly)
@@ -42,13 +42,13 @@ static class Program
         }
     }
 
-    static void Main(string[] args)
-    {
-        if (args.Length > 1)
-        {
-            TaiwuPath = args[1];
-        }
-        EventDumper.Dump();
-    }
+    // static void Main(string[] args)
+    // {
+    //     if (args.Length > 1)
+    //     {
+    //         TaiwuPath = args[1];
+    //     }
+    //     EventDumper.Dump();
+    // }
 }
 

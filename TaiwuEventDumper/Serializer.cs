@@ -96,9 +96,6 @@ namespace LuaTableSerializer
 		// Token: 0x0600000E RID: 14 RVA: 0x0000236C File Offset: 0x0000056C
 		private static string ConvertKey(object key)
 		{
-			if (!true)
-			{
-			}
 			string result;
 			if (key is string)
 			{
@@ -121,9 +118,6 @@ namespace LuaTableSerializer
 						string.Format("Not expected key Type value: {0}", key));
 			}
 
-			if (!true)
-			{
-			}
 			return result;
 		}
 
@@ -159,7 +153,7 @@ namespace LuaTableSerializer
 		// Token: 0x06000011 RID: 17 RVA: 0x00002538 File Offset: 0x00000738
 		private static string EscapeString(string data)
 		{
-			string str = data.Replace("\\", "\\\\").Replace("\t", "\\t").Replace("\n", "\\\n").Replace("\r", "\\r").Replace("\"", "\\\"").Replace("'", "\\'").Replace("[", "\\[").Replace("]", "\\]");
+			string str = data.Replace("\\", "\\\\").Replace("\t", "\\t").Replace("\n", "\\\n").Replace("\r", "\\r").Replace("\"", "\\\"").Replace("'", "\\'");
 			return "\"" + str + "\"";
 		}
 	}

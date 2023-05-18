@@ -79,7 +79,7 @@ namespace MynahModConfigGenerator
                         
                     }
 
-                    Console.WriteLine(table["FileId"].GetType());
+                    // Console.WriteLine(table["FileId"].GetType());
                     
                     Console.WriteLine(table.ToJson()); // Access a variable in C#
                     
