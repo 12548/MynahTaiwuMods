@@ -1,6 +1,7 @@
 ﻿using Config.EventConfig;
 using GameData.Domains.TaiwuEvent;
 using GameData.Domains.TaiwuEvent.EventHelper;
+using HarmonyLib;
 
 namespace EventDslFramework;
 
@@ -150,11 +151,16 @@ public class 事件选项上下文
         option.OnOptionAvailableCheck ??= () => true;
 
         option.GetExtraFormatLanguageKeys = () => default; // 多语言用的,目前无用
-
         
         foreach (var eventRef in OtherEventsToAddTo)
         {
-            EventHelper.AddOptionToEvent(eventRef.获取GUID(), _event.获取GUID(), _option.OptionKey);
+            
+            // EventHelper.AddOptionToEvent(eventRef.获取GUID(), _event.获取GUID(), _option.OptionKey);
+            var targetEvent = TaiwuEventDomain._packagesList
+                .SelectMany(it => it.EventList)
+                .First(it => it.Guid.ToString() == eventRef.获取GUID());
+
+            targetEvent.EventOptions = targetEvent.EventOptions.ToList().AddItem(_option).ToArray();
         }
         
         return option;
