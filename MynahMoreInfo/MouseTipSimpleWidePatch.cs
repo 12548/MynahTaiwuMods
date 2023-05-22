@@ -9,6 +9,7 @@ using FrameWork;
 using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Display;
+using GameData.Domains.Item;
 using GameData.Domains.Mod;
 using GameData.Serializer;
 using HarmonyLib;
@@ -104,12 +105,6 @@ public class MouseTipSimpleWidePatch
                 var cdDict = (Dictionary<string, object>)Json.Deserialize(cdString);
                 if (cdDict != null)
                 {
-                    // if (cdDict.TryGetValue("IsDead", out var isDead))
-                    // {
-                    //     contentText.text = "更多信息：详细人物浮窗暂不支持显示死人数据，敬请期待更新";
-                    //     return;
-                    // }
-
                     var objects = (List<object>)cdDict["FeatureIds"];
                     if (!hasShowLocation)
                     {
@@ -479,16 +474,51 @@ public class MouseTipSimpleWidePatch
             sb.AppendLine();
 
 
-            if (otherData.ContainsKey("AvailableLifeSkills"))
+            if (otherData.TryGetValue("AvailableLifeSkills", out var value1))
             {
-                var list = (List<object>) otherData["AvailableLifeSkills"];
+                var list = (List<object>)value1;
                 if (list.Count > 0)
                 {
                     var str = list.Select(Convert.ToInt32)
                         .Select(it => SkillBook.Instance[it])
                         .Select(it => it.Name.SetGradeColor(it.Grade))
-                        .Join(null, " ");
+                        .Join(null, "<space=1em>");
                     sb.AppendLine("可请教技艺：" + str);
+                }
+            }
+
+            if (otherData.TryGetValue("AvailableBattleSkills", out var value))
+            {
+                var list = (List<object>)value;
+                if (list.Count > 0)
+                {
+                    var str = list.Select(Convert.ToInt32)
+                        .Select(it => CombatSkill.Instance[it])
+                        .Select(it => it.Name.SetGradeColor(it.Grade))
+                        .Join(null, "<space=1em>");
+                    sb.AppendLine("擅长功法：" + str + " 等");
+                }
+            }
+
+            if (otherData.TryGetValue("AvailableItems", out var value2))
+            {
+                var list = (List<object>)value2;
+                var typeList = (List<object>)otherData["AvailableItemTypes"];
+                Debug.Log("t4");
+                if (list.Count > 0)
+                {
+                    var ids = list.Select(Convert.ToInt16).ToList();
+                    var types = typeList.Select(Convert.ToInt16).ToList();
+                    var names = new List<string>(ids.Count);
+                    names.AddRange(ids.Select((t, i) => ItemTemplateHelper.GetName((sbyte)types[i], t)
+                        .SetGradeColor(ItemTemplateHelper.GetGrade((sbyte)types[i], t))));
+
+                    // var types = 
+                    // .Select(it => SkillBook.Instance[it])
+                    // .Select(it => it.Name.SetGradeColor(it.Grade))
+                    // .Join(null, " ");
+                    // ItemTemplateHelper.GetName()
+                    sb.AppendLine("持有物品：" + names.Join(null, "<space=1em>") + " 等");
                 }
             }
         }

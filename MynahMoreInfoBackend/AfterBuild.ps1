@@ -18,5 +18,6 @@ New-Item $ModPath -ItemType "directory"
 New-Item "$ModPath\Plugins" -ItemType "directory"
 
 Copy-Item "$TargetDir${ModName}Backend.dll" "$ModPath\Plugins" -Verbose
+Copy-Item "$TargetDir${ModName}Backend.pdb" "$ModPath\Plugins" -Verbose
 
 Write-Output "copy over"

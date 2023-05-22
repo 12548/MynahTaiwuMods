@@ -22,10 +22,12 @@ $ConfigLuaPath = "$TargetDir"+"Config.lua"
 Write-Output "ConfigLuaPath: $ConfigLuaPath"
 
 $Dll = "$TargetDir${ModName}Frontend.dll"
+$Pdb = "$TargetDir${ModName}Frontend.pdb"
 
 & "../../../MynahModConfigGenerator/bin/Debug/net6.0/MynahModConfigGenerator.exe" $ConfigLuaPath $Dll
 
 Copy-Item $Dll "$ModPath\Plugins" -Verbose
+Copy-Item $Pdb "$ModPath\Plugins" -Verbose
 Copy-Item Config.lua $ModPath -Verbose
 
 Write-Output "copy over"

@@ -1,11 +1,12 @@
 return {
-    Title = "~更多信息 v1.82~",
+    Title = "~更多信息 v1.9~",
     FrontendPlugins = { "MynahMoreInfoFrontend.dll" },
     BackendPlugins = { "MynahMoreInfoBackend.dll" },
     Author = "myna12548",
     Source = 1,
     FileId = 2871621277,
     Cover = "cover.png",
+    GameVersion="99.99.99.99",
     Description = [[人物、地块增加浮窗，显示功法正逆练效果、打点、学习进度和不传之秘，显示书籍所载功法信息 
 
 （切换设置项开关后请退出重进游戏，否则可能会不生效）
@@ -42,8 +43,8 @@ return {
 1.8更新：
 - 详细人物浮窗显示当前可请教的技艺
 
-230512 1.82更新：
-- 修正适配新版
+230522 1.9更新：
+- 详细人物浮窗显示人物的功法和物品
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {

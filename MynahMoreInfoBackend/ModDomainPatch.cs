@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using ConchShip.EventConfig.Taiwu;
 using Config;
 using Config.EventConfig;
 using GameData.Domains;
+using GameData.Domains.Item;
+using GameData.Domains.Item.Display;
 using GameData.Domains.Mod;
 using GameData.Domains.TaiwuEvent;
 using GameData.Utilities;
 using HarmonyLib;
 using MiniJSON;
+using SkillBook = GameData.Domains.Item.SkillBook;
 
 namespace MynahMoreInfoBackend;
 
@@ -99,6 +102,52 @@ public class ModDomainPatch
 
         retValue["CombatSkillAttainments"] = list.ToArray();
 
+        var availableBattleSkillList = new List<int>();
+        retValue["AvailableBattleSkills"] = availableBattleSkillList;
+
+        if (ModEntry.ShowNpcGoodBattleSkillsCount > 0)
+        {
+            var skills = DomainManager.CombatSkill
+                .GetCharCombatSkills(charId)
+                .OrderByDescending(it => CombatSkill.Instance[it.Value.GetId().SkillTemplateId].Grade)
+                .Select(it => it.Value.GetId().SkillTemplateId);
+
+            retValue["AvailableBattleSkills"] = skills.Take(ModEntry.ShowNpcGoodBattleSkillsCount).ToList();
+
+            // var items = DomainManager.Character.GetAllInventoryItems(charId);
+            // items.Sort(((a, b) =>
+            // {
+            //     
+            // }));
+        }
+
+
+        var availableItemsList = new List<int>();
+        retValue["AvailableItems"] = availableItemsList;
+        retValue["AvailableItemTypes"] = availableItemsList;
+
+        if (ModEntry.ShowNpcGoodItemsCount > 0)
+        {
+            var items = DomainManager.Character.GetAllInventoryItems(charId);
+
+            items.AddRange(DomainManager.Character
+                .GetAllEquipmentItems(charId));
+
+            var displayItems = items
+                .Where(it => it.Key.ItemType is > ItemType.Invalid and < ItemType.Count)
+                .OrderByDescending(it => ItemTemplateHelper.GetGrade(it.Key.ItemType, it.Key.TemplateId))
+                .ThenByDescending(it => it.Price)
+                .Take(ModEntry.ShowNpcGoodItemsCount)
+                .ToList();
+
+            retValue["AvailableItems"] = displayItems
+                .Select(it => it.Key.TemplateId)
+                .ToList();
+            retValue["AvailableItemTypes"] = displayItems
+                .Select(it => it.Key.ItemType)
+                .ToList();
+        }
+
         var availableLifeSkillList = new List<int>();
         retValue["AvailableLifeSkills"] = availableLifeSkillList;
 
@@ -107,7 +156,7 @@ public class ModDomainPatch
             void NewFunction(TaiwuEventOption taiwuEventOption, TaiwuEventItem taiwuEventItem)
             {
                 if (!taiwuEventOption.OnOptionVisibleCheck() || !taiwuEventOption.OnOptionAvailableCheck()) return;
-            
+
                 var selectResult = taiwuEventOption.OnOptionSelect();
                 var skillId = -1;
                 if (selectResult.StartsWith("2636780e") && taiwuEventItem.ArgBox.Get("SkillCanLearn", ref skillId) &&
@@ -117,6 +166,7 @@ public class ModDomainPatch
                     {
                         availableLifeSkillList.Add(skillId);
                     }
+
                     taiwuEventItem.ArgBox.Remove<int>("SkillCanLearn");
                 }
                 else
@@ -144,7 +194,7 @@ public class ModDomainPatch
                     {
                         ArgBox = new EventArgBox(eventArgBox)
                     };
-                
+
                     // 选项：0门派请教 1私下请教
 
                     var sectLearnOption = learnWayEvent.EventOptions[0];
@@ -179,7 +229,7 @@ public class ModDomainPatch
                             // TaiwuEvent_e9f382970aa24566b27f6eb8b3123807
                         }
                     }
-                
+
                     NewFunction(learnWayEvent.EventOptions[1], learnWayEvent);
 
                     // var learnWayEvent = DomainManager.TaiwuEvent.GetEvent("49ae4b01-b8d7-47eb-b37b-cf5e4381a624");

@@ -93,6 +93,20 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("全部详细人物浮窗", description: "将全部的原版人物浮窗替换为详细文字形式")]
     public static bool ReplaceAllCharacterTipToDetail = true;
+    
+    [SliderModSetting("显示人物持有物品数", 
+        minValue: 0, 
+        maxValue: 15,
+        defaultValue: 3,
+        description: "在详细人物浮窗中显示人物持有的此数量的最高品级物品，为0则不显示")]
+    public static int ShowNpcGoodItemsCount;
+    
+    [SliderModSetting("显示人物擅长功法数", 
+        minValue: 0, 
+        maxValue: 15,
+        defaultValue: 3,
+        description: "在详细人物浮窗中显示人物会的此数量的最高品级功法，为0则不显示")]
+    public static int ShowNpcGoodBattleSkillsCount;
 
     public static string StaticModIdStr;
 
