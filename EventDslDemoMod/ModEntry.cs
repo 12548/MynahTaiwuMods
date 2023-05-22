@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using EventDslFramework;
+using GameData.Domains;
+using GameData.Domains.TaiwuEvent.EventHelper;
 using GameData.Utilities;
 using TaiwuModdingLib.Core.Plugin;
 
@@ -14,16 +16,26 @@ public class ModEntry: TaiwuRemakePlugin
 
         事件框架.创建事件("你好!")
             .其主角色为("RoleTaiwu")
-            .其触发条件为(触发条件.太吾进行了一次地格移动)
+            // .其触发条件为(触发条件.太吾进行了一次地格移动)
             .带有选项("你也好!")
                 .选择时触发((evt, box) => { AdaptableLog.Info("你也好好！"); })
                 .选择时跳转到(再见)
             .还带有选项("你不好!");
 
         事件框架.创建事件()
-            .带有选项("互动主体增加额外选项啦!")
-                .自定义内容替换((evt, box) => $"额外选项：CharacterId为{box.GetInt("CharacterId")}")
-                .选择时跳转到简单事件("你选择了新选项!", "好的!")
+            .带有选项("(遣离……)")
+                .自定义选项显示条件((evt, box) => EventHelper.IsInGroup(box.GetInt("CharacterId")))
+                .选择时触发((evt, box) =>
+                {
+                    var charId = box.GetInt("CharacterId");
+                    DomainManager.Taiwu.LeaveGroup(
+                        EventHelper.Domain.MainThreadDataContext, 
+                        charId,
+                        moveToRandomAdjacentBlock: false
+                        );
+                    DomainManager.TaiwuEvent.OnEvent_LetTeammateLeaveGroup(charId); // 支持触发离队事件
+                })
+                .选择时跳转到简单事件("遣离成功!", "(……)")
                 .并加入到其他事件("567d1caf-8b28-4dbf-8cbe-e746e8ac8cfd");
     }
 

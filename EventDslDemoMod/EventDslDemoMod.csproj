@@ -6,6 +6,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PublicizeAll>true</PublicizeAll>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\EventDslFramework\EventDslFramework.csproj" />
     </ItemGroup>
@@ -29,6 +33,13 @@
       <None Update="Config.lua">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Krafs.Publicizer" Version="2.2.1">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

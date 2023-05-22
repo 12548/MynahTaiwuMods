@@ -160,7 +160,17 @@ public class 事件选项上下文
                 .SelectMany(it => it.EventList)
                 .First(it => it.Guid.ToString() == eventRef.获取GUID());
 
-            targetEvent.EventOptions = targetEvent.EventOptions.ToList().AddItem(_option).ToArray();
+            var list = targetEvent.EventOptions.ToList();
+            if (list.Count > 0 && targetEvent.EscOptionKey != "")
+            {
+                list.Insert(list.Count - 1, _option);
+            }
+            else
+            {
+                list.Add(_option);
+            }
+
+            targetEvent.EventOptions = list.ToArray();
         }
         
         return option;
