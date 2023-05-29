@@ -2,13 +2,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Config;
+using CSharpDiff.Converters;
+using CSharpDiff.Diffs;
 using FrameWork;
 using GameData.Domains;
 using GameData.Domains.CombatSkill;
 using GameData.Domains.Item.Display;
 using GameData.Serializer;
 using GameData.Utilities;
-using HarmonyLib;
 using MynahBaseModBase;
 using MynahMoreInfo.SpriteSheet;
 using TaiwuModdingLib.Core.Plugin;
@@ -64,6 +65,12 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("显示打点和施展时间", description: "显示催破功法的打点分布和可施展功法的基本施展时间（施展速度为100%时的施展时间）")]
     public static bool ShowAttackDistribution = true;
 
+    [DropDownModSetting("突出正逆练区别",
+        new[] { "始终关闭", "按住alt键时开启", "始终开启" },
+        defaultValue: 1,
+        description: "标红正练特效与逆练特效之间的区别")]
+    public static int HintEffectDiff = 1;
+
     [ModSetting("显示书籍五行属性", description: "显示功法书对应功法的五行属性")]
     public static bool ShowBookFiveElements = true;
 
@@ -75,7 +82,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("人物浮窗显示真名", description: "从官方mod拿来的功能，在人物浮窗中显示法号对应的真实姓名")]
     public static bool CharacterMouseTipShowRealName = true;
-    
+
     [ModSetting("人物浮窗显示可请教技能", description: "在详细人物浮窗中显示可请教的技艺")]
     public static bool ShowLearnableSkill = true;
 
@@ -93,16 +100,16 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("全部详细人物浮窗", description: "将全部的原版人物浮窗替换为详细文字形式")]
     public static bool ReplaceAllCharacterTipToDetail = true;
-    
-    [SliderModSetting("显示人物持有物品数", 
-        minValue: 0, 
+
+    [SliderModSetting("显示人物持有物品数",
+        minValue: 0,
         maxValue: 15,
         defaultValue: 3,
         description: "在详细人物浮窗中显示人物持有的此数量的最高品级物品，为0则不显示")]
     public static int ShowNpcGoodItemsCount;
-    
-    [SliderModSetting("显示人物擅长功法数", 
-        minValue: 0, 
+
+    [SliderModSetting("显示人物擅长功法数",
+        minValue: 0,
         maxValue: 15,
         defaultValue: 3,
         description: "在详细人物浮窗中显示人物会的此数量的最高品级功法，为0则不显示")]
@@ -129,26 +136,6 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
         SpriteAssetManager.Init();
         // _init = true; 
         InitDelayFix();
-
-        var original = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
-            it => it.Name.Contains("OnGetSkillDisplayData"));
-        var postfix = typeof(Patch).GetMethod("Postfix");
-        HarmonyInstance.Patch(original, postfix: new HarmonyMethod(postfix));
-
-        var original2 = AccessTools.FirstMethod(typeof(MouseTipCombatSkill),
-            it => it.Name.Contains("UpdateOnlyTemplateData"));
-        var postfix2 = typeof(Patch).GetMethod("PostFixUpdateOnlyTemplateData");
-        HarmonyInstance.Patch(original2, postfix: new HarmonyMethod(postfix2));
-
-        var o3 = AccessTools.FirstMethod(typeof(UI_CombatSkillTree), it => it.Name.Contains("RefreshSkillItem"));
-        var prefix3 = typeof(Patch).GetMethod("PreFixRefreshSkillItem");
-        HarmonyInstance.Patch(o3, prefix: new HarmonyMethod(prefix3));
-
-        var o4 = AccessTools.FirstMethod(typeof(MouseTipBook), it => it.Name.Contains("Init"));
-        var postfix4 = typeof(Patch).GetMethod("PostFixMouseTipBookInit");
-        HarmonyInstance.Patch(o4, postfix: new HarmonyMethod(postfix4));
-
-        Debug.Log("ShowSpecialEffect all patched");
     }
 
     private static void InitDelayFix()
@@ -182,342 +169,5 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
         //         Debug.Log("TipsCo Replaced!");
         //     }
         // }
-    }
-
-
-    public static class Patch
-    {
-        public static void PostFixMouseTipBookInit(MouseTipBook __instance, bool ____isCombatSkill,
-            ArgumentBox argsBox)
-        {
-            if (!ShowBookSpecialEffect) return;
-            if (__instance == null) return;
-            if (argsBox == null) return;
-
-            var dh = __instance.transform.Find("DescriptionHolder");
-            if (dh == null)
-            {
-                Debug.Log("cant find DescriptionHolder");
-                return;
-            }
-
-            var combatSkillTip = UIElement.MouseTipCombatSkill.UiBaseAs<MouseTipCombatSkill>();
-            if (combatSkillTip == null || combatSkillTip.transform == null)
-            {
-                Debug.Log("cant find combatSkillTip transform");
-                return;
-            }
-
-            var specialHolder = combatSkillTip.transform.Find("DescriptionHolder/SpecialEffect");
-            if (specialHolder == null)
-            {
-                Debug.Log("cant find specialHolder");
-                return;
-            }
-
-            if (specialHolder.gameObject == null)
-            {
-                Debug.Log("cant find specialHolderGO");
-                return;
-            }
-
-            var specialEffectTrans = dh.Find("SpecialEffect");
-            if (specialEffectTrans == null)
-            {
-                specialEffectTrans =
-                    Object.Instantiate(specialHolder.gameObject, dh, false).transform;
-                specialEffectTrans.name = "SpecialEffect";
-            }
-
-            var specialEffectObj = specialEffectTrans.gameObject;
-
-            if (!____isCombatSkill)
-            {
-                specialEffectObj.SetActive(false);
-                return;
-            }
-
-            argsBox.Get("ItemData", out ItemDisplayData arg);
-
-            if (arg == null)
-            {
-                specialEffectObj.SetActive(false);
-                return;
-            }
-
-            var skillBookItem = SkillBook.Instance[arg.Key.TemplateId];
-
-            if (skillBookItem == null)
-            {
-                specialEffectObj.SetActive(false);
-                return;
-            }
-
-            var list = EasyPool.Get<List<short>>();
-            list.Clear();
-            list.Add(skillBookItem.CombatSkillTemplateId);
-
-            var domainId = DomainHelper.DomainName2DomainId["CombatSkill"];
-            var methodId = MynahBaseModFrontend.MynahBaseModFrontend.GetMethodIdByName(
-                typeof(CombatSkillDomainHelper.MethodIds),
-                "GetCombatSkillDisplayData"
-            );
-
-            __instance.AsynchMethodCall(domainId, methodId, SingletonObject.getInstance<BasicGameData>().TaiwuCharId,
-                list,
-                (offset, dataPool) =>
-                {
-                    var combatSkillItem = CombatSkill.Instance[skillBookItem.CombatSkillTemplateId];
-                    var item = EasyPool.Get<List<CombatSkillDisplayData>>();
-                    Serializer.Deserialize(dataPool, offset, ref item);
-                    var combatSkillDisplayData = item[0];
-                    EasyPool.Free(item);
-                    var flag = combatSkillDisplayData.EffectType != -1;
-
-                    if (ShowBookFiveElements)
-                    {
-                        var fiveElementsStr = LocalStringManager
-                            .Get($"LK_FiveElements_Type_{combatSkillItem.FiveElements}")
-                            .SetColor(Colors.Instance.FiveElementsColors[combatSkillItem.FiveElements]);
-                        var bookTypeStr = CombatSkillType.Instance[skillBookItem.CombatSkillType].Name;
-                        var bookSubtypeStr =
-                            LocalStringManager.Get($"LK_ItemSubType_{(object)skillBookItem.ItemSubType}");
-                        __instance.CGet<TextMeshProUGUI>("SubType").text =
-                            fiveElementsStr + bookTypeStr + bookSubtypeStr;
-                    }
-
-                    if (true) // flag
-                    {
-                        var flag4 = combatSkillDisplayData.EffectType == 0;
-
-                        ShowAllSpecialEffects(specialEffectObj, combatSkillItem, flag, flag4);
-
-                        //
-                        // var prefix1 = flag && flag4 ? "当前：" : "如果正练：";
-                        // var prefix2 = flag && !flag4 ? "当前：" : "如果逆练：";
-                        //
-                    }
-
-                    if (ShowLearningProgress)
-                    {
-                        var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                        var pracStr = combatSkillDisplayData.PracticeLevel < 0
-                            ? "未习得"
-                            : $"修习程度：{combatSkillDisplayData.PracticeLevel}%";
-
-                        var desc = $"{skillBookItem.Desc}\n{s}\n{pracStr}";
-                        MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
-                    }
-                });
-
-            EasyPool.Free(list);
-            specialEffectObj.SetActive(true);
-        }
-
-        public static void PreFixRefreshSkillItem(ref bool visibleSkill)
-        {
-            if (ShowNonPublicSkill)
-            {
-                visibleSkill = true;
-            }
-        }
-
-        public static void PostFixUpdateOnlyTemplateData(MouseTipCombatSkill __instance,
-            CombatSkillItem ____configData)
-        {
-            // if (!ShowCombatSkillSpecialEffect) return;
-            // __instance.CGet<GameObject>("DirectEffectTitle").SetActive(true);
-            // __instance.CGet<GameObject>("DirectDesc").SetActive(true);
-            // __instance.CGet<GameObject>("ReverseEffectTitle").SetActive(true);
-            // __instance.CGet<GameObject>("ReverseDesc").SetActive(true);
-            //
-            // __instance.CGet<TextMeshProUGUI>("DirectEffectDesc").text =
-            //     ("     " + SpecialEffect.Instance[____configData.DirectEffectID].Desc[0]);
-            // __instance.CGet<TextMeshProUGUI>("ReverseEffectDesc").text =
-            //     ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
-
-            ShowAttackPartDistribution(__instance, ____configData);
-        }
-
-        public static void Postfix(MouseTipCombatSkill __instance, CombatSkillItem ____configData, int offset,
-            RawDataPool dataPool)
-        {
-            if (!ShowCombatSkillSpecialEffect) return;
-            if (__instance != null)
-            {
-                var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
-
-                var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
-
-                if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
-                {
-                    return;
-                }
-
-                var item = EasyPool.Get<List<CombatSkillDisplayData>>();
-                Serializer.Deserialize(dataPool, offset, ref item);
-                var combatSkillDisplayData = item[0];
-                EasyPool.Free(item);
-                var flag = combatSkillDisplayData.EffectType != -1;
-
-                specialEffectGameObject.SetActive(true);
-                if (true) // flag
-                {
-                    var flag4 = combatSkillDisplayData.EffectType == 0;
-                    ShowAllSpecialEffects(specialEffectGameObject, ____configData, flag, flag4);
-                }
-
-                ShowAttackPartDistribution(__instance, ____configData);
-
-                if (ShowLearningProgress)
-                {
-                    var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                    var desc = $"{____configData.Desc}\n{s}";
-                    MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
-                }
-
-                var element = __instance.Element;
-                if (element != null)
-                {
-                    element.ShowAfterRefresh();
-                }
-            }
-        }
-
-        private static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
-        {
-            // effectStr = "     " + effectStr;
-            var x = effectText.rectTransform.sizeDelta.x;
-            var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
-            effectText.rectTransform.sizeDelta = preferredValues.SetX(x);
-            effectText.text = effectStr;
-        }
-
-        private static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
-            bool active, bool activeDirection)
-        {
-            specialEffectObj.transform.Find("DirectEffectTitle").gameObject.SetActive(true); // flag4
-            var directDesc = specialEffectObj.transform.Find("DirectDesc");
-            directDesc.gameObject.SetActive(true);
-            specialEffectObj.transform.Find("ReverseEffectTitle").gameObject.SetActive(true); // !flag4
-            var reverseDesc = specialEffectObj.transform.Find("ReverseDesc");
-            reverseDesc.gameObject.SetActive(true);
-
-            var template1 = active && activeDirection ? "     当前：{0}" : "     如果正练：{0}".SetColor("lightgrey");
-            var template2 = active && !activeDirection ? "     当前：{0}" : "     如果逆练：{0}".SetColor("lightgrey");
-
-            UpdateSpecialEffectText(specialEffectObj.transform.Find("DirectDesc/DirectEffectDesc")
-                .GetComponent<TextMeshProUGUI>(), string.Format(template1,
-                SpecialEffect
-                    .Instance[combatSkillItem.DirectEffectID]
-                    .Desc[0]));
-            UpdateSpecialEffectText(specialEffectObj.transform.Find("ReverseDesc/ReverseEffectDesc")
-                .GetComponent<TextMeshProUGUI>(), string.Format(template2,
-                SpecialEffect
-                    .Instance[combatSkillItem.ReverseEffectID]
-                    .Desc[0]));
-        }
-
-        private static string GetCombatSkillReadingProgressString(CombatSkillDisplayData combatSkillDisplayData)
-        {
-            var s1 = "承合解异独";
-            var s2 = "修思源参藏";
-            var s3 = "用奇巧化绝";
-
-            var p1 = new List<sbyte>(new sbyte[] { 0, 1, 2, 3, 4 }).Select(page =>
-                CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
-                    CombatSkillStateHelper.GetOutlinePageInternalIndex(page))).ToArray();
-            var p2 = new List<byte>(new byte[] { 1, 2, 3, 4, 5 }).Select(page =>
-                CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
-                    CombatSkillStateHelper.GetNormalPageInternalIndex(0, page))).ToArray();
-            var p3 = new List<byte>(new byte[] { 1, 2, 3, 4, 5 }).Select(page =>
-                CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,
-                    CombatSkillStateHelper.GetNormalPageInternalIndex(1, page))).ToArray();
-
-            string ts1 = "", ts2 = "", ts3 = "";
-            for (var i = 0; i < 5; i++)
-            {
-                ts1 += p1[i] ? $"<color=#ffffffff>{s1[i]}</color>" : $"<color=#474747ff>{s1[i]}</color>";
-                ts2 += p2[i] ? $"<color=#00ffffff>{s2[i]}</color>" : $"<color=#004747ff>{s2[i]}</color>";
-                ts3 += p3[i] ? $"<color=#ffa500ff>{s3[i]}</color>" : $"<color=#5C3C00ff>{s3[i]}</color>";
-            }
-
-            // var s = $"{p1}-<color=#00ffffff>{p2}</color>-<color=orange>{p3}</color>";
-            return $"{ts1} {ts2} {ts3}";
-        }
-
-        private static void ShowAttackPartDistribution(MouseTipCombatSkill __instance,
-            CombatSkillItem ____configData)
-        {
-            if (!ShowAttackDistribution) return;
-
-            Debug.Log($"{____configData.Name} - {____configData.PrepareTotalProgress}");
-
-
-            {
-                var typeTrans = __instance.transform.Find("DescriptionHolder/Type");
-                var secondTypeTrans = typeTrans.Find("Type");
-
-                var adtName = "PrepareTotalProgressTips";
-                var transform = typeTrans.Find(adtName);
-                GameObject adt;
-                if (transform == null)
-                {
-                    adt = Object.Instantiate(secondTypeTrans.gameObject, typeTrans, false);
-                    adt.name = adtName;
-                }
-                else
-                {
-                    adt = transform.gameObject;
-                }
-
-                if (____configData.PrepareTotalProgress > 0)
-                {
-                    // var s = $"基础施展时间: {____configData.PrepareTotalProgress}\n";
-
-                    adt.transform.Find("TextHolder/Tips").GetComponent<TextMeshProUGUI>().text = "基础施展时间";
-                    adt.transform.Find("TextHolder/TypeIcon").gameObject.SetActive(false);
-                    adt.transform.Find("TextHolder/Type").GetComponent<TextMeshProUGUI>().text =
-                        $"{(____configData.PrepareTotalProgress / 7200.0):0.##}秒";
-                    adt.SetActive(true);
-                }
-                else
-                {
-                    adt.SetActive(false);
-                }
-            }
-
-            if (____configData.EquipType == 1)
-            {
-                var attackEffectObj = __instance.CGet<GameObject>("AttackProperty");
-                var adtName = "AttackDisturbTips";
-                var transform = attackEffectObj.transform.Find(adtName);
-                GameObject adt;
-                if (transform == null)
-                {
-                    var t = attackEffectObj.transform.Find("AcupointTips").gameObject;
-                    adt = Object.Instantiate(t, attackEffectObj.transform, false);
-                    adt.name = adtName;
-                }
-                else
-                {
-                    adt = transform.gameObject;
-                }
-
-                var s = "打点：";
-                var d = ____configData.InjuryPartAtkRateDistribution;
-
-                if (d.Length > 0 && d[0] > 0) s += "胸" + d[0];
-                if (d.Length > 1 && d[1] > 0) s += " 腹" + d[1];
-                if (d.Length > 2 && d[2] > 0) s += " 头" + d[2];
-                if (d.Length > 3 && d[3] > 0) s += " 左手" + d[3];
-                if (d.Length > 4 && d[4] > 0) s += " 右手" + d[4];
-                if (d.Length > 5 && d[5] > 0) s += " 左腿" + d[5];
-                if (d.Length > 6 && d[6] > 0) s += " 右腿" + d[6];
-
-                adt.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = s;
-                adt.SetActive(true);
-            }
-        }
     }
 }
