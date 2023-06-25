@@ -19,7 +19,7 @@ public class UI_EventWindowPatch
         if (transform == null) return;
         var mouseTipObj = transform.gameObject;
 
-        if (mainCharacter == null || !HasCharacter(__instance, true))
+        if (mainCharacter == null || !__instance.HasMainCharacter())
         {
             if (refers != null)
             {
@@ -47,7 +47,7 @@ public class UI_EventWindowPatch
         if (transform == null) return;
         var mouseTipObj = transform.gameObject;
 
-        if (targetCharacter == null || !HasCharacter(__instance, false))
+        if (targetCharacter == null || !__instance.HasTargetCharacter())
         {
             if (refers != null)
             {
@@ -63,12 +63,4 @@ public class UI_EventWindowPatch
         }
     }
 
-    // [HarmonyReversePatch]
-    // [HarmonyPatch(typeof(UI_EventWindow), "HasCharacter")]
-    static bool HasCharacter(UI_EventWindow instance, bool left)
-    {
-        return (bool)AccessTools.Method(typeof(UI_EventWindow), "HasCharacter")
-            .Invoke(instance, new object[] { left });
-        // throw new Exception("stub!");
-    }
 }

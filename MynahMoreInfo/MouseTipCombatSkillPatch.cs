@@ -76,12 +76,14 @@ public static class MouseTipCombatSkillPatch
         //     ("     " + SpecialEffect.Instance[____configData.DirectEffectID].Desc[0]);
         // __instance.CGet<TextMeshProUGUI>("ReverseEffectDesc").text =
         //     ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
-
+        
+        var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
+        ShowAllSpecialEffects(specialEffectGameObject, ____configData, false, false, true);
         ShowAttackPartDistribution(__instance, ____configData);
     }
-    
+
     public static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
-        bool active, bool activeDirection)
+        bool active, bool activeDirection, bool doubleActive = false)
     {
         specialEffectObj.transform.Find("DirectEffectTitle").gameObject.SetActive(true); // flag4
         var directDesc = specialEffectObj.transform.Find("DirectDesc");
@@ -93,6 +95,12 @@ public static class MouseTipCombatSkillPatch
         var template1 = active && activeDirection ? "     当前：{0}" : "     如果正练：{0}".SetColor("lightgrey");
         var template2 = active && !activeDirection ? "     当前：{0}" : "     如果逆练：{0}".SetColor("lightgrey");
 
+        if (doubleActive)
+        {
+            template1 = "{0}";
+            template2 = "{0}";
+        }
+        
         var directText = SpecialEffect
             .Instance[combatSkillItem.DirectEffectID]
             .Desc[0];

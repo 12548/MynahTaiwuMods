@@ -50,6 +50,7 @@ public class SpecialEffectDisplayer : MonoBehaviour
     
     public static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
     {
+        if(effectText == null) return;
         // effectStr = "     " + effectStr;
         var x = effectText.rectTransform.sizeDelta.x;
         var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
