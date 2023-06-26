@@ -71,6 +71,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="CombatSkillSortAndFilterPatch.cs" />
         <Compile Include="ExtraFilterPlace.cs" />
         <Compile Include="ItemSortAndFilterType.cs" />
         <Compile Include="ItemSubtypeFilter.cs" />

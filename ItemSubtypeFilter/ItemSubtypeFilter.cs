@@ -21,6 +21,9 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting(displayName: "书籍高级筛选")] public static readonly bool BookThirdFilter = true;
 
+    [ModSetting(displayName: "修习功法排序", description: "允许在修习界面对功法排序")]
+    public static readonly bool PracticeCombatSkillSort = true; 
+
     [DropDownModSetting(
         displayName: "功法书高级筛选方式",
         options: new[] { "按类型", "按门派" },
