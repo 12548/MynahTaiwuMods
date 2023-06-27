@@ -2,6 +2,7 @@ return {
     Title = "~事件导出器~",
     BackendPlugins = { "TaiwuEventDumper.dll" },
     Author = "myna12548",
+    GameVersion="99.99.99.99",
     Source = 1,
     FileId = 2977353708,
     Cover = "cover.png",

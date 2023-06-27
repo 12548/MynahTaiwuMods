@@ -34,7 +34,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MynahMoreInfoBackend", "Myn
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MoreInfo", "MoreInfo", "{41314DA0-96A4-4206-AEDA-4C3D5DB2486D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaiwuSavingFolder", "TaiwuSavingFolder\TaiwuSavingFolder.csproj", "{4E936F5D-15C1-4777-A457-D8CE531C2B2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaiwuSavingFolderBackend", "TaiwuSavingFolderBackend\TaiwuSavingFolderBackend.csproj", "{4E936F5D-15C1-4777-A457-D8CE531C2B2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaiwuEventDumper", "TaiwuEventDumper\TaiwuEventDumper.csproj", "{55DE7D16-E0CD-4C50-B97B-4A8EF94039E6}"
 EndProject

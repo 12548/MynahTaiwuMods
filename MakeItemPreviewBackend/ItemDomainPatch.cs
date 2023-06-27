@@ -13,7 +13,7 @@ public class ItemDomainPatch
     [HarmonyPrefix, HarmonyPatch(typeof(ItemDomain), "GetItemDisplayData")]
     static bool Prefix(ItemKey itemKey, int charId, ref ItemDisplayData __result)
     {
-        AdaptableLog.Info($"Prefixing! {itemKey.Id} {charId}");
+        // AdaptableLog.Info($"Prefixing! {itemKey.Id} {charId}");
         if (itemKey.Id != -12548 || charId != -12548)
         {
             return true;
