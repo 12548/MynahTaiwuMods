@@ -1,11 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using GameData.Domains.TaiwuEvent.EventHelper;
 
 namespace TaiwuSavingFolder;
 
 public static class SavingFolderCommon
 {
-    public static readonly string FolderPostfix = "_mod_data";
+
+    public static readonly string FolderPostfix = "_mod_data"; 
     
     /// <summary>
     /// 获取原版指定编号的存档目录的完整路径
@@ -54,22 +56,13 @@ public static class SavingFolderCommon
     
     /// <summary>
     /// 获取当前正在运行的游戏对应的本mod创建的文件夹的完整路径
-    /// <param name="archiveId">从0开始的存档编号（当前最大为4，即共5个存档）</param>
-    /// </summary>
-    /// <returns>当前正在运行的游戏对应的本mod创建的文件夹的完整路径</returns>
-    public static string GetCurrentModSaveDirPath(sbyte archiveId)
-    {
-        return Path.Combine(GetSaveDirPath(archiveId), "_current_mod_data");
-    }
-    /// <summary>
-    /// 获取当前正在运行的游戏对应的本mod创建的文件夹的完整路径
     /// </summary>
     /// <returns>当前正在运行的游戏对应的本mod创建的文件夹的完整路径</returns>
     public static string GetCurrentModSaveDirPath()
     {
-        return GetCurrentModSaveDirPath(EventHelper.GetCurrentArchiveId());
+        return Path.Combine(GameData.ArchiveData.Common.ArchiveBaseDir, "_current_mod_data");
     }
-    
+
     /// <summary>
     /// 复制文件夹
     /// </summary>

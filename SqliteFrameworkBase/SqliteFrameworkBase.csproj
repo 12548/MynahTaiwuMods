@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{DFF45336-119A-41E5-9240-7C39D7D82CB4}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>SqliteFrameworkBase</RootNamespace>
+        <AssemblyName>SqliteFrameworkBase</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup>
+      <PostBuildEvent>pwsh AfterBuild.ps1 2995720038</PostBuildEvent>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Mono.Data.Sqlite">
+          <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\The Scroll of Taiwu_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
+        </Reference>
+        <Reference Include="System" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Data" />
+        <Reference Include="System.Xml" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Orm\ComponentModel\AutoIncrementAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\CheckAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\Collation.cs" />
+        <Compile Include="Orm\ComponentModel\CollationAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\ColumnAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\ConflictResolution.cs" />
+        <Compile Include="Orm\ComponentModel\DataConverterAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\DefaultAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\Deferred.cs" />
+        <Compile Include="Orm\ComponentModel\Direction.cs" />
+        <Compile Include="Orm\ComponentModel\EnumAffinityAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\ForeignKeyAction.cs" />
+        <Compile Include="Orm\ComponentModel\ForeignKeyAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\IgnoreAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\IndexAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\IndexedAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\MaxLengthAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\NotNullAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\NullMatch.cs" />
+        <Compile Include="Orm\ComponentModel\PrimaryKeyAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\RenameTableAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\TableAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\TokenizerAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\UniqueAttribute.cs" />
+        <Compile Include="Orm\ComponentModel\VirtualAttribute.cs" />
+        <Compile Include="Orm\DataConverter\IDataConverter.cs" />
+        <Compile Include="Orm\Extensions.cs" />
+        <Compile Include="Orm\FullTextSearchSpecialCommands.cs" />
+        <Compile Include="Orm\InstanceCreatedEventArgs.cs" />
+        <Compile Include="Orm\ITrackConnection.cs" />
+        <Compile Include="Orm\OrmHelper.cs" />
+        <Compile Include="Orm\QueryCache.cs" />
+        <Compile Include="Orm\SqliteErrorCode.cs" />
+        <Compile Include="Orm\SqliteExtensions.cs" />
+        <Compile Include="Orm\SqliteSession.cs" />
+        <Compile Include="Orm\SqliteSessionBase.cs" />
+        <Compile Include="Orm\SqliteWriter.cs" />
+        <Compile Include="Orm\TableMapping.cs" />
+        <Compile Include="Orm\TableQuery.cs" />
+        <Compile Include="SqliteFramework.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="AfterBuild.ps1">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
+
+</Project>

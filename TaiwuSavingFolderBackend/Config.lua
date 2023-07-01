@@ -3,8 +3,8 @@ return {
     BackendPlugins = { "TaiwuSavingFolderBackend.dll" },
     Author = "myna12548",
     GameVersion="99.99.99.99",
-    --Source = 1,
-    --FileId = 2977353708,
+    Source = 1,
+    FileId = 2995707635,
     --Cover = "cover.png",
     Description = [[在存档目录建立文件夹
     ]],

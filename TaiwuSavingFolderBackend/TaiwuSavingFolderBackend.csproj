@@ -5,6 +5,7 @@
         <LangVersion>10</LangVersion>
         <Nullable>annotations</Nullable>
         <RootNamespace>TaiwuSavingFolder</RootNamespace>
+        <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -37,7 +38,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="pwsh AfterBuild.ps1 $(TargetDir) " />
+      <Exec Command="pwsh AfterBuild.ps1 $(TargetDir) 2995707635" />
     </Target>
 
 </Project>
