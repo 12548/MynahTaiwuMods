@@ -6,13 +6,11 @@ using Config;
 using Config.EventConfig;
 using GameData.Domains;
 using GameData.Domains.Item;
-using GameData.Domains.Item.Display;
 using GameData.Domains.Mod;
 using GameData.Domains.TaiwuEvent;
 using GameData.Utilities;
 using HarmonyLib;
 using MiniJSON;
-using SkillBook = GameData.Domains.Item.SkillBook;
 
 namespace MynahMoreInfoBackend;
 
@@ -26,7 +24,7 @@ public class ModDomainPatch
         // AdaptableLog.Info($"GetString: {modIdStr} {dataName} {isArchive}");
         // if (modIdStr != ModEntry.StaticModIdStr) return true;
         // if (isArchive) return true;
-        if (!dataName.StartsWith("GetCharacterData|")) return true;
+        if (dataName == null || !dataName.StartsWith("GetCharacterData|")) return true;
         var charId = int.Parse(dataName.Split("|")[1]);
         var retValue = new Dictionary<string, object>();
 

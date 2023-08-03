@@ -172,7 +172,7 @@ public class MouseTipSimpleWidePatch
         // 年龄
         if (isAlive)
         {
-            title += " · " + groupCharDisplayData.CurrAge + "岁";
+            title += " · " + groupCharDisplayData!.CurrAge + "岁";
         }
 
         // 性格
@@ -180,7 +180,7 @@ public class MouseTipSimpleWidePatch
 
         // 所属
         title += " · " + CommonUtils.GetOrganizationString(displayData.OrgInfo.OrgTemplateId,
-            worldMapModel.SettlementRandNameDict.ContainsKey(displayData.OrgInfo.SettlementId)
+            worldMapModel.SettlementRandNameDict!.ContainsKey(displayData.OrgInfo.SettlementId)
                 ? worldMapModel.SettlementRandNameDict[displayData.OrgInfo.SettlementId]
                 : (short)-1);
 
@@ -197,7 +197,7 @@ public class MouseTipSimpleWidePatch
         if (isAlive)
         {
             var healthInfo =
-                CommonUtils.GetCharacterHealthInfo(groupCharDisplayData.Health, groupCharDisplayData.MaxLeftHealth);
+                CommonUtils.GetCharacterHealthInfo(groupCharDisplayData!.Health, groupCharDisplayData.MaxLeftHealth);
             sb.Append("健康：" + healthInfo.Item1.Replace("\n", ""));
             if (!healthInfo.Item1.Contains("("))
             {
@@ -231,7 +231,7 @@ public class MouseTipSimpleWidePatch
 
         if (isAlive)
         {
-            var favorString = CommonUtils.GetFavorString(groupCharDisplayData.FavorabilityToTaiwu);
+            var favorString = CommonUtils.GetFavorString(groupCharDisplayData!.FavorabilityToTaiwu);
             sb.Append("好感：" + favorString.Replace("\n", ""));
             if (!favorString.Contains("\n"))
             {
@@ -254,7 +254,7 @@ public class MouseTipSimpleWidePatch
 
         if (isAlive)
         {
-            var attackMedal = groupCharDisplayData.AttackMedal;
+            var attackMedal = groupCharDisplayData!.AttackMedal;
             var amSprite = attackMedal > 0
                 ? "sp_icon_renwutexing_10"
                 : (attackMedal < 0 ? "sp_icon_renwutexing_4" : "sp_icon_renwutexing_7");

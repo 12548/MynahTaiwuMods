@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
@@ -13,6 +14,8 @@ public class SpecialEffectDisplayer : MonoBehaviour
     public string reverseEffect1;
     
     private bool _isAltDown;
+
+    private bool _isBook;
 
     private TextMeshProUGUI txtDirect, txtReverse;
 
@@ -34,6 +37,8 @@ public class SpecialEffectDisplayer : MonoBehaviour
         txtDirect = transform.Find("DirectDesc/DirectEffectDesc").GetComponent<TextMeshProUGUI>();
         txtReverse = transform.Find("ReverseDesc/ReverseEffectDesc").GetComponent<TextMeshProUGUI>();
 
+        _isBook = transform.parent.parent.GetComponent<MouseTipBook>() != null;
+
         UpdateText();
     }
 
@@ -48,11 +53,20 @@ public class SpecialEffectDisplayer : MonoBehaviour
         IsAltDown = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
     }
     
-    public static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
+    /**
+     * 从 MouseTipCombatSkill#UpdateSpecialEffectText 拿来改的
+     */
+    public void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
     {
         if(effectText == null) return;
         // effectStr = "     " + effectStr;
         var x = effectText.rectTransform.sizeDelta.x;
+
+        if (_isBook)
+        {
+            x = 640;
+        }
+        
         var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
         effectText.rectTransform.sizeDelta = preferredValues.SetX(x);
         effectText.text = effectStr;

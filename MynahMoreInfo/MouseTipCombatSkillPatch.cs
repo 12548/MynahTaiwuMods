@@ -47,7 +47,7 @@ public static class MouseTipCombatSkillPatch
                 ShowAllSpecialEffects(specialEffectGameObject, ____configData, flag, flag4);
             }
 
-            ShowAttackPartDistribution(__instance, ____configData);
+            ShowCastTime(__instance, ____configData);
 
             if (ModEntry.ShowLearningProgress)
             {
@@ -79,7 +79,7 @@ public static class MouseTipCombatSkillPatch
         
         var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
         ShowAllSpecialEffects(specialEffectGameObject, ____configData, false, false, true);
-        ShowAttackPartDistribution(__instance, ____configData);
+        ShowCastTime(__instance, ____configData);
     }
 
     public static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
@@ -100,13 +100,15 @@ public static class MouseTipCombatSkillPatch
             template1 = "{0}";
             template2 = "{0}";
         }
-        
-        var directText = SpecialEffect
-            .Instance[combatSkillItem.DirectEffectID]
-            .Desc[0];
-        var reverseText = SpecialEffect
-            .Instance[combatSkillItem.ReverseEffectID]
-            .Desc[0];
+
+        var directText = CommonUtils.GetSpecialEffectDesc(combatSkillItem.TemplateId, true);
+        var reverseText = CommonUtils.GetSpecialEffectDesc(combatSkillItem.TemplateId, false);
+        // var directText = SpecialEffect
+        //     .Instance[combatSkillItem.DirectEffectID]
+        //     .Desc[0];
+        // var reverseText = SpecialEffect
+        //     .Instance[combatSkillItem.ReverseEffectID]
+        //     .Desc[0];
 
         var specialEffectDisplayer = specialEffectObj.GetOrAddComponent<SpecialEffectDisplayer>();
 
@@ -159,10 +161,10 @@ public static class MouseTipCombatSkillPatch
     }
 
 
-    public static void ShowAttackPartDistribution(MouseTipCombatSkill __instance,
+    public static void ShowCastTime(MouseTipCombatSkill __instance,
         CombatSkillItem ____configData)
     {
-        if (!ModEntry.ShowAttackDistribution) return;
+        if (!ModEntry.ShowCastTime) return;
 
         Debug.Log($"{____configData.Name} - {____configData.PrepareTotalProgress}");
 
@@ -197,38 +199,6 @@ public static class MouseTipCombatSkillPatch
             {
                 adt.SetActive(false);
             }
-        }
-
-        if (____configData.EquipType == 1)
-        {
-            var attackEffectObj = __instance.CGet<GameObject>("AttackProperty");
-            var adtName = "AttackDisturbTips";
-            var transform = attackEffectObj.transform.Find(adtName);
-            GameObject adt;
-            if (transform == null)
-            {
-                var t = attackEffectObj.transform.Find("AcupointTips").gameObject;
-                adt = Object.Instantiate(t, attackEffectObj.transform, false);
-                adt.name = adtName;
-            }
-            else
-            {
-                adt = transform.gameObject;
-            }
-
-            var s = "打点：";
-            var d = ____configData.InjuryPartAtkRateDistribution;
-
-            if (d.Length > 0 && d[0] > 0) s += "胸" + d[0];
-            if (d.Length > 1 && d[1] > 0) s += " 腹" + d[1];
-            if (d.Length > 2 && d[2] > 0) s += " 头" + d[2];
-            if (d.Length > 3 && d[3] > 0) s += " 左手" + d[3];
-            if (d.Length > 4 && d[4] > 0) s += " 右手" + d[4];
-            if (d.Length > 5 && d[5] > 0) s += " 左腿" + d[5];
-            if (d.Length > 6 && d[6] > 0) s += " 右腿" + d[6];
-
-            adt.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = s;
-            adt.SetActive(true);
         }
     }
 

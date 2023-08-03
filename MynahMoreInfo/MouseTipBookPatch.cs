@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Config;
 using FrameWork;
 using GameData.Domains;
@@ -23,6 +24,9 @@ public class MouseTipBookPatch
         if (!ModEntry.ShowBookSpecialEffect) return;
         if (__instance == null) return;
         if (argsBox == null) return;
+        
+        // __instance.GetComponent<RectTransform>().SetWidth(790);
+        // __instance.transform.Find("SeparateLine").GetComponent<RectTransform>().SetWidth(750);
 
         var dh = __instance.transform.Find("DescriptionHolder");
         if (dh == null)

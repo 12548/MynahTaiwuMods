@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Config;
 using FrameWork;
@@ -14,6 +15,7 @@ using UnityEngine;
 namespace MynahMoreInfo;
 
 [HarmonyPatch(typeof(MouseTipMapBlock), "Init")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class MouseTipMapBlockPatch
 {
     public static void Postfix(MouseTipMapBlock __instance, ArgumentBox argsBox)
@@ -49,7 +51,7 @@ public class MouseTipMapBlockPatch
 
         if (!ModEntry.MapBlockMouseTipCharList) return;
 
-        Refers adventureLayout = __instance.CGet<Refers>("AdventureLayout");
+        Refers adventureLayout = __instance.CGet<Refers>("TreasureLayout");
         var blockCharList = new List<int>();
         if (blockData.CharacterSet != null)
             blockCharList.AddRange(blockData.CharacterSet);

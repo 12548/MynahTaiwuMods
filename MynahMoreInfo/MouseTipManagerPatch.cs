@@ -84,7 +84,7 @@ public class MouseTipManagerPatch
                 if (____currMouseTipDisplayerActive)
                     __instance.HideTips();
                 _currMouseOverObj.SetValue(__instance, hitObj);
-                _currMouseTipDisplayerActive.SetValue(__instance, mouseTipDisplayerActive && hitObj.GetComponent<MouseTipDisplayer>().ShowTips());
+                _currMouseTipDisplayerActive.SetValue(__instance, mouseTipDisplayerActive && hitObj!.GetComponent<MouseTipDisplayer>().ShowTips());
                 
                 // this._currMouseOverObj = hitObj;
                 // this._currMouseTipDisplayerActive = mouseTipDisplayerActive && hitObj.GetComponent<MouseTipDisplayer>().ShowTips();
