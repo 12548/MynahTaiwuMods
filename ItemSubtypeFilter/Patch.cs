@@ -36,7 +36,7 @@ public class Patch
     {
         __instance.OutputItemList.Clear();
         if (__instance.transform == null) return true;
-        
+
         var items = new List<ItemDisplayData>(____itemList);
 
         var thirdFilter = __instance.transform.Find("ThirdFilter");
@@ -45,7 +45,7 @@ public class Patch
         {
             // 有三级筛选且三级筛选不为“全”时进入
             Debug.Log("thirdFilter!");
-            
+
             var extraFilter = __instance.transform.Find("ExtraFilter");
             if (extraFilter != null && extraFilter.gameObject.activeSelf &&
                 extraFilter.GetComponent<CToggleGroup>().GetActive().Key != 0)
@@ -114,14 +114,20 @@ public class Patch
                 var togKey = ____equipFilterTogGroup.GetActive().Key;
                 if (togKey < 99)
                 {
-                    __instance.OutputItemList.AddRange(items.FindAll(data =>
-                        typeList.Contains(ItemSortAndFilter.GetEquipFilterType(data.Key))));
+                    __instance.OutputItemList.AddRange(
+                        items.FindAll(data => !data.Key.IsValid() ||
+                                              typeList.Contains(
+                                                  ItemSortAndFilter.GetEquipFilterType(
+                                                      data.Key))));
                 }
                 else
                 {
                     var subType = togKey - 100;
-                    __instance.OutputItemList.AddRange(items.FindAll(data =>
-                        ItemTemplateHelper.GetItemSubType(data.Key.ItemType, data.Key.TemplateId) == subType));
+                    __instance.OutputItemList.AddRange(
+                        items.FindAll(data => !data.Key.IsValid() ||
+                                              ItemTemplateHelper.GetItemSubType(
+                                                  data.Key.ItemType,
+                                                  data.Key.TemplateId) == subType));
                 }
             }
         }
@@ -135,8 +141,11 @@ public class Patch
             }
             else
             {
-                __instance.OutputItemList.AddRange(items.FindAll(data =>
-                    typeList.Contains(ItemSortAndFilter.GetFilterType(data.Key.ItemType))));
+                __instance.OutputItemList.AddRange(
+                    items.FindAll(data => !data.Key.IsValid() ||
+                                          typeList.Contains(
+                                              ItemSortAndFilter.GetFilterType(
+                                                  data.Key.ItemType))));
             }
         }
         else
