@@ -131,6 +131,15 @@ public class Patch
                 }
             }
         }
+        else if (__instance._medicineFilterTogGroup.gameObject.activeSelf && __instance._medicineFilterTogGroup.GetActive().Key != 0)
+        {
+            // 原版药品筛选
+            List<ItemSortAndFilter.MedicineFilterType> typeList = __instance.SortFilterSetting.MedicineFilterType;
+            if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.MedicineFilterType.Invalid)
+                __instance.OutputItemList.AddRange((IEnumerable<ItemDisplayData>) __instance._itemList);
+            else
+                __instance.OutputItemList.AddRange((IEnumerable<ItemDisplayData>) __instance._itemList.FindAll((Predicate<ItemDisplayData>) (data => !data.Key.IsValid() || typeList.Contains(ItemSortAndFilter.GetMedicineFilterType(data.Key)))));
+        }
         else if (____filterTogGroup.gameObject.activeSelf)
         {
             // 如果没有细分 按大类分
@@ -322,14 +331,32 @@ public class Patch
 
         var viewport = parentTransform.GetComponent<CScrollRect>().Viewport;
         var equipTypeFilter = sortAndFilter.CGet<CToggleGroup>("EquipTypeFilter");
+        var medicineTypeFilter = sortAndFilter.CGet<CToggleGroup>("MedicineTypeFilter");
         if (viewport == null || equipTypeFilter == null) return true;
 
         var itemFilterType = (ItemSortAndFilter.ItemFilterType)currentTogKey;
 
-        if (SecondFilterHelper.ItemFilterTypeToSubTypeString.ContainsKey(itemFilterType) ||
+        if (itemFilterType == ItemSortAndFilter.ItemFilterType.Medicine)
+        {
+            equipTypeFilter.gameObject.SetActive(false);
+            medicineTypeFilter.gameObject.SetActive(true);
+            
+            if (places.OriginalViewportPos == null || places.OriginalViewportSize == null)
+            {
+                places.OriginalViewportPos = viewport.position;
+                places.OriginalViewportSize = viewport.sizeDelta;
+            }
+
+            medicineTypeFilter.transform.position = places.SecondFilterPos;
+
+            viewport.position = places.NewViewportPos;
+            viewport.sizeDelta = places.NewViewportSize;
+        }
+        else if (SecondFilterHelper.ItemFilterTypeToSubTypeString.ContainsKey(itemFilterType) ||
             itemFilterType == ItemSortAndFilter.ItemFilterType.Equip)
         {
             equipTypeFilter.gameObject.SetActive(true);
+            medicineTypeFilter.gameObject.SetActive(false);
             if (equipTypeFilter.transform.Find("Subtype701") == null)
             {
                 // 未初始化，第一次初始化
@@ -390,6 +417,7 @@ public class Patch
         else
         {
             equipTypeFilter.gameObject.SetActive(false);
+            medicineTypeFilter.gameObject.SetActive(false);
 
             if (places.OriginalViewportPos != null && places.OriginalViewportSize != null)
             {

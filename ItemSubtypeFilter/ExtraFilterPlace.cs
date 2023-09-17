@@ -6,7 +6,7 @@ namespace ItemSubtypeFilter;
 /// 指示额外过滤器的UI坐标位置
 /// </summary>
 public class ExtraFilterPlace
-{
+{ 
     /// <summary>
     /// 新视口位置
     /// </summary>
