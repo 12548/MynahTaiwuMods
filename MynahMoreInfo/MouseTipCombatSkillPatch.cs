@@ -34,10 +34,8 @@ public static class MouseTipCombatSkillPatch
                 return;
             }
 
-            var item = EasyPool.Get<List<CombatSkillDisplayData>>();
-            Serializer.Deserialize(dataPool, offset, ref item);
-            var combatSkillDisplayData = item[0];
-            EasyPool.Free(item);
+            CombatSkillDisplayData combatSkillDisplayData = null;
+            Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
             var flag = combatSkillDisplayData.EffectType != -1;
 
             specialEffectGameObject.SetActive(true);

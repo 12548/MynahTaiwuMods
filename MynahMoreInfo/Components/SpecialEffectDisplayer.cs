@@ -65,7 +65,7 @@ public class SpecialEffectDisplayer : MonoBehaviour
         if (_isBook)
         {
             x = 640;
-        }
+        } 
         
         var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
         effectText.rectTransform.sizeDelta = preferredValues.SetX(x);

@@ -43,7 +43,7 @@ public class MouseTipSimpleWidePatch
         if (hasDisplayData)
         {
             charId = displayData.CharacterId;
-        }
+        } 
 
         var titleText = __instance.CGet<TextMeshProUGUI>("Title");
         var contentText = __instance.CGet<TextMeshProUGUI>("Desc");
@@ -67,7 +67,7 @@ public class MouseTipSimpleWidePatch
             ModEntry.StaticModIdStr,
             $"GetCharacterData|{charId}",
             false,
-            gCall.AddAction("CharacterData"));
+            gCall.AddAction("CharacterData")); 
 
         gCall.OnAllOver = dict =>
         {
@@ -85,9 +85,9 @@ public class MouseTipSimpleWidePatch
 
                 EasyPool.Free(item);
 
-                if (dict.ContainsKey("CharacterDisplayDataList"))
+                if (dict.TryGetValue("CharacterDisplayDataList", out var value))
                 {
-                    var (cddOffset, cddDatapool) = dict["CharacterDisplayDataList"];
+                    var (cddOffset, cddDatapool) = value;
                     var item2 = EasyPool.Get<List<CharacterDisplayData>>();
                     Serializer.Deserialize(cddDatapool, cddOffset, ref item2);
                     if (item2.Count > 0)
@@ -172,7 +172,7 @@ public class MouseTipSimpleWidePatch
         // 年龄
         if (isAlive)
         {
-            title += " · " + groupCharDisplayData!.CurrAge + "岁";
+            title += " · " + groupCharDisplayData!.CurrAge + "岁"; 
         }
 
         // 性格
