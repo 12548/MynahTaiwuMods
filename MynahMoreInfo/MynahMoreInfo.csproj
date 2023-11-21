@@ -94,6 +94,7 @@
     <ItemGroup>
         <Compile Include="AvatarPatch.cs" />
         <Compile Include="Components\SpecialEffectDisplayer.cs" />
+        <Compile Include="EventWindowCharacterPatch.cs" />
         <Compile Include="GroupCallBuilder.cs" />
         <Compile Include="MiniJSON\Json.cs" />
         <Compile Include="MouseTipBookPatch.cs" />
@@ -109,7 +110,6 @@
         <Compile Include="SpriteSheet\SpriteAssetManager.cs" />
         <Compile Include="UIBottomPatch.cs" />
         <Compile Include="UICombatSkillTreePatch.cs" />
-        <Compile Include="UI_EventWindowPatch.cs" />
         <Compile Include="UI_MapBlockCharListPatch.cs" />
         <Compile Include="Util.cs" />
     </ItemGroup>

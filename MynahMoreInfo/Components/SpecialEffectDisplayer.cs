@@ -58,7 +58,7 @@ public class SpecialEffectDisplayer : MonoBehaviour
      */
     public void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
     {
-        if(effectText == null) return;
+        if(null == effectText) return;
         // effectStr = "     " + effectStr;
         var x = effectText.rectTransform.sizeDelta.x;
 

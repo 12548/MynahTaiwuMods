@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v2.21~",
+    Title = "~更多信息 v2.3~",
     FrontendPlugins = { "MynahMoreInfoFrontend.dll" },
     BackendPlugins = { "MynahMoreInfoBackend.dll" },
     Author = "myna12548",
@@ -51,9 +51,9 @@ return {
 2.1更新：
 - 已适配新版本《禅武之道/奇毒绝方》
 - 移除了显示打点的功能（游戏本体已自带）
+v2.2 更新： 已适配新版本《文武双全/龟蛇蟠扶》
 
-230914 v2.2 更新： 已适配新版本《文武双全/龟蛇蟠扶》
-v2.21 更新： 已修正部分情况下技能浮窗仍会红字报错的问题
+231121 v2.3 更新： 已适配新版本《隐世白猿/镜水倒颠》
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {

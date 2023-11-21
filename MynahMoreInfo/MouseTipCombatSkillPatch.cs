@@ -3,10 +3,7 @@ using System.Linq;
 using Config;
 using CSharpDiff.Converters;
 using CSharpDiff.Diffs;
-using FrameWork;
 using GameData.Domains.CombatSkill;
-using GameData.Serializer;
-using GameData.Utilities;
 using HarmonyLib;
 using MynahMoreInfo.Components;
 using TMPro;
@@ -18,9 +15,8 @@ namespace MynahMoreInfo;
 public static class MouseTipCombatSkillPatch
 {
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(MouseTipCombatSkill), "OnGetSkillDisplayData")]
-    public static void Postfix(MouseTipCombatSkill __instance, CombatSkillItem ____configData, int offset,
-        RawDataPool dataPool)
+    [HarmonyPatch(typeof(MouseTipCombatSkill), "RefreshCombatSkillPanel")]
+    public static void Postfix(MouseTipCombatSkill __instance)
     {
         if (!ModEntry.ShowCombatSkillSpecialEffect) return;
         if (__instance != null)
@@ -34,23 +30,23 @@ public static class MouseTipCombatSkillPatch
                 return;
             }
 
-            CombatSkillDisplayData combatSkillDisplayData = null;
-            Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
+            CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
+            // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
             var flag = combatSkillDisplayData.EffectType != -1;
 
             specialEffectGameObject.SetActive(true);
             if (true) // flag
             {
                 var flag4 = combatSkillDisplayData.EffectType == 0;
-                ShowAllSpecialEffects(specialEffectGameObject, ____configData, flag, flag4);
+                ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
             }
 
-            ShowCastTime(__instance, ____configData);
+            ShowCastTime(__instance, __instance._configData);
 
             if (ModEntry.ShowLearningProgress)
             {
                 var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                var desc = $"{____configData.Desc}\n{s}";
+                var desc = $"{__instance._configData.Desc}\n{s}";
                 MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
             }
 
@@ -61,8 +57,7 @@ public static class MouseTipCombatSkillPatch
 
     [HarmonyPatch(typeof(MouseTipCombatSkill), "UpdateOnlyTemplateData")]
     [HarmonyPostfix]
-    public static void UpdateOnlyTemplateDataPostfix(MouseTipCombatSkill __instance,
-        CombatSkillItem ____configData)
+    public static void UpdateOnlyTemplateDataPostfix(MouseTipCombatSkill __instance)
     {
         // if (!ShowCombatSkillSpecialEffect) return;
         // __instance.CGet<GameObject>("DirectEffectTitle").SetActive(true);
@@ -76,8 +71,8 @@ public static class MouseTipCombatSkillPatch
         //     ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
         
         var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
-        ShowAllSpecialEffects(specialEffectGameObject, ____configData, false, false, true);
-        ShowCastTime(__instance, ____configData);
+        ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, false, false, true);
+        ShowCastTime(__instance, __instance._configData);
     }
 
     public static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
