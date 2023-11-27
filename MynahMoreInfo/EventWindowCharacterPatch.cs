@@ -12,27 +12,27 @@ public class EventWindowCharacterPatch
     [HarmonyPatch(typeof(EventWindowCharacter), "Refresh")]
     public static void Postfix(EventWindowCharacter __instance)
     {
-        Debug.Log("EventWindowCharacterPatch1");
         if (!ModEntry.ShowEventUICharacterMouseTip) return;
-        Debug.Log("EventWindowCharacterPatch2");
         if (__instance != null)
         {
-            Debug.Log("EventWindowCharacterPatch3");
-            var mou = Util.EnsureMouseTipDisplayer(__instance.transform.Find("CanvasChanger/AvatarArea/ShowCharacterMenu").gameObject);
+            var transform = __instance.transform.Find("CanvasChanger/AvatarArea/ShowCharacterMenu");
+            if (transform == null) return;
+            var mou = Util.EnsureMouseTipDisplayer(transform.gameObject);
             mou.enabled = __instance.GetHasCharacter();
-            if (mou.enabled)
-            {
-                Util.EnableMouseTipCharacter(mou,
-                    __instance.IsLeftCharacter
-                        ? __instance.Data.MainCharacter.CharacterId
-                        : __instance.Data.TargetCharacter.CharacterId,
+
+            if (__instance.GetHasCharacter())
+            { 
+                if (__instance.Data == null) return;
+                
+                var character = __instance.IsLeftCharacter
+                    ? __instance.Data.MainCharacter
+                    : __instance.Data.TargetCharacter;
+
+                if(character == null) return;
+                
+                Util.EnableMouseTipCharacter(mou, character.CharacterId,
                     ModEntry.ReplaceAllCharacterTipToDetail ? 2 : 1);
-                Debug.Log("EventWindowCharacterPatch4");
             }
-
-            Debug.Log("EventWindowCharacterPatch5");
         }
-
-        
     }
 }

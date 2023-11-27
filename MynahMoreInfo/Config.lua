@@ -1,5 +1,5 @@
 return {
-    Title = "~更多信息 v2.3~",
+    Title = "~更多信息 v2.31~",
     FrontendPlugins = { "MynahMoreInfoFrontend.dll" },
     BackendPlugins = { "MynahMoreInfoBackend.dll" },
     Author = "myna12548",
@@ -54,6 +54,7 @@ return {
 v2.2 更新： 已适配新版本《文武双全/龟蛇蟠扶》
 
 231121 v2.3 更新： 已适配新版本《隐世白猿/镜水倒颠》
+       v2.31 更新： 修正bug
 
 另外希望大家反馈bug或者提问可以去讨论区，留言没办法单独回复]],
     DefaultSettings = {
