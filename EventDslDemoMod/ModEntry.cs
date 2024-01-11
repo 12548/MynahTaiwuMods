@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using EventDslFramework;
+﻿using EventDslFramework;
 using GameData.Domains;
 using GameData.Domains.TaiwuEvent.EventHelper;
 using GameData.Utilities;
@@ -16,7 +15,7 @@ public class ModEntry: TaiwuRemakePlugin
 
         事件框架.创建事件("你好!")
             .其主角色为("RoleTaiwu")
-            // .其触发条件为(触发条件.太吾进行了一次地格移动)
+            .其触发条件为(触发条件.太吾进行了一次地格移动)
             .带有选项("你也好!")
                 .选择时触发((evt, box) => { AdaptableLog.Info("你也好好！"); })
                 .选择时跳转到(再见)
@@ -29,7 +28,7 @@ public class ModEntry: TaiwuRemakePlugin
                 {
                     var charId = box.GetInt("CharacterId");
                     DomainManager.Taiwu.LeaveGroup(
-                        EventHelper.Domain.MainThreadDataContext, 
+                        DomainManager.TaiwuEvent.MainThreadDataContext, 
                         charId,
                         moveToRandomAdjacentBlock: false
                         );

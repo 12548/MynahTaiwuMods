@@ -63,7 +63,7 @@ public class MouseTipMapBlockPatch
             return;
         }
 
-        __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
+        __instance.AsyncMethodCall(DomainHelper.DomainIds.Character,
             CharacterDomainHelper.MethodName2MethodId["GetNameRelatedDataList"], blockCharList,
             (offset, pool) =>
             {

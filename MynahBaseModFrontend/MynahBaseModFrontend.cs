@@ -44,7 +44,7 @@ public class MynahBaseModFrontend
     public static void ModSetString(string modIdStr, UIBase uiBase, string key, string value, bool isArchive,
         Action<bool> callback = null)
     {
-        uiBase.AsynchMethodCall(GetDomainIdByName("Mod"),
+        uiBase.AsyncMethodCall(GetDomainIdByName("Mod"),
             GetMethodIdByName(typeof(ModDomainHelper.MethodIds), "SetString"), modIdStr, key, isArchive, value,
             (offset, dataPool) =>
             {
@@ -66,7 +66,7 @@ public class MynahBaseModFrontend
     public static void ModSetInt(string modIdStr, UIBase uiBase, string key, int value, bool isArchive,
         Action<bool> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.SetInt, modIdStr, key, isArchive,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.SetInt, modIdStr, key, isArchive,
             value, (offset, dataPool) =>
             {
                 bool result = false;
@@ -88,7 +88,7 @@ public class MynahBaseModFrontend
     public static void ModSetBool(string ModIdStr, UIBase uiBase, string key, bool value, bool isArchive,
         Action<bool> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.SetBool, ModIdStr, key, isArchive,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.SetBool, ModIdStr, key, isArchive,
             value, (offset, dataPool) =>
             {
                 bool result = false;
@@ -109,7 +109,7 @@ public class MynahBaseModFrontend
     public static void ModSetCustom(string modIdStr, UIBase uiBase, string key, SerializableModData value,
         bool isArchive, Action<bool> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.SetSerializableModData, modIdStr,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.SetSerializableModData, modIdStr,
             key, isArchive, value, (offset, dataPool) =>
             {
                 bool result = false;
@@ -129,7 +129,7 @@ public class MynahBaseModFrontend
     public static void ModGetString(string modIdStr, UIBase uiBase, string key, bool isArchive,
         Action<string> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetString, modIdStr, key,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetString, modIdStr, key,
             isArchive, (offset, dataPool) =>
             {
                 string result = "";
@@ -149,7 +149,7 @@ public class MynahBaseModFrontend
     public static void ModGetInt(string modIdStr, UIBase uiBase, string key, bool isArchive,
         Action<int> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetInt, modIdStr, key, isArchive,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetInt, modIdStr, key, isArchive,
             (offset, dataPool) =>
             {
                 int result = 0;
@@ -169,7 +169,7 @@ public class MynahBaseModFrontend
     public static void ModGetBool(string modIdStr, UIBase uiBase, string key, bool isArchive,
         Action<bool> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetBool, modIdStr, key, isArchive,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetBool, modIdStr, key, isArchive,
             (offset, dataPool) =>
             {
                 bool result = false;
@@ -190,7 +190,7 @@ public class MynahBaseModFrontend
     public static void ModGetCustom(string modIdStr, UIBase uiBase, string key, bool isArchive,
         Action<SerializableModData> callback = null)
     {
-        uiBase.AsynchMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetSerializableModData, modIdStr,
+        uiBase.AsyncMethodCall(DomainHelper.DomainIds.Mod, ModDomainHelper.MethodIds.GetSerializableModData, modIdStr,
             key, isArchive, (offset, dataPool) =>
             {
                 SerializableModData result = null;

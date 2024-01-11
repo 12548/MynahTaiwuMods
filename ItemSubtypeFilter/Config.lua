@@ -3,7 +3,7 @@ return {
     FrontendPlugins = { "ItemSubtypeFilter.dll" },
     Author = "myna12548",
     FileId = 2871616225,
-    Source = 1,
+    Source = 0,
     Cover = "cover.png",
     GameVersion="99.99.99.99",
     Description = [[myna的太吾mod群：834901403，mod相关问题欢迎加群讨论

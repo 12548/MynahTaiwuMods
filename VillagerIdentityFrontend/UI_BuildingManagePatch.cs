@@ -37,7 +37,7 @@ public class UI_BuildingManagePatch
             if (!____propertyValueDict.ContainsKey(operatorCharId))
             {
                 // 如果有人缺少所需属性（技艺造诣） 那么这里要获取
-                __instance.AsynchMethodCall(
+                __instance.AsyncMethodCall(
                     DomainHelper.DomainName2DomainId["Character"],
                     MynahBaseModFrontend.MynahBaseModFrontend.GetMethodIdByName(
                         typeof(CharacterDomainHelper.MethodIds),

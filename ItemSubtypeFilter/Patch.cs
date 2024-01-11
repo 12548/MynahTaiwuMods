@@ -82,21 +82,21 @@ public class Patch
                             return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
                                     skillBookItem.CombatSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
                         }
-                        else
-                        {
-                            var sectId = CombatSkill.Instance[skillBookItem.CombatSkillTemplateId].SectId;
-                            return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
-                                    sectId == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
-                        }
+
+                        var sectId = CombatSkill.Instance[skillBookItem.CombatSkillTemplateId].SectId;
+                        return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.CombatSkillBook &&
+                                sectId == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
                     }
-                    else if (itemSubType == 1000)
+
+                    if (itemSubType == 1000)
                     {
                         var skillBookItem = SkillBook.Instance[data.Key.TemplateId];
                         var thirdFilterInfo = ThirdFilterHelper.ThirdFilters.Find(it => it.togKey == togKey);
                         return (thirdFilterInfo.ThirdFilterType == ThirdFilterType.LifeSkillBook &&
                                 skillBookItem.LifeSkillType == thirdFilterInfo.combatOrLifeSkillTypeOrSectId);
                     }
-                    else return false;
+
+                    return false;
                 }));
             }
         }
@@ -136,9 +136,9 @@ public class Patch
             // 原版药品筛选
             List<ItemSortAndFilter.MedicineFilterType> typeList = __instance.SortFilterSetting.MedicineFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.MedicineFilterType.Invalid)
-                __instance.OutputItemList.AddRange((IEnumerable<ItemDisplayData>) __instance._itemList);
+                __instance.OutputItemList.AddRange(__instance._itemList);
             else
-                __instance.OutputItemList.AddRange((IEnumerable<ItemDisplayData>) __instance._itemList.FindAll((Predicate<ItemDisplayData>) (data => !data.Key.IsValid() || typeList.Contains(ItemSortAndFilter.GetMedicineFilterType(data.Key)))));
+                __instance.OutputItemList.AddRange(__instance._itemList.FindAll((Predicate<ItemDisplayData>) (data => !data.Key.IsValid() || typeList.Contains(ItemSortAndFilter.GetMedicineFilterType(data.Key)))));
         }
         else if (____filterTogGroup.gameObject.activeSelf)
         {

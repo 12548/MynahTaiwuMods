@@ -33,6 +33,15 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug Beta|AnyCPU' ">
+      <DebugSymbols>true</DebugSymbols>
+      <DebugType>full</DebugType>
+      <Optimize>false</Optimize>
+      <DefineConstants>DEBUG;TRACE</DefineConstants>
+      <ErrorReport>prompt</ErrorReport>
+      <WarningLevel>4</WarningLevel>
+      <OutputPath>bin\Debug Beta\</OutputPath>
+    </PropertyGroup>
     <PropertyGroup>
       <PostBuildEvent>pwsh AfterBuild.ps1 $(TargetDir)</PostBuildEvent>
     </PropertyGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using FrameWork;
 using GameData.Domains.Character.Display;
 using HarmonyLib;
@@ -13,38 +14,19 @@ namespace MynahMoreInfo;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class UI_MapBlockCharListPatch
 {
-    [HarmonyPatch(typeof(UI_MapBlockCharList), "OnRenderChar")]
+    [HarmonyPatch(typeof(MapBlockCharNormal), "Init")]
     [HarmonyPostfix]
     static void OnRenderCharPostfix(
-        int index,
-        Refers charRefers,
-        bool ____canSeeDetail,
-        CToggleGroup ____togGroup,
-        List<int> ____infectedList,
-        List<int> ____normalCharList,
-        List<int> ____graveList,
-        Dictionary<int, GraveDisplayData> ____graveDataDict,
-        Dictionary<int, CharacterDisplayData> ____charDataDict,
-        UI_MapBlockCharList __instance)
+        bool canInteract,
+        CharacterDisplayData characterDisplayData,
+        MapBlockCharNormal __instance)
     {
         if (ModEntry.MouseTipMapBlockCharList == 0) return;
-        var trigger = ____canSeeDetail;
-        var key = ____togGroup.GetActive().Key;
-        var showingRandomEnemy = key == 1 && index >= ____infectedList.Count;
-        if (showingRandomEnemy) trigger = false;
-        if (key > 1 && key != 3) trigger = false;
+        var trigger = canInteract;
 
-        var cbutton = charRefers.CGet<CButton>("Button");
+        var cbutton = __instance.transform.Find("Button");
         var obj = cbutton.gameObject;
         var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(obj);
-
-        var charList = (key switch
-        {
-            0 => ____normalCharList,
-            1 => ____infectedList,
-            3 => ____graveList,
-            _ => new List<int>()
-        });
 
         if (!trigger)
         {
@@ -53,30 +35,16 @@ public class UI_MapBlockCharListPatch
             return;
         }
 
-        if (!charList.CheckIndex(index))
-        {
-            Debug.Log($"{key} {index} CheckIndex fail!");
-            return;
-        }
-
-        if (key != 3 && !____charDataDict.ContainsKey(charList[index]))
-        {
-            Debug.Log($"{key} {index}ContainsKey {charList[index]} fail!");
-            return;
-        }
-
-        var charIndex = charList[index];
-        var charDisplayData = key == 3 ? null : ____charDataDict[charIndex];
         try
         {
-            var characterId = charDisplayData?.CharacterId ?? ____graveDataDict[charIndex].Id;
+            var characterId = characterDisplayData.CharacterId;
 
             // Debug.Log($"charId: {characterId}, disp: {(charDisplayData?.FullName ?? ____graveDataDict[charIndex].NameData.FullName).GetName(charDisplayData?.Gender ?? ____graveDataList[charIndex].NameData.Gender, new Dictionary<int, string>())}");
 
             switch (ModEntry.MouseTipMapBlockCharList)
             {
                 case 2:
-                    GetAlternateCharTipStr(mouseTipDisplayer, charDisplayData, characterId);
+                    GetAlternateCharTipStr(mouseTipDisplayer, characterDisplayData, characterId);
                     break;
                 case 1:
                     Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);

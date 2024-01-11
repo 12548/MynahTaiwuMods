@@ -12,7 +12,7 @@ public class GroupCallBuilder
 
     public Action<Dictionary<string, (int, RawDataPool)>> OnAllOver = null;
 
-    public Action<int, RawDataPool> AddAction(string key)
+    public AsyncMethodCallbackDelegate AddAction(string key)
     {
         _keys.Add(key);
         return (offset, dp) => {
@@ -23,5 +23,4 @@ public class GroupCallBuilder
             OnAllOver?.Invoke(_resultMap); 
         };
     }
-
 }

@@ -1,12 +1,14 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
+using System.Reflection.Emit;
 using Config.EventConfig;
 using GameData.Domains;
 using GameData.Domains.TaiwuEvent;
 using GameData.Utilities;
 using LuaTableSerializer;
-using MynahModConfigGenerator.EventViewerTest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SDILReader;
 using TaiwuEventDumper;
 
 
@@ -176,6 +178,7 @@ public static class EventDumper
         {
             Dictionary<string, EventData> parsedLangs = new();
             Dictionary<string, string> groupNames = new();
+            Dictionary<string, string> groupNamesO = new();
 
             var count = 0;
 
@@ -200,7 +203,8 @@ public static class EventDumper
                     files.ToDictionary(f => f.Key, f => new TaiWuTemplate(f.Value));
                 foreach (var (key, value) in parsedTemplates)
                 {
-                    groupNames[value.group] = value.groupName + "-导出";
+                    groupNames[value.group] = value.groupName + "-导出"; 
+                    groupNamesO[value.group] = value.groupName; 
                     foreach (var (s, eventData) in value.eventMap)
                     {
                         parsedLangs.Add(s, eventData);
@@ -208,17 +212,30 @@ public static class EventDumper
                 }
             }
 
+            var jsonExportDir = Path.Join(taiwuPath, "EventsJson");
             var targetMainDir = Path.Join(taiwuPath, "ModFactory", "ConchShip_export", "WorkSpace/EventEditorData/EventCore");
 
-            List<EventPackage> packages = (List<EventPackage>)typeof(TaiwuEventDomain).GetField("_packagesList", (BindingFlags)(-1))!.GetValue(null);
+            if (ModEntry.ExportJson)
+            {
+                Directory.CreateDirectory(jsonExportDir);
+                Globals.LoadOpCodes();
+            }
+
+            var packages = TaiwuEventDomain._packagesList;
             
             // DomainManager.TaiwuEvent.
 
             foreach (var package in packages)
             {
-                List<TaiwuEventItem> eventList =
-                    (List<TaiwuEventItem>)typeof(EventPackage).GetField("EventList", (BindingFlags)(-1))!.GetValue(
-                        package);
+                if(package == null) continue;
+                if (!groupNames.ContainsKey(package.Group))
+                {
+                    continue;
+                }
+                
+                var jsonDumps = new List<EventDumpInfo>();
+                
+                var eventList = package.EventList;
 
                 var packageDir = Path.Join(targetMainDir, package.Group);
 
@@ -240,7 +257,7 @@ public static class EventDumper
                         "",
                         taiwuEventItem.MaskControl != 0,
                         taiwuEventItem.MaskControl,
-                        taiwuEventItem.MaskTweenTime.ToString(),
+                        taiwuEventItem.MaskTweenTime.ToString(CultureInfo.InvariantCulture),
                         taiwuEventItem.EventAudio,
                         taiwuEventItem.EscOptionKey,
                         taiwuEventItem.EventOptions
@@ -249,7 +266,7 @@ public static class EventDumper
 
                     var serializeObject = JsonConvert.SerializeObject(twe);
                     var redeObj = JsonConvert.DeserializeObject<JObject>(serializeObject);
-                    var tod = JObjToDict(redeObj);
+                    var tod = JObjToDict(redeObj!);
                     var table = LuaSerializer.Serialize(tod);
                     var tweDir = Path.Join(packageDir, eventGuid);
                     var twePath = Path.Join(tweDir, eventGuid + ".twe");
@@ -270,42 +287,64 @@ public static class EventDumper
                     }
                     
                     indexData.AllEventContent[eventGuid] = t;
+
+                    if (ModEntry.ExportJson)
+                    {
+                        if(jsonDumps.Any(it => it.Twe.EventGuid == taiwuEventItem.Guid.ToString())) continue;
+                        var dum = new EventDumpInfo(taiwuEventItem.EventGroup, twe, eventLang, taiwuEventItem.GetType().FullName?? "");
+                        foreach (var option in taiwuEventItem.EventOptions)
+                        {
+                            var possibleNexts = new List<string>();
+                            try
+                            {
+                                var reader = new MethodBodyReader(option.OnOptionSelect.Method);
+                                foreach (var instruction in reader.instructions.Where(instruction => instruction.Code == OpCodes.Ldstr))
+                                {
+                                    var isGuid = Guid.TryParse(instruction.Operand.ToString(), out var _guid);
+                                    if (!isGuid) continue;
+                                    possibleNexts.Add(_guid.ToString());
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                AdaptableLog.Warning($"Exception when dumping: {groupNamesO[taiwuEventItem.EventGroup]} {eventLang.name}");
+                                AdaptableLog.Warning(e.ToString());
+                            }
+                            
+                            dum.PossibleNexts.Add(possibleNexts);
+                        }
+                        
+                        jsonDumps.Add(dum);
+                    }
+                }
+
+                if (ModEntry.ExportJson)
+                {
+                    var jsonPath = Path.Combine(jsonExportDir, $"{package.Key}.json");
+                    AdaptableLog.Info($"正在导出：{jsonPath}");
+                    var serializeList = JsonConvert.SerializeObject(jsonDumps);
+                    File.WriteAllText(jsonPath, serializeList);
                 }
                 
                 {                    
                     var serializeObject = JsonConvert.SerializeObject(indexData);
                     var redeObj = JsonConvert.DeserializeObject<JObject>(serializeObject);
-                    var tod = JObjToDict(redeObj);
+                    var tod = JObjToDict(redeObj!);
                     var table = LuaSerializer.Serialize(tod);
                     var twePath = Path.Join(packageDir, "index.lua");
                     
                     AdaptableLog.Info($"正在导出：{twePath}");
-                    File.WriteAllText(twePath, "return " + table);}
+                    File.WriteAllText(twePath, "return " + table);
+                }
 
-                //
-                // foreach (var t in exportedTypes
-                //              .FindAll(it => it.IsSubclassOf(typeof(TaiwuEventItem))))
-                // {
-                //     try
-                //     {
-                //         count++;
-                //         var taiwuEventItem = (TaiwuEventItem)Activator.CreateInstance(t)!;
-                //         var eventDumpInfo = new EventDumpInfo(taiwuEventItem);
-                //
-                //         if (!groups.ContainsKey(taiwuEventItem.EventGroup))
-                //         {
-                //             groups.Add(taiwuEventItem.EventGroup, new Dictionary<string, EventDumpInfo>());
-                //         }
-                //         
-                //         groups[taiwuEventItem.EventGroup].Add(eventDumpInfo.Guid, eventDumpInfo);
-                //     }
-                //     catch (Exception e)
-                //     {
-                //         Console.WriteLine($"Error dumping {t.Name} from {eventAssembly.Location}");
-                //         Console.WriteLine(2);
-                //         continue;
-                //     }
-                // }
+            }
+            
+            if (ModEntry.ExportJson)
+            {
+                var jsonPath = Path.Combine(jsonExportDir, $"_GroupNames.json");
+                AdaptableLog.Info($"正在导出：{jsonPath}");
+                var serializeList = JsonConvert.SerializeObject(groupNamesO);
+                File.WriteAllText(jsonPath, serializeList);
             }
 
             // File.WriteAllText("dump.json", JsonConvert.SerializeObject(groups));

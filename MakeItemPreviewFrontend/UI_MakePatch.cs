@@ -41,7 +41,7 @@ public class UI_MakePatch
     //     };
     //
     //     Debug.Log("calling!");
-    //     __instance.AsynchMethodCall(DomainHelper.DomainIds.Item, ItemDomainHelper.MethodIds.GetItemDisplayData, ik, -12548,
+    //     __instance.AsyncMethodCall(DomainHelper.DomainIds.Item, ItemDomainHelper.MethodIds.GetItemDisplayData, ik, -12548,
     //         (offset, datapool) =>
     //         {
     //             ItemDisplayData data = null;

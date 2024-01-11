@@ -1,4 +1,5 @@
 ﻿using GameData.Utilities;
+using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace TaiwuEventDumper;
@@ -6,6 +7,9 @@ namespace TaiwuEventDumper;
 [PluginConfig("TaiwuEventDumper", "myna12548", "99.99.99.99")]
 public class ModEntry : TaiwuRemakePlugin
 {
+
+    public static bool ExportJson = true;
+    
     public override void Initialize()
     {
     }

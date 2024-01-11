@@ -51,18 +51,18 @@ public class MouseTipSimpleWidePatch
 
         if (!hasDisplayData)
         {
-            __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
+            __instance.AsyncMethodCall(DomainHelper.DomainIds.Character,
                 CharacterDomainHelper.MethodName2MethodId["GetCharacterDisplayDataList"],
                 new List<int> { charId },
                 gCall.AddAction("CharacterDisplayDataList"));
         }
 
-        __instance.AsynchMethodCall(DomainHelper.DomainIds.Character,
+        __instance.AsyncMethodCall(DomainHelper.DomainIds.Character,
             CharacterDomainHelper.MethodName2MethodId["GetGroupCharDisplayDataList"],
             new List<int> { charId },
             gCall.AddAction("GroupCharDisplayDataList"));
 
-        __instance.AsynchMethodCall(DomainHelper.DomainIds.Mod,
+        __instance.AsyncMethodCall(DomainHelper.DomainIds.Mod,
             ModDomainHelper.MethodIds.GetString,
             ModEntry.StaticModIdStr,
             $"GetCharacterData|{charId}",

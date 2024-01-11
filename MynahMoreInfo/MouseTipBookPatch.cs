@@ -97,7 +97,7 @@ public class MouseTipBookPatch
             "GetCombatSkillDisplayData"
         );
 
-        __instance.AsynchMethodCall(domainId, methodId, SingletonObject.getInstance<BasicGameData>().TaiwuCharId,
+        __instance.AsyncMethodCall(domainId, methodId, SingletonObject.getInstance<BasicGameData>().TaiwuCharId,
             list,
             (offset, dataPool) =>
             {

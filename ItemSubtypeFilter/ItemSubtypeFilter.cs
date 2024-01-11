@@ -26,11 +26,11 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [DropDownModSetting(
         displayName: "功法书高级筛选方式",
-        options: new[] { "按类型", "按门派" },
+        options: new[] { "按类型", "按门派" }, 
         description: "开启书籍高级筛选时生效（进入过游戏再切换则大退重进游戏生效）",
         defaultValue: 0
     )]
-    public static readonly int CombatSkillFilterType = 0;
+    public static readonly int CombatSkillFilterType = 0; 
 
     public override void OnModSettingUpdate()
     {

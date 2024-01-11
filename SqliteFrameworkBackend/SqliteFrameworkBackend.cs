@@ -24,12 +24,21 @@ public class SqliteFrameworkBackend : TaiwuRemakeHarmonyPlugin
  
         var modDirectory = DomainManager.Mod.GetModDirectory(ModIdStr); 
         AdaptableLog.Info($"ModDir: {modDirectory}");
-        
-        File.Copy(Path.Combine(modDirectory, "Plugins/sqlite3.dll"),
-            Path.Combine(cwd, "sqlite3.dll"), true);
-        File.Copy(Path.Combine(modDirectory, "Plugins/sqlite3.dll"),
-            Path.Combine(cwd, "../The Scroll of Taiwu_Data/Plugins/x86_64/sqlite3.dll"), true);
 
+        var sqliteDllSource = Path.Combine(modDirectory, "Plugins/sqlite3.dll");
+        var sqliteDllTargetBackend = Path.Combine(cwd, "sqlite3.dll");
+        if (!File.Exists(sqliteDllTargetBackend))
+        {
+            File.Copy(sqliteDllSource,
+                sqliteDllTargetBackend, true);
+        }
+
+        var sqliteDllTargetFrontend = Path.Combine(cwd, "../The Scroll of Taiwu_Data/Plugins/x86_64/sqlite3.dll");
+        if (!File.Exists(sqliteDllTargetFrontend))
+        {
+            File.Copy(sqliteDllSource, sqliteDllTargetFrontend, true);
+        }
+        
         Assembly.LoadFile(Path.Combine(GameData.Program.BaseDataDir, "The Scroll of Taiwu_Data/Managed/Mono.Data.Sqlite.dll"));
         //
         //
