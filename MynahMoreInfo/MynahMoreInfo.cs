@@ -83,8 +83,8 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("人物浮窗显示真名", description: "从官方mod拿来的功能，在人物浮窗中显示法号对应的真实姓名")]
     public static bool CharacterMouseTipShowRealName = true;
 
-    [ModSetting("人物浮窗显示可请教技能", description: "在详细人物浮窗中显示可请教的技艺")]
-    public static bool ShowLearnableSkill = true;
+    // [ModSetting("人物浮窗显示可私下请教技能", description: "在详细人物浮窗中显示可私下请教的技艺")]
+    // public static bool ShowLearnableSkill = true;
 
     [ModSetting("地块浮窗显示人物列表", description: "")]
     public static bool MapBlockMouseTipCharList = true;

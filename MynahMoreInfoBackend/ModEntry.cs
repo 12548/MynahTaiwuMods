@@ -6,8 +6,8 @@ namespace MynahMoreInfoBackend;
 [PluginConfig("MynahMoreInfo", "myna12548", "1")]
 public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
-    [ModSetting("人物浮窗显示可请教技能", description: "在详细人物浮窗中显示可请教的技艺")]
-    public static bool ShowLearnableSkill = true;
+    // [ModSetting("人物浮窗显示可请教技能", description: "在详细人物浮窗中显示可请教的技艺")]
+    // public static bool ShowLearnableSkill = true;
 
     [SliderModSetting("显示人物持有物品数", 
         minValue: 0, 
