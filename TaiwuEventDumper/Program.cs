@@ -4,7 +4,7 @@ using System.Reflection;
 
 static class Program
 {
-    public static string TaiwuPath = Path.Join(Environment.CurrentDirectory, "..");
+    public static readonly string TaiwuPath = Path.Join(Environment.CurrentDirectory, "..");
     static Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 
     public static void LoadAssemblyReferences(Assembly selectedAssembly)
@@ -23,7 +23,6 @@ static class Program
             {
                 var taiwuPath = TaiwuPath;
 
-                if (taiwuPath != null)
                 {
                     var taiwuDllPath = Path.Join(taiwuPath, "The Scroll of Taiwu_Data", "Managed",
                         reference.Name + ".dll");

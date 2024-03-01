@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
 using Config.EventConfig;
@@ -193,23 +194,23 @@ public static class EventDumper
                 }
 
                 Console.WriteLine("[+] saving EventLanguages...");
+                readEventLanguageFiles(parsedLangs, groupNames, groupNamesO, eventsDirectory);
 
-                DirectoryInfo d = new DirectoryInfo(eventsDirectory); //Assuming Test is your Folder
-                Console.WriteLine("Loading files");
-                Dictionary<string, FileInfo>
-                    files = d.GetFiles("*.txt").ToDictionary(file => file.Name); //Getting Text files
-                Console.WriteLine("Generating Templates");
-                var parsedTemplates =
-                    files.ToDictionary(f => f.Key, f => new TaiWuTemplate(f.Value));
-                foreach (var (key, value) in parsedTemplates)
+
+                var dir1 = Path.Join(taiwuPath, "The Scroll of Taiwu_Data");
+
+                var subdirs = Directory.EnumerateDirectories(dir1);
+                foreach ( var subdir in subdirs)
                 {
-                    groupNames[value.group] = value.groupName + "-导出"; 
-                    groupNamesO[value.group] = value.groupName; 
-                    foreach (var (s, eventData) in value.eventMap)
+                    Console.WriteLine("Finding dlc events in: " + subdir);
+                    string path = Path.Join(subdir, "Events", "EventLanguages");
+                    if (Directory.Exists(path))
                     {
-                        parsedLangs.Add(s, eventData);
+                        Console.WriteLine("Found dlc events in: " + path);
+                        readEventLanguageFiles(parsedLangs, groupNames, groupNamesO, path);
                     }
                 }
+
             }
 
             var jsonExportDir = Path.Join(taiwuPath, "EventsJson");
@@ -326,7 +327,7 @@ public static class EventDumper
                     File.WriteAllText(jsonPath, serializeList);
                 }
                 
-                {                    
+                if (ModEntry.DumpTwe){                    
                     var serializeObject = JsonConvert.SerializeObject(indexData);
                     var redeObj = JsonConvert.DeserializeObject<JObject>(serializeObject);
                     var tod = JObjToDict(redeObj!);
@@ -345,6 +346,16 @@ public static class EventDumper
                 AdaptableLog.Info($"正在导出：{jsonPath}");
                 var serializeList = JsonConvert.SerializeObject(groupNamesO);
                 File.WriteAllText(jsonPath, serializeList);
+
+                if (ModEntry.AutoOpenViewer)
+                {
+                    var evDir = Path.Combine(ModEntry.ModDir, "EventViewer");
+
+                    var configFile = Path.Combine(evDir, "config.json");
+                    File.ReadAllText(configFile);
+
+                    Process.Start(Path.Combine(evDir, "TaiwuEventViewer.exe"), taiwuPath);
+                }
             }
 
             // File.WriteAllText("dump.json", JsonConvert.SerializeObject(groups));
@@ -352,8 +363,27 @@ public static class EventDumper
         }
     }
 
+    private static void readEventLanguageFiles(Dictionary<string, EventData> parsedLangs, Dictionary<string, string> groupNames, Dictionary<string, string> groupNamesO, string eventsDirectory)
+    {
+        DirectoryInfo d = new DirectoryInfo(eventsDirectory); //Assuming Test is your Folder
+        Console.WriteLine("Loading files");
+        Dictionary<string, FileInfo>
+            files = d.GetFiles("*.txt").ToDictionary(file => file.Name); //Getting Text files
+        Console.WriteLine("Generating Templates");
+        var parsedTemplates =
+            files.ToDictionary(f => f.Key, f => new TaiWuTemplate(f.Value));
+        foreach (var (key, value) in parsedTemplates)
+        {
+            groupNames[value.group] = value.groupName + "-导出";
+            groupNamesO[value.group] = value.groupName;
+            foreach (var (s, eventData) in value.eventMap)
+            {
+                parsedLangs.Add(s, eventData);
+            }
+        }
+    }
 
-    
+
     static Dictionary<string, object> JObjToDict(JObject obj)
     {
         var res = new Dictionary<string, Object>();

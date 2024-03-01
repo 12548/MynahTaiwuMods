@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <Reference Include="0Harmony">
-        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\The Scroll of Taiwu_Data\Managed\0Harmony.dll</HintPath>
+        <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\0Harmony.dll</HintPath>
       </Reference>
       <Reference Include="GameData">
         <HintPath>$(TAIWU_PATH)\Backend\GameData.dll</HintPath>
@@ -17,7 +17,7 @@
         <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
       </Reference>
       <Reference Include="TaiwuModdingLib">
-        <HintPath>..\..\..\SteamLibrary\steamapps\common\The Scroll Of Taiwu\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+        <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
       </Reference>
     </ItemGroup>
 
@@ -35,12 +35,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Config.lua">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Krafs.Publicizer" Version="2.2.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -48,7 +42,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="pwsh AfterBuild.ps1 $(TargetDir) 2977353708" />
+      <Exec Command="pwsh AfterBuild.ps1 &quot;$(TargetDir)&quot;" />
     </Target>
 
 </Project>
