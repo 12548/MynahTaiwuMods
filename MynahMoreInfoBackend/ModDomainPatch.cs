@@ -5,6 +5,7 @@ using ConchShip.EventConfig.Taiwu;
 using Config;
 using Config.EventConfig;
 using GameData.Domains;
+using GameData.Domains.Character.Display;
 using GameData.Domains.Item;
 using GameData.Domains.Mod;
 using GameData.Domains.TaiwuEvent;
@@ -54,6 +55,7 @@ public class ModDomainPatch
                 retValue["PreexistenceCharCount"] = deadGuy.PreexistenceCharIds.Count;
 
                 retValue["FeatureIds"] = deadGuy.FeatureIds;
+                retValue["Favorability"] = DomainManager.Character.GetFavorability(charId, DomainManager.Taiwu.GetTaiwuCharId());
 
                 var loc = DomainManager.Character.GetCharacterDisplayData(charId).Location;
                 if (loc.IsValid())
@@ -62,6 +64,32 @@ public class ModDomainPatch
                     retValue["BlockFullName"] =
                         MapDomainUtils.GetBlockFullName(loc, "", "", false)
                         + $"({pos.X}, {pos.Y})";
+                }
+
+                if (DomainManager.Character.TryGetElement_Graves(charId, out var grave))
+                {
+                    retValue["GraveLevel"] = grave.GetLevel();
+                    retValue["GraveDurability"] = grave.GetDurability();
+                    
+                    if (ModEntry.ShowNpcGoodItemsCount > 0)
+                    {
+                        var inventory = grave.GetInventory();
+                        var items = inventory.Items.Keys;
+                        
+                        var displayItems = items
+                            .Where(it => it.ItemType is > ItemType.Invalid and < ItemType.Count)
+                            .OrderByDescending(it => ItemTemplateHelper.GetGrade(it.ItemType, it.TemplateId))
+                            .Take(ModEntry.ShowNpcGoodItemsCount)
+                            .ToList();
+
+                        retValue["AvailableItems"] = displayItems
+                            .Select(it => it.TemplateId)
+                            .ToList();
+                        retValue["AvailableItemTypes"] = displayItems
+                            .Select(it => it.ItemType)
+                            .ToList();
+                    }
+
                 }
             }
 

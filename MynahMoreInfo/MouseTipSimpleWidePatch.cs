@@ -240,7 +240,13 @@ public class MouseTipSimpleWidePatch
         }
         else
         {
-            sb.Append("好感：前尘已忘");
+            var favor = Convert.ToInt16(otherData["Favorability"]);
+            var favorString = CommonUtils.GetFavorString(favor);
+            sb.Append("好感：" + favorString.Replace("\n", ""));
+            if (!favorString.Contains("\n"))
+            {
+                sb.Append($"({favor})");
+            }
         }
 
         var fameType = groupCharDisplayData != null
@@ -301,8 +307,9 @@ public class MouseTipSimpleWidePatch
         if (otherData.TryGetValue("BlockFullName", out var blockFullName))
         {
             var title1 = groupCharDisplayData != null ? "所在" : "葬于";
-            sb.Append($"{title1}： {blockFullName}    ");
+            sb.AppendLine($"{title1}： {blockFullName}    ");
         }
+        
 
         if (groupCharDisplayData != null)
         {
@@ -500,26 +507,34 @@ public class MouseTipSimpleWidePatch
                 }
             }
 
-            if (otherData.TryGetValue("AvailableItems", out var value2))
+        }
+        else if(otherData.TryGetValue("GraveLevel", out var graveLevelValue))
+        {
+            var graveLevel = Convert.ToInt32(graveLevelValue);
+            var graveDurability = Convert.ToInt16(otherData["GraveDurability"]);
+            var maxGraveDurability = GlobalConfig.Instance.GraveDurabilities[graveLevel];
+            sb.AppendLine($"坟墓等级： {graveLevel}\t坟墓耐久：{graveDurability}/{maxGraveDurability}");
+        }
+        
+        if (otherData.TryGetValue("AvailableItems", out var value2))
+        {
+            var list = (List<object>)value2;
+            var typeList = (List<object>)otherData["AvailableItemTypes"];
+            if (list.Count > 0)
             {
-                var list = (List<object>)value2;
-                var typeList = (List<object>)otherData["AvailableItemTypes"];
-                Debug.Log("t4");
-                if (list.Count > 0)
-                {
-                    var ids = list.Select(Convert.ToInt16).ToList();
-                    var types = typeList.Select(Convert.ToInt16).ToList();
-                    var names = new List<string>(ids.Count);
-                    names.AddRange(ids.Select((t, i) => ItemTemplateHelper.GetName((sbyte)types[i], t)
-                        .SetGradeColor(ItemTemplateHelper.GetGrade((sbyte)types[i], t))));
+                var ids = list.Select(Convert.ToInt16).ToList();
+                var types = typeList.Select(Convert.ToInt16).ToList();
+                var names = new List<string>(ids.Count);
+                names.AddRange(ids.Select((t, i) => ItemTemplateHelper.GetName((sbyte)types[i], t)
+                    .SetGradeColor(ItemTemplateHelper.GetGrade((sbyte)types[i], t))));
 
-                    // var types = 
-                    // .Select(it => SkillBook.Instance[it])
-                    // .Select(it => it.Name.SetGradeColor(it.Grade))
-                    // .Join(null, " ");
-                    // ItemTemplateHelper.GetName()
-                    sb.AppendLine("持有物品：" + names.Join(null, "<space=1em>") + " 等");
-                }
+                // var types = 
+                // .Select(it => SkillBook.Instance[it])
+                // .Select(it => it.Name.SetGradeColor(it.Grade))
+                // .Join(null, " ");
+                // ItemTemplateHelper.GetName()
+                var itemHeader = isAlive? "持有物品：" : "葬有物品：";
+                sb.AppendLine(itemHeader + names.Join(null, "<space=1em>") + " 等");
             }
         }
 
