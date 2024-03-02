@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using FrameWork;
 using GameData.Domains.Character.Display;
@@ -12,19 +13,44 @@ namespace MynahMoreInfo;
 
 [HarmonyPatch]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
 public class UI_MapBlockCharListPatch
 {
-    [HarmonyPatch(typeof(MapBlockCharNormal), "Init")]
+
+    [HarmonyPatch(typeof(MapBlockCharNormal), "Refresh")]
     [HarmonyPostfix]
-    static void OnRenderCharPostfix(
-        bool canInteract,
-        CharacterDisplayData characterDisplayData,
+    static void MapBlockCharNormalRefreshPostfix(
+        // bool canInteract,
+        // CharacterDisplayData characterDisplayData,
         MapBlockCharNormal __instance)
     {
         if (ModEntry.MouseTipMapBlockCharList == 0) return;
-        var trigger = canInteract;
 
-        var cbutton = __instance.transform.Find("Button");
+        var charId = __instance.CharId;
+        Transform transform = __instance.transform;
+
+        EnableMouseTipChar(charId, transform);
+    }
+    
+    [HarmonyPatch(typeof(MapBlockCharGrave), "Refresh")]
+    [HarmonyPostfix]
+    static void MapBlockCharGraveRefreshPostfix(
+        // bool canInteract,
+        // CharacterDisplayData characterDisplayData,
+        MapBlockCharGrave __instance)
+    {
+        if (ModEntry.MouseTipMapBlockCharList == 0) return;
+
+        var charId = __instance._graveDisplayData.Id;
+        Transform transform = __instance.transform;
+
+        EnableMouseTipChar(charId, transform);
+    }
+
+    private static void EnableMouseTipChar(int charId, Transform transform)
+    {
+        var trigger = charId > -1;
+        var cbutton = transform.Find("Button");
         var obj = cbutton.gameObject;
         var mouseTipDisplayer = Util.EnsureMouseTipDisplayer(obj);
 
@@ -37,14 +63,14 @@ public class UI_MapBlockCharListPatch
 
         try
         {
-            var characterId = characterDisplayData.CharacterId;
+            var characterId = charId;
 
             // Debug.Log($"charId: {characterId}, disp: {(charDisplayData?.FullName ?? ____graveDataDict[charIndex].NameData.FullName).GetName(charDisplayData?.Gender ?? ____graveDataList[charIndex].NameData.Gender, new Dictionary<int, string>())}");
 
             switch (ModEntry.MouseTipMapBlockCharList)
             {
                 case 2:
-                    GetAlternateCharTipStr(mouseTipDisplayer, characterDisplayData, characterId);
+                    GetAlternateCharTipStr(mouseTipDisplayer, null, characterId);
                     break;
                 case 1:
                     Util.EnableMouseTipCharacter(mouseTipDisplayer, characterId);
