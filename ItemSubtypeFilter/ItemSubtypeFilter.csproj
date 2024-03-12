@@ -63,6 +63,12 @@
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="TaiWuRPC">
+          <HintPath>$(TAIWU_WORKSHOP_PATH)\2879349207\Plugins\TaiWuRPC.dll</HintPath>
+        </Reference>
+        <Reference Include="TWRPC">
+          <HintPath>$(TAIWU_WORKSHOP_PATH)\2879349207\Plugins\TWRPC.dll</HintPath>
+        </Reference>
         <Reference Include="Unity.TextMeshPro">
           <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\Unity.TextMeshPro.dll</HintPath>
           <Private>False</Private>
@@ -84,7 +90,7 @@
         <Compile Include="CombatSkillSortAndFilterPatch.cs" />
         <Compile Include="ExtraFilterPlace.cs" />
         <Compile Include="ItemSortAndFilterType.cs" />
-        <Compile Include="ItemSubtypeFilter.cs" />
+        <Compile Include="ModEntry.cs" />
         <Compile Include="Patch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ReadStateFilterComponent.cs" />

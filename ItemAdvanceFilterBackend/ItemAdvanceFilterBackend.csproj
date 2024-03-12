@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\0Harmony.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GameData">
+            <HintPath>$(TAIWU_PATH)\Backend\GameData.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="TaiwuModdingLib">
+            <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="AfterBuild.ps1">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="AfterBuild.ps1">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="pwsh AfterBuild.ps1 ItemSubtypeFilter $(TargetFileName) $(TargetDir)" />
+    </Target>
+
+</Project>

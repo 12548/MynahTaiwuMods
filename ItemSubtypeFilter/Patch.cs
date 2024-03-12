@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Config;
+using FrameWork.Linq;
 using GameData.Domains.Item;
 using GameData.Domains.Item.Display;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using Enumerable = System.Linq.Enumerable;
 using Object = UnityEngine.Object;
 
 namespace ItemSubtypeFilter;
@@ -38,6 +40,23 @@ public class Patch
         if (__instance.transform == null) return true;
 
         var items = new List<ItemDisplayData>(____itemList);
+        
+        // 阅读状态筛选
+        var readingStateFilterTransform = __instance.transform.Find("ReadingStateFilter");
+        if (readingStateFilterTransform != null && readingStateFilterTransform.gameObject.activeSelf)
+        {
+            var key = readingStateFilterTransform.GetComponent<CToggleGroup>().GetActive().Key;
+            var readingStates = Enumerable.ToList(ModEntry
+                .GetTotalReadingProgressList(Enumerable.ToList(items.Select(it => it.Key.Id)))
+                .Select(it => it >= 100));
+            if (key == 10001)
+            {
+                items = Enumerable.ToList(Enumerable.Where(items, (_, index) => !readingStates[index]));
+            } else if (key == 10002)
+            {
+                items = Enumerable.ToList(Enumerable.Where(items, (_, index) => readingStates[index]));
+            }
+        }
 
         var thirdFilter = __instance.transform.Find("ThirdFilter");
         if (thirdFilter != null && thirdFilter.gameObject.activeSelf &&
@@ -131,14 +150,16 @@ public class Patch
                 }
             }
         }
-        else if (__instance._medicineFilterTogGroup.gameObject.activeSelf && __instance._medicineFilterTogGroup.GetActive().Key != 0)
+        else if (__instance._medicineFilterTogGroup.gameObject.activeSelf &&
+                 __instance._medicineFilterTogGroup.GetActive().Key != 0)
         {
             // 原版药品筛选
             List<ItemSortAndFilter.MedicineFilterType> typeList = __instance.SortFilterSetting.MedicineFilterType;
             if (typeList.Count == 0 || typeList[0] == ItemSortAndFilter.MedicineFilterType.Invalid)
                 __instance.OutputItemList.AddRange(__instance._itemList);
             else
-                __instance.OutputItemList.AddRange(__instance._itemList.FindAll((Predicate<ItemDisplayData>) (data => !data.Key.IsValid() || typeList.Contains(ItemSortAndFilter.GetMedicineFilterType(data.Key)))));
+                __instance.OutputItemList.AddRange(__instance._itemList.FindAll((Predicate<ItemDisplayData>)(data =>
+                    !data.Key.IsValid() || typeList.Contains(ItemSortAndFilter.GetMedicineFilterType(data.Key)))));
         }
         else if (____filterTogGroup.gameObject.activeSelf)
         {
@@ -167,7 +188,7 @@ public class Patch
         if (sortEnabled)
         {
             __instance.OutputItemList.Sort(
-                (itemL, itemR) => ItemCompare(__instance, itemL, itemR));
+                __instance.ItemCompare);
         }
 
         Action onItemListChanged = ____onItemListChanged;
@@ -183,14 +204,6 @@ public class Patch
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(ItemSortAndFilter), "UpdateItemList")]
     public static void OriginalUpdateItemList(object instance)
-    {
-        // its a stub so it has no initial content
-        throw new Exception("It's a stub");
-    }
-
-    [HarmonyReversePatch]
-    [HarmonyPatch(typeof(ItemSortAndFilter), "ItemCompare")]
-    public static int ItemCompare(object instance, ItemDisplayData itemL, ItemDisplayData itemR)
     {
         // its a stub so it has no initial content
         throw new Exception("It's a stub");
@@ -240,6 +253,8 @@ public class Patch
         if (!ModEntry.BookThirdFilter) return;
 
         ThirdFilterType thirdFilterType;
+        
+        var sortAndFilterType = SecondFilterHelper.GetItemSortAndFilterType(__instance);
 
         switch (togNew.gameObject.name)
         {
@@ -250,19 +265,33 @@ public class Patch
                 thirdFilterType = ThirdFilterType.LifeSkillBook;
                 break;
             default:
+                if (sortAndFilterType != null &&
+                    SecondFilterHelper.SecondFilterPlaces.TryGetValue(sortAndFilterType.Value, out var places))
+                {
+                    if (places.ExtraFilterPos.HasValue)
+                    {
+                        // 阅读状态筛选归位
+                        var find = __instance.transform.Find("ReadingStateFilter");
+                        if (find != null) find.position = places.ExtraFilterPos.Value;
+                    }
+                }
+                
                 ThirdFilterHelper.TurnOffThirdFilter(SecondFilterHelper.GetItemSortAndFilterType(__instance),
                     __instance);
+                UpdateItemListPrefix(__instance, ____filterTogGroup, ____equipFilterTogGroup, ____itemList,
+                    ____onItemListChanged);
                 return;
         }
 
-        var sortAndFilterType = SecondFilterHelper.GetItemSortAndFilterType(__instance);
         if (sortAndFilterType == null)
         {
+            UpdateItemListPrefix(__instance, ____filterTogGroup, ____equipFilterTogGroup, ____itemList,
+                ____onItemListChanged);
             return;
         }
 
         var toggleGroup =
-            ThirdFilterHelper.EnsureThirdFilter((ItemSortAndFilterType)sortAndFilterType, __instance, thirdFilterType);
+            ThirdFilterHelper.EnsureThirdFilter(sortAndFilterType.Value, __instance, thirdFilterType);
 
         if (toggleGroup == null) return;
 
@@ -326,21 +355,24 @@ public class Patch
                 return true;
         }
 
-        var places = SecondFilterHelper.SecondFilterPlaces[(ItemSortAndFilterType)sortAndFilterType];
+        var places = SecondFilterHelper.SecondFilterPlaces[sortAndFilterType.Value];
         if (places == null) return true;
 
         var viewport = parentTransform.GetComponent<CScrollRect>().Viewport;
         var equipTypeFilter = sortAndFilter.CGet<CToggleGroup>("EquipTypeFilter");
         var medicineTypeFilter = sortAndFilter.CGet<CToggleGroup>("MedicineTypeFilter");
+        var readingStateFilter = sortAndFilter.transform.Find("ReadingStateFilter");
         if (viewport == null || equipTypeFilter == null) return true;
 
         var itemFilterType = (ItemSortAndFilter.ItemFilterType)currentTogKey;
 
         if (itemFilterType == ItemSortAndFilter.ItemFilterType.Medicine)
         {
+            // 原生药品筛选
             equipTypeFilter.gameObject.SetActive(false);
             medicineTypeFilter.gameObject.SetActive(true);
-            
+            if (readingStateFilter != null) readingStateFilter.gameObject.SetActive(false);
+
             if (places.OriginalViewportPos == null || places.OriginalViewportSize == null)
             {
                 places.OriginalViewportPos = viewport.position;
@@ -353,10 +385,12 @@ public class Patch
             viewport.sizeDelta = places.NewViewportSize;
         }
         else if (SecondFilterHelper.ItemFilterTypeToSubTypeString.ContainsKey(itemFilterType) ||
-            itemFilterType == ItemSortAndFilter.ItemFilterType.Equip)
+                 itemFilterType == ItemSortAndFilter.ItemFilterType.Equip)
         {
             equipTypeFilter.gameObject.SetActive(true);
             medicineTypeFilter.gameObject.SetActive(false);
+            if (readingStateFilter != null) readingStateFilter.gameObject.SetActive(false);
+            
             if (equipTypeFilter.transform.Find("Subtype701") == null)
             {
                 // 未初始化，第一次初始化
@@ -413,11 +447,27 @@ public class Patch
 
             viewport.position = places.NewViewportPos;
             viewport.sizeDelta = places.NewViewportSize;
+
+            if (itemFilterType == ItemSortAndFilter.ItemFilterType.Book && ModEntry.BookReadingStateFilter)
+            {
+                Debug.Log("Initing BookReadingStateFilter");
+                // 书籍额外筛选
+                var readingStateToogleGroup =
+                    ThirdFilterHelper.EnsureReadingStateFilter(sortAndFilterType.Value, sortAndFilter);
+                if (readingStateToogleGroup != null)
+                {
+                    readingStateFilter = readingStateToogleGroup.transform;
+                    readingStateFilter.gameObject.SetActive(true);
+                    readingStateFilter.position = places.ExtraFilterPos!.Value;
+                    readingStateToogleGroup.Set(0);
+                }
+            }
         }
         else
         {
             equipTypeFilter.gameObject.SetActive(false);
             medicineTypeFilter.gameObject.SetActive(false);
+            if (readingStateFilter != null) readingStateFilter.gameObject.SetActive(false);
 
             if (places.OriginalViewportPos != null && places.OriginalViewportSize != null)
             {

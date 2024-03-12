@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using GameData.Domains.Item.Display;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,7 +41,8 @@ public class ThirdFilterHelper
                     new Vector3(-3.97f, 1.6f, 240f),
                     new Vector2(848f, 350f),
                     new Vector3(-5.5f, 2.2f, 240f),
-                    doubleLine: true
+                    doubleLine: true,
+                    extraFilterPos: new Vector3(-6.96f, 1.83f, 240f)
                 )
             },
             {
@@ -53,7 +51,8 @@ public class ThirdFilterHelper
                     new Vector3(3.93f, 1.6f, 240f),
                     new Vector2(848f, 350f),
                     new Vector3(2.38f, 2.2f, 240f),
-                    doubleLine: true
+                    doubleLine: true,
+                    extraFilterPos: new Vector3(0.9f, 1.83f, 240f)
                 )
             },
 
@@ -63,7 +62,8 @@ public class ThirdFilterHelper
                     new Vector3(-1.5f, 2f, 240f),
                     new Vector2(848f, -105f),
                     new Vector3(-2.62f, 2.6f, 240f),
-                    doubleLine: true
+                    doubleLine: true,
+                    extraFilterPos: new Vector3(-4.4f, 2.26f, 240f)
                 )
             },
             {
@@ -72,7 +72,8 @@ public class ThirdFilterHelper
                     new Vector3(5.1f, 2f, 240f),
                     new Vector2(848f, -105f),
                     new Vector3(3.7f, 2.63f, 240f),
-                    doubleLine: true
+                    doubleLine: true,
+                    extraFilterPos:new Vector3(2.25f, 2.26f, 240f)
                 )
             },
 
@@ -82,7 +83,8 @@ public class ThirdFilterHelper
                     new Vector3(-4.02f, 1.02f, 240f),
                     new Vector2(0, -140),
                     new Vector3(-5.2f, 1.8f, 240f),
-                    doubleLine: true
+                    doubleLine: true,
+                    extraFilterPos: new Vector3(-6.65f, 1.43f, 240f)
                 )
             },
             {
@@ -91,7 +93,8 @@ public class ThirdFilterHelper
                     new Vector3(4.13f, 1.02f, 240f),
                     new Vector2(0, -140),
                     new Vector3(2.98f, 1.8f, 240f),
-                    doubleLine: true
+                    doubleLine: true,
+                    extraFilterPos: new Vector3(1.5f, 1.43f, 240f)
                 )
             },
         };
@@ -198,24 +201,14 @@ public class ThirdFilterHelper
 
             toggleGroup.OnActiveToggleChange = (_, _) =>
             {
-                var ____itemList = typeof(ItemSortAndFilter)
-                    .GetField("_itemList", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
-                    ?.GetValue(parentSortAndFilter);
-                var ____filterTogGroup = typeof(ItemSortAndFilter)
-                    .GetField("_filterTogGroup", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
-                    ?.GetValue(parentSortAndFilter);
-                var ____equipFilterTogGroup = typeof(ItemSortAndFilter)
-                    .GetField("_equipFilterTogGroup",
-                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
-                    ?.GetValue(parentSortAndFilter);
-                var ____onItemListChanged = typeof(ItemSortAndFilter)
-                    .GetField("_onItemListChanged",
-                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic)
-                    ?.GetValue(parentSortAndFilter);
+                var itemList = parentSortAndFilter._itemList;
+                var filterTogGroup = parentSortAndFilter._filterTogGroup;
+                var equipFilterTogGroup = parentSortAndFilter._equipFilterTogGroup;
+                var onItemListChanged = parentSortAndFilter._onItemListChanged;
 
-                Patch.UpdateItemListPrefix(parentSortAndFilter, ____filterTogGroup as CToggleGroup,
-                    ____equipFilterTogGroup as CToggleGroup, ____itemList as List<ItemDisplayData>,
-                    ____onItemListChanged as Action);
+                Patch.UpdateItemListPrefix(parentSortAndFilter, filterTogGroup,
+                    equipFilterTogGroup, itemList,
+                    onItemListChanged);
             };
         }
 
@@ -250,25 +243,92 @@ public class ThirdFilterHelper
         viewport.position = places.NewViewportPos;
         viewport.sizeDelta = places.NewViewportSize;
 
-        if (places.ExtraFilterPos != null)
+        var readingStateFilter = parentTrans.Find("ReadingStateFilter");
+        if (places.ExtraFilterPos.HasValue && readingStateFilter != null)
         {
-            var extraFilterObj = parentTrans.Find("ThirdFilter");
-            if (extraFilterObj == null)
+            readingStateFilter.position = places.ExtraFilterPos.Value;
+        }
+
+        return filterObj.GetComponent<CToggleGroup>();
+    }
+    
+    public static CToggleGroup EnsureReadingStateFilter(ItemSortAndFilterType uiType, ItemSortAndFilter parentSortAndFilter)
+    {
+        SecondFilterHelper.SecondFilterPlaces.TryGetValue(uiType, out var places);
+        if (places?.ExtraFilterPos == null) return null;
+
+        var parentTrans = parentSortAndFilter.transform;
+        var viewport = parentTrans.parent.GetComponent<CScrollRect>().Viewport;
+        var filterObj = parentTrans.Find("ReadingStateFilter");
+
+        if (filterObj == null)
+        {
+            filterObj = Object.Instantiate(parentTrans.Find("Filter"), parentTrans, false);
+            filterObj.transform.name = "ReadingStateFilter";
+            filterObj.position = places.ExtraFilterPos.Value;
+
+            var toggleGroup = filterObj.GetComponent<CToggleGroup>();
+            // var originalToggles = filterObj.GetComponentsInChildren<CToggle>();
+
+            var template = filterObj.GetChild(0);
+            
+            var plist = new Dictionary<int, string> {
+                { 10001, "未" }, { 10002, "阅" }
+            };
+
+            foreach (var thirdFilterInfo in plist)
             {
-                extraFilterObj = Object.Instantiate(parentTrans.Find("Filter"), parentTrans, false);
-                extraFilterObj.transform.name = "ThirdFilter";
-                extraFilterObj.position = places.SecondFilterPos;
-                var toggleGroup = extraFilterObj.GetComponent<CToggleGroup>();
-                var template = filterObj.GetChild(0);
-                
-                var plist = new List<string>() {
-                    "未", "阅"
-                };
-                
-                var filterComponent = parentSortAndFilter.gameObject.AddComponent<ReadStateFilterComponent>();
-                filterComponent.ToggleGroup = toggleGroup;
+                var obj = Object.Instantiate(template, filterObj, false);
+                var cToggle = obj.GetComponent<CToggle>();
+                cToggle.Key = thirdFilterInfo.Key;
+                cToggle.isOn = false;
+                obj.GetComponentInChildren<TextMeshProUGUI>().text = thirdFilterInfo.Value;
+                toggleGroup.Add(cToggle);
+                obj.name = thirdFilterInfo.Value;
+            }
+
+            toggleGroup.InitPreOnToggle();
+
+            toggleGroup.OnActiveToggleChange = (_, _) =>
+            {
+                var itemList = parentSortAndFilter._itemList;
+                var filterTogGroup = parentSortAndFilter._filterTogGroup;
+                var equipFilterTogGroup = parentSortAndFilter._equipFilterTogGroup;
+                var onItemListChanged = parentSortAndFilter._onItemListChanged;
+
+                Patch.UpdateItemListPrefix(parentSortAndFilter, filterTogGroup,
+                    equipFilterTogGroup, itemList,
+                    onItemListChanged);
+            };
+        }
+
+        // 只显示适用的按钮
+        for (int i = 0; i < filterObj.childCount; i++)
+        {
+            var toggle = filterObj.GetChild(i).GetComponent<CToggle>();
+            if (toggle.Key == 0 || toggle.Key == 10001 || toggle.Key == 10002)
+            {
+                toggle.gameObject.SetActive(true);
+            }
+            else
+            {
+                // Debug.Log($"{toggle.gameObject.name} {toggle.Key} not active");
+                toggle.gameObject.SetActive(false);
             }
         }
+
+        filterObj.gameObject.SetActive(true);
+
+        if (places.OriginalViewportPos == null || places.OriginalViewportSize == null)
+        {
+            places.OriginalViewportPos = viewport.position;
+            places.OriginalViewportSize = viewport.sizeDelta;
+        }
+
+        filterObj.transform.position = places.SecondFilterPos;
+
+        viewport.position = places.NewViewportPos;
+        viewport.sizeDelta = places.NewViewportSize;
 
         return filterObj.GetComponent<CToggleGroup>();
     }

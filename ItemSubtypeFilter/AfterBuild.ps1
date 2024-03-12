@@ -20,6 +20,5 @@ $Dll = "$TargetDir${ModName}.dll"
 & "../../../MynahModConfigGenerator/bin/Debug/net6.0/MynahModConfigGenerator.exe" $ConfigLuaPath $Dll
 
 Copy-Item $Dll "$ModPath\Plugins" -Verbose
-Copy-Item Config.lua $ModPath -Verbose
 
 Write-Output "copy over"
