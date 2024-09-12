@@ -14,6 +14,17 @@ namespace MynahModConfigGenerator
 {
     static class Program
     {
+        const string FrontendPlugins = "FrontendPlugins";
+        const string BackendPlugins = "BackendPlugins";
+        const string Dependencies = "Dependencies";
+        const string DefaultSettings = "DefaultSettings";
+        readonly static Dictionary<string, long> KnownDependencies = new()
+        {
+            ["MynahBaseModBase"] = 2878665107,
+            ["MynahBaseModBackend"] = 2878665107,
+            ["MynahBaseModFrontend"] = 2878665107,
+        };
+
         static Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 
         public static void LoadAssemblyReferences(Assembly selectedAssembly)
@@ -141,12 +152,23 @@ namespace MynahModConfigGenerator
                 Console.WriteLine(table.ToJson());
 
                 var data = JsonConvert.DeserializeObject<JObject>(table.ToJson());
-                data!.TryGetValue("DefaultSettings", out JToken token);
-
+                data!.TryGetValue(DefaultSettings, out JToken token);
                 var settings = (token) as JArray ?? new JArray();
                 settings.Clear();
 
+                data!.TryGetValue(Dependencies, out token);
+                var dependencies = (token) as JArray ?? new JArray();
+
+                Dictionary<string, JArray> plugins = new();
+
+                data!.TryGetValue(FrontendPlugins, out token);
+                plugins.Add(FrontendPlugins, (token) as JArray ?? new JArray());
+
+                data!.TryGetValue(BackendPlugins, out token);
+                plugins.Add(BackendPlugins, (token) as JArray ?? new JArray());
+                
                 var keyList = new HashSet<string>();
+                var deps = new HashSet<long>();
                 foreach (var assembly in modAssemblies)
                 {
                     foreach (var type in assembly.ExportedTypes)
@@ -173,9 +195,37 @@ namespace MynahModConfigGenerator
                             keyList.Add(key);
                         }
                     }
+
+                    // 检查Mod的前后端属性
+                    string catagory = GeussPluginCatagory(assembly);
+                    if (plugins.TryGetValue(catagory, out var list))
+                    {
+                        string name = Path.GetFileName(assembly.Location);
+                        if (!list.Contains(name))
+                        {
+                            list.Add(name);
+                        }
+                    }
+
+                    // 检查Mod的依赖项
+                    IEnumerable<long> thisDeps = ExtractDependencies(assembly);
+                    deps.UnionWith(thisDeps);
                 }
 
-                data["DefaultSettings"] = settings;
+                foreach (var dep in deps)
+                {
+                    if (!dependencies.Contains(dep))
+                    {
+                        dependencies.Add(dep);
+                    }
+                }
+
+                data[DefaultSettings] = settings;
+                data[Dependencies] = dependencies;
+                foreach (var (catagory, pluginList) in plugins)
+                {
+                    data[catagory] = pluginList;
+                }
 
                 var s = JObjToDict(data);
 
@@ -184,6 +234,35 @@ namespace MynahModConfigGenerator
 
                 return result;
             }
+        }
+
+        static string GeussPluginCatagory(Assembly assembly)
+        {
+            foreach (var reference in assembly.GetReferencedAssemblies())
+            {
+                switch (reference.Name)
+                {
+                    case "GameData":
+                        return "BackendPlugins";
+                    case "Assembly-CSharp":
+                        return "FrontendPlugins";
+                }
+            }
+            return "";
+        }
+
+        static HashSet<long> ExtractDependencies(Assembly assembly)
+        {
+            HashSet<long> deps = new();
+            foreach (var reference in assembly.GetReferencedAssemblies())
+            {
+                if (KnownDependencies.TryGetValue(reference.Name, out var id))
+                {
+                    deps.Add(id);
+                }
+            }
+
+            return deps;
         }
 
         static Dictionary<string, object> JObjToDict(JObject obj)

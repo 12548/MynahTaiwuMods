@@ -1,0 +1,9 @@
+﻿<Project>
+    <PropertyGroup>
+        <ConfigGenerator_TaskFolder Condition="'$(MSBuildRuntimeType)' == 'Core'">net6.0</ConfigGenerator_TaskFolder>
+        <ConfigGenerator_TaskFolder Condition="'$(MSBuildRuntimeType)' != 'Core'">net48</ConfigGenerator_TaskFolder>
+        <ConfigGenerator_TaskAssembly>$(MSBuildThisFileDirectory)..\lib\$(ConfigGenerator_TaskFolder)\$(MSBuildThisFileName).dll</ConfigGenerator_TaskAssembly>
+    </PropertyGroup>
+
+    <UsingTask TaskName="GenerateTaiwuConfigTask" AssemblyFile="$(ConfigGenerator_TaskAssembly)" />
+</Project>
