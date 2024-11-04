@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net48;net6.0</TargetFrameworks>
+        <DebugType>embedded</DebugType>
+        
+        <PackageId>MynahModConfigGenerator.MSBuild</PackageId>
+        <Version>1.0.0</Version>
+        <Description>MSBuild integration for MynahModConfigGenerator</Description>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
+        <BaseModPrefix>..\MynahTaiwuMods\MynahBaseMod</BaseModPrefix>
+
+        <!-- 根据目标平台确定前/后端 -->
+        <PluginTarget Condition="'$(TargetFramework)' == 'net48'">Frontend</PluginTarget>
+        <PluginTarget Condition="'$(TargetFramework)' == 'net6.0'">Backend</PluginTarget>
+
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyBaseMod;CopyGenerator</TargetsForTfmSpecificBuildOutput>
+        <NoWarn>$(NoWarn);MSB3270</NoWarn> <!-- 忽略编译结果为AnyCPU架构警告，其只通过shell调用ConfigGenerator可执行文件 -->
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" ExcludeAssets="Runtime" />
+        <PackageReference Include="NuGet.Build.Tasks.Pack" Version="6.11.0" PrivateAssets="all" ExcludeAssets="Runtime" />
+
+        <!-- 引用对应前/后端的BaseMod -->
+        <ProjectReference Include="..\MynahBaseModBase\MynahBaseModBase.csproj" PrivateAssets="all" />
+        <ProjectReference Include="..\MynahBaseMod$(PluginTarget)\MynahBaseMod$(PluginTarget).csproj" PrivateAssets="all" />
+      
+        <!-- 将ConfigGenerator添加引用，触发生成可执行文件 -->
+        <ProjectReference Include="..\MynahModConfigGenerator\MynahModConfigGenerator.csproj" PrivateAssets="all" Condition="'$(TargetFramework)' == 'net6.0'" />
+    </ItemGroup>
+
+    <!-- 将相关游戏dll库进行裁剪形成仅供引用的stub文件，随ConfigGenerator一起发布 -->  
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+        <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+      
+        <!-- 将相关游戏dll库进行裁剪，删除具体逻辑，形成仅供引用的stub文件 -->
+        <Reference Include="TaiwuModdingLib" HintPath="$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll" Publicize="true" Strip="true" />
+        <Reference Include="Assembly-CSharp" HintPath="$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\Assembly-CSharp.dll" Publicize="true" Strip="true" />
+        <Reference Include="GameData" HintPath="$(TAIWU_PATH)\Backend\GameData.dll" Publicize="true" Strip="true" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include=".\readme.md" Pack="true" PackagePath="" />
+        <None Include="..\LICENSE.txt" Pack="true" PackagePath="" />
+      
+        <!-- 定义GenerateTaiwuConfigTask，引入NuGet包的项目会自动引入该配置文件 -->
+        <Content Include="$(MSBuildProjectName).props" Pack="true" PackagePath="build" />
+    </ItemGroup>
+
+    <!-- 将BaseMod添加到包中，方便其他项目引用 -->
+    <Target Name="CopyBaseMod" DependsOnTargets="ResolveReferences">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'MynahBaseModBase'" />
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'MynahBaseMod$(PluginTarget)'" />
+        </ItemGroup>
+    </Target>
+
+    <!-- 打包ConfigGenerato至tools路径，供GenerateTaiwuConfigTask调用 -->
+    <Target Name="CopyGenerator" DependsOnTargets="ResolveReferences" Condition="'$(TargetFramework)' == 'net6.0'">
+        <ItemGroup>
+          <!-- TODO: 消除文件重复添加冲突导致的警告信息 -->
+          <!-- 用strip后的游戏stub替换游戏dll -->
+          <TfmSpecificPackageFile Include="$(IntermediateOutputPath)\publicized\*.dll" PackagePath="tools" />
+          <TfmSpecificPackageFile Include="..\MynahModConfigGenerator\$(OutputPath)\*" PackagePath="tools" />
+        </ItemGroup>
+    </Target>
+  
+</Project>
