@@ -39,8 +39,16 @@ public class Patch
         __instance.OutputItemList.Clear();
         if (__instance.transform == null) return true;
 
+        // 特殊筛选使用原版
+        // ReSharper disable once RedundantLogicalConditionalExpressionOperand
+        if (false
+            || __instance._specialBreakFilterTogGroup.gameObject.activeSelf
+            || __instance._clothingWeaveFilterTogGroup.gameObject.activeSelf
+            || __instance._poisonFilterTogGroup.gameObject.activeSelf
+           ) return true;
+
         var items = new List<ItemDisplayData>(____itemList);
-        
+
         // 阅读状态筛选
         var readingStateFilterTransform = __instance.transform.Find("ReadingStateFilter");
         if (readingStateFilterTransform != null && readingStateFilterTransform.gameObject.activeSelf)
@@ -52,7 +60,8 @@ public class Patch
             if (key == 10001)
             {
                 items = Enumerable.ToList(Enumerable.Where(items, (_, index) => !readingStates[index]));
-            } else if (key == 10002)
+            }
+            else if (key == 10002)
             {
                 items = Enumerable.ToList(Enumerable.Where(items, (_, index) => readingStates[index]));
             }
@@ -183,19 +192,20 @@ public class Patch
             // 否则不分
             __instance.OutputItemList.AddRange(items);
         }
+        
+        if (__instance.SetItemInteraction != null)
+        {
+            foreach (ItemDisplayData outputItem in __instance.OutputItemList)
+                outputItem.Interactable = __instance.SetItemInteraction(outputItem);
+        }
 
-        bool sortEnabled = __instance.SortEnabled;
-        if (sortEnabled)
+        if (__instance.SortEnabled)
         {
             __instance.OutputItemList.Sort(
                 __instance.ItemCompare);
         }
 
-        Action onItemListChanged = ____onItemListChanged;
-        if (onItemListChanged != null)
-        {
-            onItemListChanged();
-        }
+        ____onItemListChanged?.Invoke();
 
         // 完全替换原函数
         return false;
@@ -253,7 +263,7 @@ public class Patch
         if (!ModEntry.BookThirdFilter) return;
 
         ThirdFilterType thirdFilterType;
-        
+
         var sortAndFilterType = SecondFilterHelper.GetItemSortAndFilterType(__instance);
 
         switch (togNew.gameObject.name)
@@ -275,7 +285,7 @@ public class Patch
                         if (find != null) find.position = places.ExtraFilterPos.Value;
                     }
                 }
-                
+
                 ThirdFilterHelper.TurnOffThirdFilter(SecondFilterHelper.GetItemSortAndFilterType(__instance),
                     __instance);
                 UpdateItemListPrefix(__instance, ____filterTogGroup, ____equipFilterTogGroup, ____itemList,
@@ -390,7 +400,7 @@ public class Patch
             equipTypeFilter.gameObject.SetActive(true);
             medicineTypeFilter.gameObject.SetActive(false);
             if (readingStateFilter != null) readingStateFilter.gameObject.SetActive(false);
-            
+
             if (equipTypeFilter.transform.Find("Subtype701") == null)
             {
                 // 未初始化，第一次初始化

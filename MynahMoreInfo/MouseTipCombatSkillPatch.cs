@@ -19,40 +19,38 @@ public static class MouseTipCombatSkillPatch
     public static void Postfix(MouseTipCombatSkill __instance)
     {
         if (!ModEntry.ShowCombatSkillSpecialEffect) return;
-        if (__instance != null)
+        if (__instance == null) return;
+        var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
+
+        var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
+
+        if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
         {
-            var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
-
-            var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
-
-            if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
-            // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
-            var flag = combatSkillDisplayData.EffectType != -1;
-
-            specialEffectGameObject.SetActive(true);
-            if (true) // flag
-            {
-                var flag4 = combatSkillDisplayData.EffectType == 0;
-                ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
-            }
-
-            ShowCastTime(__instance, __instance._configData);
-
-            if (ModEntry.ShowLearningProgress)
-            {
-                var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                var desc = $"{__instance._configData.Desc}\n{s}";
-                MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
-            }
-
-            var element = __instance.Element;
-            element?.ShowAfterRefresh();
+            return;
         }
+
+        CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
+        // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
+        var flag = combatSkillDisplayData.EffectType != -1;
+
+        specialEffectGameObject.SetActive(true);
+        if (true) // flag
+        {
+            var flag4 = combatSkillDisplayData.EffectType == 0;
+            ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
+        }
+
+        ShowCastTime(__instance, __instance._configData);
+
+        if (ModEntry.ShowLearningProgress)
+        {
+            var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
+            var desc = $"{__instance._configData.Desc}\n{s}";
+            MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
+        }
+
+        var element = __instance.Element;
+        element?.ShowAfterRefresh();
     }
 
     [HarmonyPatch(typeof(MouseTipCombatSkill), "UpdateOnlyTemplateData")]

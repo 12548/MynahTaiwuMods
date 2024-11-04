@@ -25,6 +25,13 @@ public class MouseTipBookPatch
         if (__instance == null) return;
         if (argsBox == null) return;
         
+        var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
+        if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        
         // __instance.GetComponent<RectTransform>().SetWidth(790);
         // __instance.transform.Find("SeparateLine").GetComponent<RectTransform>().SetWidth(750);
 
