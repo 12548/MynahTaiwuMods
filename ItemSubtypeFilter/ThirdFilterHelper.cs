@@ -80,11 +80,11 @@ public class ThirdFilterHelper
             {
                 ItemSortAndFilterType.Warehouse,
                 new ExtraFilterPlace(
-                    new Vector3(-4.02f, 1.02f, 240f),
+                    new Vector3(-3.7f, 0.6f, 240f),
                     new Vector2(0, -140),
-                    new Vector3(-5.2f, 1.8f, 240f),
+                    new Vector3(-5.2f, 1.39f, 240f),
                     doubleLine: true,
-                    extraFilterPos: new Vector3(-6.65f, 1.43f, 240f)
+                    extraFilterPos: new Vector3(-6.65f, 1.0f, 240f)
                 )
             },
             {
@@ -159,7 +159,7 @@ public class ThirdFilterHelper
         if (places == null) return null;
 
         var parentTrans = parentSortAndFilter.transform;
-        var viewport = parentTrans.parent.GetComponent<CScrollRect>().Viewport;
+        var viewport = parentTrans.parent.GetComponent<CScrollRect>()?.Viewport ?? parentTrans.parent.GetComponent<LoopVerticalScrollRect>().viewport;
         var filterObj = parentTrans.Find("ThirdFilter");
 
         if (filterObj == null)
@@ -258,7 +258,7 @@ public class ThirdFilterHelper
         if (places?.ExtraFilterPos == null) return null;
 
         var parentTrans = parentSortAndFilter.transform;
-        var viewport = parentTrans.parent.GetComponent<CScrollRect>().Viewport;
+        var viewport = parentTrans.parent.GetComponent<CScrollRect>()?.Viewport ?? parentTrans.parent.GetComponent<LoopVerticalScrollRect>().viewport;
         var filterObj = parentTrans.Find("ReadingStateFilter");
 
         if (filterObj == null)
@@ -337,9 +337,9 @@ public class ThirdFilterHelper
     {
         if (uiType == null) return;
         var parentTrans = parentSortAndFilter.transform;
-        var viewport = parentTrans.parent.GetComponent<CScrollRect>().Viewport;
+        var viewport = parentTrans.parent.GetComponent<CScrollRect>()?.Viewport ?? parentTrans.parent.GetComponent<LoopVerticalScrollRect>().viewport;
         var filterObj = parentTrans.Find("ThirdFilter");
-        if (filterObj == null) return;
+        if (filterObj is null) return;
         if (!filterObj.gameObject.activeSelf) return; // 已经关了的不要再关一遍
 
         filterObj.gameObject.SetActive(false);

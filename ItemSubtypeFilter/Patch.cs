@@ -8,6 +8,7 @@ using GameData.Domains.Item.Display;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Enumerable = System.Linq.Enumerable;
 using Object = UnityEngine.Object;
 
@@ -232,6 +233,13 @@ public class Patch
     {
         if (____filterTogInitializing) return;
         var currentTogKey = togNew.Key;
+        
+        Debug.Log($"ItemSortAndFilter.OnItemFilterTogChangePostfix: {currentTogKey}");
+
+        if (__instance.transform.parent.GetComponent<CScrollRect>() is null && __instance.transform.parent.GetComponent<LoopVerticalScrollRect>() is null) {
+            Debug.Log("ItemSortAndFilter.OnItemFilterTogChangePostfix: CScrollRect or LoopVerticalScrollRect not found.");
+            return;
+        }
 
         ThirdFilterHelper.TurnOffThirdFilter(SecondFilterHelper.GetItemSortAndFilterType(__instance),
             __instance);
@@ -367,12 +375,12 @@ public class Patch
 
         var places = SecondFilterHelper.SecondFilterPlaces[sortAndFilterType.Value];
         if (places == null) return true;
-
-        var viewport = parentTransform.GetComponent<CScrollRect>().Viewport;
+        
+        var viewport = parentTransform.GetComponent<CScrollRect>()?.Viewport ?? parentTransform.GetComponent<LoopVerticalScrollRect>().viewport;
         var equipTypeFilter = sortAndFilter.CGet<CToggleGroup>("EquipTypeFilter");
         var medicineTypeFilter = sortAndFilter.CGet<CToggleGroup>("MedicineTypeFilter");
         var readingStateFilter = sortAndFilter.transform.Find("ReadingStateFilter");
-        if (viewport == null || equipTypeFilter == null) return true;
+        if (!viewport || !equipTypeFilter) return true;
 
         var itemFilterType = (ItemSortAndFilter.ItemFilterType)currentTogKey;
 

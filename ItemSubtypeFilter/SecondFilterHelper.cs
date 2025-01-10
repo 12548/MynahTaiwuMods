@@ -27,10 +27,10 @@ public static class SecondFilterHelper
             {
                 ItemSortAndFilterType.Warehouse,
                 new ExtraFilterPlace(
-                    new Vector3(-4.02f, 1.39f, 240f),
+                    new Vector3(-3.7f, 1.00f, 240f),
                     new Vector2(0, -90),
-                    new Vector3(-6.65f, 1.8f, 240f),
-                    extraFilterPos: new Vector3(-5.25f, 1.8f, 240f)
+                    new Vector3(-6.65f, 1.39f, 240f),
+                    extraFilterPos: new Vector3(-5.25f, 1.39f, 240f)
                 )
             },
             {
@@ -178,14 +178,22 @@ public static class SecondFilterHelper
 
         // 多选物品： UI_MultiSelectItem/PopupWindowBase/ElementsRoot/InventoryItemScroll
         // 仓库： UI_Warehouse/MainWindow/Warehouse/ScrollBack/WarehouseItemScroll
-
-        if (parentTransform.parent.parent.parent.parent.name == "UI_Warehouse")
+        
+        // 新版：
+        // UI_Warehouse/MainWindow/Warehouse/Layout/ScrollBack/WarehouseItemScroll/ItemSortAndFilter
+        
+        // 新新版：：
+        // UI_Warehouse/MainWindow/Warehouse/Layout/ScrollBack/WarehouseItemGroupedScroll/ItemSortAndFilter
+        // UI_Warehouse/MainWindow/Inventory/ScrollBack/InventoryItemScroll/ItemSortAndFilter
+        if (parentTransform.parent.parent.parent.parent.name == "UI_Warehouse"
+             || parentTransform.parent.parent.parent.parent.parent.name == "UI_Warehouse")
         {
             switch (parentTransform.name)
             {
                 case "InventoryItemScroll":
                     return ItemSortAndFilterType.WarehouseInventory;
                 case "WarehouseItemScroll":
+                case "WarehouseItemGroupedScroll":
                     return ItemSortAndFilterType.Warehouse;
             }
         }
