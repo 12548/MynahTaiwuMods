@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Config;
 using CSharpDiff.Converters;
 using CSharpDiff.Diffs;
+using Game.Views.MouseTips;
 using GameData.Domains.CombatSkill;
 using HarmonyLib;
 using MynahMoreInfo.Components;
 using TMPro;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MynahMoreInfo;
 
@@ -15,190 +18,261 @@ namespace MynahMoreInfo;
 public static class MouseTipCombatSkillPatch
 {
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(MouseTipCombatSkill), "RefreshCombatSkillPanel")]
-    public static void Postfix(MouseTipCombatSkill __instance)
+    [HarmonyPatch(typeof(TooltipCombatSkill), nameof(TooltipCombatSkill.RefreshSpecialEffect))]
+    public static void Postfix(TooltipCombatSkill __instance)
     {
-        if (!ModEntry.ShowCombatSkillSpecialEffect) return;
-        if (__instance == null) return;
-        var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
-
-        var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
-
-        if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
-        {
-            return;
-        }
-
-        CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
-        // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
-        var flag = combatSkillDisplayData.EffectType != -1;
-
-        specialEffectGameObject.SetActive(true);
-        if (true) // flag
-        {
-            var flag4 = combatSkillDisplayData.EffectType == 0;
-            ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
-        }
-
-        ShowCastTime(__instance, __instance._configData);
-
-        if (ModEntry.ShowLearningProgress)
-        {
-            var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-            var desc = $"{__instance._configData.Desc}\n{s}";
-            MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
-        }
-
-        var element = __instance.Element;
-        element?.ShowAfterRefresh();
-    }
-
-    [HarmonyPatch(typeof(MouseTipCombatSkill), "UpdateOnlyTemplateData")]
-    [HarmonyPostfix]
-    public static void UpdateOnlyTemplateDataPostfix(MouseTipCombatSkill __instance)
-    {
-        // if (!ShowCombatSkillSpecialEffect) return;
-        // __instance.CGet<GameObject>("DirectEffectTitle").SetActive(true);
-        // __instance.CGet<GameObject>("DirectDesc").SetActive(true);
-        // __instance.CGet<GameObject>("ReverseEffectTitle").SetActive(true);
-        // __instance.CGet<GameObject>("ReverseDesc").SetActive(true);
-        //
-        // __instance.CGet<TextMeshProUGUI>("DirectEffectDesc").text =
-        //     ("     " + SpecialEffect.Instance[____configData.DirectEffectID].Desc[0]);
-        // __instance.CGet<TextMeshProUGUI>("ReverseEffectDesc").text =
-        //     ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
+        // sbyte effectType = __instance._combatSkillDisplayData.EffectType;
+        // int? nullable = effectType.HasValue ? new int?((int) effectType.GetValueOrDefault()) : new int();
+        // bool flag1 = !(nullable.GetValueOrDefault() == num & nullable.HasValue);
         
-        var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
-        ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, false, false, true);
-        ShowCastTime(__instance, __instance._configData);
-    }
-
-    public static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
-        bool active, bool activeDirection, bool doubleActive = false)
-    {
-        specialEffectObj.transform.Find("DirectEffectTitle").gameObject.SetActive(true); // flag4
-        var directDesc = specialEffectObj.transform.Find("DirectDesc");
-        directDesc.gameObject.SetActive(true);
-        specialEffectObj.transform.Find("ReverseEffectTitle").gameObject.SetActive(true); // !flag4
-        var reverseDesc = specialEffectObj.transform.Find("ReverseDesc");
-        reverseDesc.gameObject.SetActive(true);
-
-        var template1 = active && activeDirection ? "     当前：{0}" : "     如果正练：{0}".SetColor("lightgrey");
-        var template2 = active && !activeDirection ? "     当前：{0}" : "     如果逆练：{0}".SetColor("lightgrey");
-
-        if (doubleActive)
-        {
-            template1 = "{0}";
-            template2 = "{0}";
-        }
-
-        var directText = CommonUtils.GetSpecialEffectDesc(combatSkillItem.TemplateId, true);
-        var reverseText = CommonUtils.GetSpecialEffectDesc(combatSkillItem.TemplateId, false);
-        // var directText = SpecialEffect
-        //     .Instance[combatSkillItem.DirectEffectID]
-        //     .Desc[0];
-        // var reverseText = SpecialEffect
-        //     .Instance[combatSkillItem.ReverseEffectID]
-        //     .Desc[0];
-
-        var specialEffectDisplayer = specialEffectObj.GetOrAddComponent<SpecialEffectDisplayer>();
-
+        string specialEffectDesc1 = __instance.rightDirectEffectDescText.text;
+        string specialEffectDesc2 = __instance.rightReverseEffectDescText.text;
+        
         if (ModEntry.HintEffectDiff > 0)
         {
             var diff = new Diff();
-
+        
             var d1 = diff
-                .diff(directText, reverseText)
+                .diff(specialEffectDesc1, specialEffectDesc2)
                 .Where(it => !(it.removed ?? false));
             var d2 = diff
-                .diff(reverseText, directText)
+                .diff(specialEffectDesc2, specialEffectDesc1)
                 .Where(it => !(it.removed ?? false));
-
+        
             var dt1 = DiffConvert.ToXml(d2.ToList())
                 .Replace("<ins>", "<color=\"red\">")
                 .Replace("</ins>", "</color>");
-
+        
             var rt1 = DiffConvert.ToXml(d1.ToList())
                 .Replace("<ins>", "<color=\"red\">")
                 .Replace("</ins>", "</color>");
-
-            specialEffectDisplayer.directEffect1 = string.Format(template1, dt1);
-            specialEffectDisplayer.reverseEffect1 = string.Format(template2, rt1);
-        }
-
-        var directEffectStr = string.Format(template1, directText);
-        specialEffectDisplayer.directEffect = directEffectStr;
         
-        // UpdateSpecialEffectText(specialEffectObj.transform.Find("DirectDesc/DirectEffectDesc")
-        //     .GetComponent<TextMeshProUGUI>(), directEffectStr);
-
-        var reverseEffectStr = string.Format(template2, reverseText);
-        specialEffectDisplayer.reverseEffect = reverseEffectStr;
-        // UpdateSpecialEffectText(specialEffectObj.transform.Find("ReverseDesc/ReverseEffectDesc")
-        //     .GetComponent<TextMeshProUGUI>(), reverseEffectStr);
-
-        specialEffectDisplayer.enabled = true;
-        specialEffectDisplayer.UpdateText();
-    }
-
-
-    public static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
-    {
-        // effectStr = "     " + effectStr;
-        var x = effectText.rectTransform.sizeDelta.x;
-        var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
-        effectText.rectTransform.sizeDelta = preferredValues.SetX(x);
-        effectText.text = effectStr;
-    }
-
-
-    public static void ShowCastTime(MouseTipCombatSkill __instance,
-        CombatSkillItem ____configData)
-    {
-        if (!ModEntry.ShowCastTime) return;
-
-        Debug.Log($"{____configData.Name} - {____configData.PrepareTotalProgress}");
-
-        {
-            var typeTrans = __instance.transform.Find("DescriptionHolder/Type");
-            var secondTypeTrans = typeTrans.Find("Type");
-
-            var adtName = "PrepareTotalProgressTips";
-            var transform = typeTrans.Find(adtName);
-            GameObject adt;
-            if (transform == null)
-            {
-                adt = Object.Instantiate(secondTypeTrans.gameObject, typeTrans, false);
-                adt.name = adtName;
-            }
-            else
-            {
-                adt = transform.gameObject;
-            }
-
-            if (____configData.PrepareTotalProgress > 0)
-            {
-                // var s = $"基础施展时间: {____configData.PrepareTotalProgress}\n";
-
-                adt.transform.Find("TextHolder/Tips").GetComponent<TextMeshProUGUI>().text = "基础施展时间";
-                adt.transform.Find("TextHolder/TypeIcon").gameObject.SetActive(false);
-                adt.transform.Find("TextHolder/Type").GetComponent<TextMeshProUGUI>().text =
-                    $"{(____configData.PrepareTotalProgress / 7200.0):0.##}秒";
-                adt.SetActive(true);
-            }
-            else
-            {
-                adt.SetActive(false);
-            }
+            __instance.rightDirectEffectDescText.text = dt1;
+            __instance.rightReverseEffectDescText.text = rt1;
         }
     }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TooltipCombatSkill), nameof(TooltipCombatSkill.RefreshDirectionEffectConfigOnly))]
+    public static void RefreshDirectionEffectConfigOnlyPostfix(TooltipCombatSkill __instance)
+    {
+        string specialEffectDesc1 = __instance.rightDirectEffectDescText.text;
+        string specialEffectDesc2 = __instance.rightReverseEffectDescText.text;
+        
+        if (ModEntry.HintEffectDiff > 0)
+        {
+            var diff = new Diff();
+        
+            var d1 = diff
+                .diff(specialEffectDesc1, specialEffectDesc2)
+                .Where(it => !(it.removed ?? false));
+            var d2 = diff
+                .diff(specialEffectDesc2, specialEffectDesc1)
+                .Where(it => !(it.removed ?? false));
+        
+            var dt1 = DiffConvert.ToXml(d2.ToList())
+                .Replace("<ins>", "<color=\"red\">")
+                .Replace("</ins>", "</color>");
+        
+            var rt1 = DiffConvert.ToXml(d1.ToList())
+                .Replace("<ins>", "<color=\"red\">")
+                .Replace("</ins>", "</color>");
+        
+            __instance.rightDirectEffectDescText.text = dt1;
+            __instance.rightReverseEffectDescText.text = rt1;
+        }
+        // sbyte effectType = __instance._combatSkillDisplayData.EffectType;
+        // int? nullable = effectType.HasValue ? new int?((int) effectType.GetValueOrDefault()) : new int();
+        // bool flag1 = !(nullable.GetValueOrDefault() == num & nullable.HasValue);
+    }
 
-
+// [HarmonyPostfix]
+    // [HarmonyPatch(typeof(MouseTipCombatSkill), "RefreshCombatSkillPanel")]
+    // public static void Postfix(MouseTipCombatSkill __instance)
+    // {
+    //     if (!ModEntry.ShowCombatSkillSpecialEffect) return;
+    //     if (__instance == null) return;
+    //     var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
+    //
+    //     var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
+    //
+    //     if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
+    //     {
+    //         return;
+    //     }
+    //
+    //     CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
+    //     // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
+    //     var flag = combatSkillDisplayData.EffectType != -1;
+    //
+    //     specialEffectGameObject.SetActive(true);
+    //     if (true) // flag
+    //     {
+    //         var flag4 = combatSkillDisplayData.EffectType == 0;
+    //         ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
+    //     }
+    //
+    //     ShowCastTime(__instance, __instance._configData);
+    //
+    //     if (ModEntry.ShowLearningProgress)
+    //     {
+    //         var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
+    //         var desc = $"{__instance._configData.Desc}\n{s}";
+    //         MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
+    //     }
+    //
+    //     var element = __instance.Element;
+    //     element?.ShowAfterRefresh();
+    // }
+    //
+    // [HarmonyPatch(typeof(MouseTipCombatSkill), "UpdateOnlyTemplateData")]
+    // [HarmonyPostfix]
+    // public static void UpdateOnlyTemplateDataPostfix(MouseTipCombatSkill __instance)
+    // {
+    //     // if (!ShowCombatSkillSpecialEffect) return;
+    //     // __instance.CGet<GameObject>("DirectEffectTitle").SetActive(true);
+    //     // __instance.CGet<GameObject>("DirectDesc").SetActive(true);
+    //     // __instance.CGet<GameObject>("ReverseEffectTitle").SetActive(true);
+    //     // __instance.CGet<GameObject>("ReverseDesc").SetActive(true);
+    //     //
+    //     // __instance.CGet<TextMeshProUGUI>("DirectEffectDesc").text =
+    //     //     ("     " + SpecialEffect.Instance[____configData.DirectEffectID].Desc[0]);
+    //     // __instance.CGet<TextMeshProUGUI>("ReverseEffectDesc").text =
+    //     //     ("     " + SpecialEffect.Instance[____configData.ReverseEffectID].Desc[0]);
+    //     
+    //     var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
+    //     ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, false, false, true);
+    //     ShowCastTime(__instance, __instance._configData);
+    // }
+    //
+    // public static void ShowAllSpecialEffects(GameObject specialEffectObj, CombatSkillItem combatSkillItem,
+    //     bool active, bool activeDirection, bool doubleActive = false)
+    // {
+    //     specialEffectObj.transform.Find("DirectEffectTitle").gameObject.SetActive(true); // flag4
+    //     var directDesc = specialEffectObj.transform.Find("DirectDesc");
+    //     directDesc.gameObject.SetActive(true);
+    //     specialEffectObj.transform.Find("ReverseEffectTitle").gameObject.SetActive(true); // !flag4
+    //     var reverseDesc = specialEffectObj.transform.Find("ReverseDesc");
+    //     reverseDesc.gameObject.SetActive(true);
+    //
+    //     var template1 = active && activeDirection ? "     当前：{0}" : "     如果正练：{0}".SetColor("lightgrey");
+    //     var template2 = active && !activeDirection ? "     当前：{0}" : "     如果逆练：{0}".SetColor("lightgrey");
+    //
+    //     if (doubleActive)
+    //     {
+    //         template1 = "{0}";
+    //         template2 = "{0}";
+    //     }
+    //
+    //     var directText = CommonUtils.GetSpecialEffectDesc(combatSkillItem.TemplateId, true);
+    //     var reverseText = CommonUtils.GetSpecialEffectDesc(combatSkillItem.TemplateId, false);
+    //     // var directText = SpecialEffect
+    //     //     .Instance[combatSkillItem.DirectEffectID]
+    //     //     .Desc[0];
+    //     // var reverseText = SpecialEffect
+    //     //     .Instance[combatSkillItem.ReverseEffectID]
+    //     //     .Desc[0];
+    //
+    //     var specialEffectDisplayer = specialEffectObj.GetOrAddComponent<SpecialEffectDisplayer>();
+    //
+    //     if (ModEntry.HintEffectDiff > 0)
+    //     {
+    //         var diff = new Diff();
+    //
+    //         var d1 = diff
+    //             .diff(directText, reverseText)
+    //             .Where(it => !(it.removed ?? false));
+    //         var d2 = diff
+    //             .diff(reverseText, directText)
+    //             .Where(it => !(it.removed ?? false));
+    //
+    //         var dt1 = DiffConvert.ToXml(d2.ToList())
+    //             .Replace("<ins>", "<color=\"red\">")
+    //             .Replace("</ins>", "</color>");
+    //
+    //         var rt1 = DiffConvert.ToXml(d1.ToList())
+    //             .Replace("<ins>", "<color=\"red\">")
+    //             .Replace("</ins>", "</color>");
+    //
+    //         specialEffectDisplayer.directEffect1 = string.Format(template1, dt1);
+    //         specialEffectDisplayer.reverseEffect1 = string.Format(template2, rt1);
+    //     }
+    //
+    //     var directEffectStr = string.Format(template1, directText);
+    //     specialEffectDisplayer.directEffect = directEffectStr;
+    //     
+    //     // UpdateSpecialEffectText(specialEffectObj.transform.Find("DirectDesc/DirectEffectDesc")
+    //     //     .GetComponent<TextMeshProUGUI>(), directEffectStr);
+    //
+    //     var reverseEffectStr = string.Format(template2, reverseText);
+    //     specialEffectDisplayer.reverseEffect = reverseEffectStr;
+    //     // UpdateSpecialEffectText(specialEffectObj.transform.Find("ReverseDesc/ReverseEffectDesc")
+    //     //     .GetComponent<TextMeshProUGUI>(), reverseEffectStr);
+    //
+    //     specialEffectDisplayer.enabled = true;
+    //     specialEffectDisplayer.UpdateText();
+    // }
+    //
+    //
+    // public static void UpdateSpecialEffectText(TextMeshProUGUI effectText, string effectStr)
+    // {
+    //     // effectStr = "     " + effectStr;
+    //     var x = effectText.rectTransform.sizeDelta.x;
+    //     var preferredValues = effectText.GetPreferredValues(effectStr, x, float.PositiveInfinity);
+    //     effectText.rectTransform.sizeDelta = preferredValues.SetX(x);
+    //     effectText.text = effectStr;
+    // }
+    //
+    //
+    // public static void ShowCastTime(
+    //     MouseTipCombatSkill __instance,
+    //     CombatSkillItem ____configData
+    // ) {
+    //     if (!ModEntry.ShowCastTime) return;
+    //
+    //     Debug.Log($"{____configData.Name} - {____configData.PrepareTotalProgress}");
+    //
+    //     try {
+    //         var typeTrans = __instance.transform.Find("DescriptionHolder/Type");
+    //
+    //         if (typeTrans == null) return;
+    //
+    //         var secondTypeTrans = typeTrans.Find("Type");
+    //
+    //         if (secondTypeTrans == null) return;
+    //
+    //         var adtName = "PrepareTotalProgressTips";
+    //         var transform = typeTrans.Find(adtName);
+    //         GameObject adt;
+    //         if (transform == null) {
+    //             adt = Object.Instantiate(secondTypeTrans.gameObject, typeTrans, false);
+    //             adt.name = adtName;
+    //         }
+    //         else {
+    //             adt = transform.gameObject;
+    //         }
+    //
+    //         if (____configData.PrepareTotalProgress > 0) {
+    //             // var s = $"基础施展时间: {____configData.PrepareTotalProgress}\n";
+    //
+    //             adt.transform.Find("TextHolder/Tips").GetComponent<TextMeshProUGUI>().text = "基础施展时间";
+    //             adt.transform.Find("TextHolder/TypeIcon").gameObject.SetActive(false);
+    //             adt.transform.Find("TextHolder/Type").GetComponent<TextMeshProUGUI>().text =
+    //                 $"{(____configData.PrepareTotalProgress / 7200.0):0.##}秒";
+    //             adt.SetActive(true);
+    //         }
+    //         else {
+    //             adt.SetActive(false);
+    //         }
+    //     }
+    //     catch (Exception) { }
+    // }
+    //
+    //
     public static string GetCombatSkillReadingProgressString(CombatSkillDisplayData combatSkillDisplayData)
     {
-        var s1 = "承合解异独";
-        var s2 = "修思源参藏";
-        var s3 = "用奇巧化绝";
+        const string s1 = "承合解异独";
+        const string s2 = "修思源参藏";
+        const string s3 = "用奇巧化绝";
 
         var p1 = new List<sbyte>(new sbyte[] { 0, 1, 2, 3, 4 }).Select(page =>
             CombatSkillStateHelper.IsPageRead(combatSkillDisplayData.ReadingState,

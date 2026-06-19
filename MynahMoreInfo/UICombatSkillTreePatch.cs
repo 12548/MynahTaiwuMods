@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Game.Views.CombatSkillTree;
+using HarmonyLib;
 
 namespace MynahMoreInfo;
 
@@ -8,14 +9,13 @@ public static class UICombatSkillTreePatch
     /// <summary>
     /// 显示不传之秘
     /// </summary>
-    /// <param name="visibleSkill"></param>
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(UI_CombatSkillTree), "RefreshSkillItem")]
-    public static void PreFixRefreshSkillItem(ref bool visibleSkill)
+    [HarmonyPatch(typeof(CombatSkillTreeSkillItem), "Set")]
+    public static void PreFixSetSkillItem(ref bool isVisible)
     {
         if (ModEntry.ShowNonPublicSkill)
         {
-            visibleSkill = true;
+            isVisible = true;
         }
     }
 }

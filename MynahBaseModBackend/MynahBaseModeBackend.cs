@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using GameData.Domains;
 using GameData.Domains.Mod;
+using HarmonyLib;
 using MynahBaseModBase;
 using TaiwuModdingLib.Core.Plugin;
 using TaiwuModdingLib.Core.Utils;
@@ -10,8 +11,20 @@ using TaiwuModdingLib.Core.Utils;
 namespace MynahBaseModBackend;
 
 [PluginConfig("MynahBaseModBackend", "myna12548", "0")]
-public class DummyModEntry : TaiwuRemakeHarmonyPlugin
+public class DummyModEntry : TaiwuRemakePlugin
 {
+    Harmony harmony;
+    
+    public override void Initialize()
+    {
+        harmony = new Harmony(PluginName);
+        harmony.PatchAll();
+    }
+
+    public override void Dispose()
+    {
+        harmony.UnpatchSelf();
+    }
 }
 
 public class MynahBaseModBackend

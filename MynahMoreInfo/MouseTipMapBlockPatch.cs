@@ -14,12 +14,13 @@ using UnityEngine;
 
 namespace MynahMoreInfo;
 
-[HarmonyPatch(typeof(MouseTipMapBlock), "Init")]
+[HarmonyPatch(typeof(Game.Views.MouseTips.MouseTipMapBlock), "Refresh")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class MouseTipMapBlockPatch
 {
-    public static void Postfix(MouseTipMapBlock __instance, ArgumentBox argsBox)
+    public static void Postfix(Game.Views.MouseTips.MouseTipMapBlock __instance, ArgumentBox argsBox)
     {
+        Debug.Log("MouseTipMapBlockPatch Postfix");
         argsBox.Get("MapBlockData", out MapBlockData blockData);
 
         if (ModEntry.ShowPosAndId)
@@ -29,26 +30,26 @@ public class MouseTipMapBlockPatch
                 $"\n世界坐标(AreaId, BlockId): ({blockData.AreaId},{blockData.BlockId})\n区域坐标(x, y): ({pos.X},{pos.Y})";
 
             var mapBlockItem = MapBlock.Instance[blockData.TemplateId];
-            __instance.CGet<TextMeshProUGUI>("Desc").text = (mapBlockItem.Desc + str).ColorReplace();
+            __instance.transform.Find("DescLayout/Desc").GetComponent<TextMeshProUGUI>().text = (mapBlockItem.Desc + str).ColorReplace();
         }
 
-        if (ModEntry.MapBlockMouseTipHighlightResourceNumber > 0 && !blockData.IsCityTown())
-        {
-            var names = new[] { "Food", "Wood", "Stone", "Jade", "Silk", "Herbal" };
-            var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
-            for (var i = 0; i < 6; i++)
-            {
-                var text = __instance.transform.Find($"ResourceLayout/ResourceHolder/{names[i]}/ValueBack/Current");
-                if (text == null) continue;
-
-                var curr = blockData.CurrResources.Get(i);
-                var max = blockData.MaxResources.Get(i);
-
-                text.GetComponent<TextMeshProUGUI>().text = curr >= ModEntry.MapBlockMouseTipHighlightResourceNumber
-                    ? $"<color={colors[i]}>{curr}/{max}</color>"
-                    : $"{curr}/{max}</color>";
-            }
-        }
+        // if (ModEntry.MapBlockMouseTipHighlightResourceNumber > 0 && !blockData.IsCityTown())
+        // {
+        //     var names = new[] { "Food", "Wood", "Stone", "Jade", "Silk", "Herbal" };
+        //     var colors = new[] { "#adcb84", "#c68639", "#81b1c0", "#52c3ad", "#c66963", "#6bb963" };
+        //     for (var i = 0; i < 6; i++)
+        //     {
+        //         var text = __instance.transform.Find($"ResourceLayout/ResourceHolder/{names[i]}/ValueBack/Current");
+        //         if (text == null) continue;
+        //
+        //         var curr = blockData.CurrResources.Get(i);
+        //         var max = blockData.MaxResources.Get(i);
+        //
+        //         text.GetComponent<TextMeshProUGUI>().text = curr >= ModEntry.MapBlockMouseTipHighlightResourceNumber
+        //             ? $"<color={colors[i]}>{curr}/{max}</color>"
+        //             : $"{curr}/{max}</color>";
+        //     }
+        // }
 
         if (!ModEntry.MapBlockMouseTipCharList) return;
 
@@ -58,9 +59,11 @@ public class MouseTipMapBlockPatch
             blockCharList.AddRange(blockData.CharacterSet);
         if (blockData.InfectedCharacterSet != null)
             blockCharList.AddRange(blockData.InfectedCharacterSet);
+        Debug.Log("blockCharCount: " + blockCharList.Count);
         if (blockCharList.Count == 0)
         {
             GetCharListLayout(__instance, adventureLayout).gameObject.SetActive(false);
+            
             return;
         }
 
@@ -87,8 +90,9 @@ public class MouseTipMapBlockPatch
 
                     if (ModEntry.ShowPosAndId) stringBuilder.Append($"({num})");
 
+                    // stringBuilder.AppendLine();
                     if (index % 2 == 1) stringBuilder.AppendLine();
-                    else stringBuilder.Append("<pos=40%>");
+                    else stringBuilder.Append("\t");
 
                     if (index >= 11)
                     {
@@ -117,7 +121,7 @@ public class MouseTipMapBlockPatch
             });
     }
 
-    private static Transform GetCharListLayout(MouseTipMapBlock mouseTipInstance, Refers adventureLayout)
+    private static Transform GetCharListLayout(Game.Views.MouseTips.MouseTipMapBlock mouseTipInstance, Refers adventureLayout)
     {
         var charListLayout = mouseTipInstance.transform.Find("charListLayout");
 
@@ -129,5 +133,5 @@ public class MouseTipMapBlockPatch
         }
 
         return charListLayout;
-    }
+    } 
 }

@@ -1,4 +1,7 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using Game.Views.Bottom;
+using GameData.Utilities;
+using HarmonyLib;
 using UnityEngine;
 
 namespace MynahMoreInfo;
@@ -7,22 +10,37 @@ namespace MynahMoreInfo;
 public class UIBottomPatch
 {
     
-    [HarmonyPatch(typeof(UI_Bottom), "UpdateCombatTeammate", typeof(int), typeof(int))]
+    [HarmonyPatch(typeof(ViewBottom), nameof(ViewBottom.RefreshCharacterAvatar))]
     [HarmonyPostfix]
-    public static void UpdateCombatTeammatePostfix(int index, int charId, UI_Bottom __instance)
+    public static void UpdateCombatTeammatePostfix(ViewBottom __instance)
     {
-        Debug.Log($"Updating Combat Teammate {charId}");
-        // var component = __instance._groupChar.CGet<RectTransform>("CombatCharHolder").Find(index.ToString()).GetComponent<Refers>();
-        var component = __instance._groupChar.CGet<RectTransform>("CombatCharHolder").Find($"{index}/Avatar");
-        bool isExist = charId >= 0;
-        // var avatar = component.CGet<UICommon.Character.Avatar.Avatar>("Avatar");
+        Debug.Log($"Updating Combat Teammate");
 
-        var mouseTipDisplayer = component.gameObject.GetOrAddComponent<MouseTipDisplayer>();
-        mouseTipDisplayer.enabled = isExist;
-        
-        if (isExist)
+        for (int i = 0; i < 3; i++)
         {
-            Util.EnableMouseTipCharacter(mouseTipDisplayer, charId);
+            List<int> combatTeamCharIds = SingletonObject.getInstance<CharacterMonitorModel>().GetTaiwuCombatTeamCharIds();
+            var charId = combatTeamCharIds.GetOrDefault(i + 1, -1);
+            {
+                var component = __instance.transform.Find($"AnimationRoot/Teammate{i+1}/Bg");
+                if(component == null) return;
+                Util.EnableMouseTipCharacter(Util.EnsureMouseTipDisplayer(component.gameObject), charId);
+            }
         }
+        
+        
+        //
+        //
+        // // var component = __instance._groupChar.CGet<RectTransform>("CombatCharHolder").Find(index.ToString()).GetComponent<Refers>();
+        // var component = __instance._groupChar.CGet<RectTransform>("CombatCharHolder").Find($"{index}/Avatar");
+        // bool isExist = charId >= 0;
+        // // var avatar = component.CGet<UICommon.Character.Avatar.Avatar>("Avatar");
+        //
+        // var mouseTipDisplayer = component.gameObject.GetOrAddComponent<TooltipInvoker>();
+        // mouseTipDisplayer.enabled = isExist;
+        //
+        // if (isExist)
+        // {
+        //     Util.EnableMouseTipCharacter(mouseTipDisplayer, charId);
+        // }
     }
 }

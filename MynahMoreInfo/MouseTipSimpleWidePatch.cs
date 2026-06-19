@@ -168,7 +168,7 @@ public class MouseTipSimpleWidePatch
             title += $"({(object)displayData.CharacterId})";
 
         // 性别
-        title += " · " + CommonUtils.GetGenderString(displayData.Gender);
+        title += " · " + CommonUtils.GetGenderString(CommonUtils.GetDisplayGender(displayData.Gender, displayData.TemplateId));
 
         // 年龄
         if (isAlive)
@@ -180,14 +180,11 @@ public class MouseTipSimpleWidePatch
         title += " · " + CommonUtils.GetBehaviorString(displayData.BehaviorType);
 
         // 所属
-        title += " · " + CommonUtils.GetOrganizationString(displayData.OrgInfo.OrgTemplateId,
-            worldMapModel.SettlementRandNameDict!.ContainsKey(displayData.OrgInfo.SettlementId)
-                ? worldMapModel.SettlementRandNameDict[displayData.OrgInfo.SettlementId]
-                : (short)-1);
+        title += " · " + displayData.OrgInfo.ToString();
 
-        // 身份
-        title += CommonUtils.GetCharacterGradeString(displayData.OrgInfo, displayData.Gender,
-            displayData.CurrAge);
+        // // 身份
+        // title += CommonUtils.GetCharacterGradeString(displayData.OrgInfo, displayData.Gender,
+        //     displayData.PhysiologicalAge);
 
         // bool isFixedCharacter =
         //     CreatingType.IsFixedPresetType(Character.Instance.GetItem(displayData.TemplateId)

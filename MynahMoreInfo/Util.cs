@@ -7,21 +7,21 @@ public class Util
 {
     public static string GetSpriteStr(string spriteName)
     {
-        // return TMPTextSpriteHelper.GetStringWithTextSpriteTag(spriteName);
-        return $"<sprite=\"mmiSprites\" name=\"{spriteName}\">";
+        return TMPTextSpriteHelper.GetStringWithTextSpriteTag(spriteName);
+        // return $"<sprite=\"mmiSprites\" name=\"{spriteName}\">";
     }
     
-    public static MouseTipDisplayer EnsureMouseTipDisplayer(GameObject obj)
+    public static TooltipInvoker EnsureMouseTipDisplayer(GameObject obj)
     {
-        var mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
+        var mouseTipDisplayer = obj.GetComponent<TooltipInvoker>();
         if (mouseTipDisplayer != null) return mouseTipDisplayer;
-        obj.AddComponent<MouseTipDisplayer>();
-        mouseTipDisplayer = obj.GetComponent<MouseTipDisplayer>();
+        obj.AddComponent<TooltipInvoker>();
+        mouseTipDisplayer = obj.GetComponent<TooltipInvoker>();
 
         return mouseTipDisplayer;
     }
 
-    public static void EnableMouseTipCharacter(MouseTipDisplayer mouseTipDisplayer, int characterId, bool forceMod = false)
+    public static void EnableMouseTipCharacter(TooltipInvoker mouseTipDisplayer, int characterId, bool forceMod = false)
     {
         var type = ModEntry.MouseTipCharStyle;
         if (type != 0 || forceMod)

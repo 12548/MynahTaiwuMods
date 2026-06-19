@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using MynahBaseModBase;
+using MynahBaseModFrontend;
 using MynahMoreInfo.SpriteSheet;
 using TaiwuModdingLib.Core.Plugin;
 using UnityEngine;
@@ -16,50 +17,41 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("门派武学列表-显示不传之秘", description: "显示门派武学列表中的不传之秘")]
     public static bool ShowNonPublicSkill = true;
 
-    [DropDownModSetting(
-        "地块浮窗",
-        new[] { "不显示", "按住alt显示", "始终显示（原版）" },
-        description: "注意：如果选择按住alt显示，那么需要按住alt再移动鼠标到新的地块来显示浮窗",
-        defaultValue: 2
-    )]
-    public static int MapBlockMouseTipStat = 2;
+    // [DropDownModSetting(
+    //     "地块浮窗",
+    //     new[] { "不显示", "按住alt显示", "始终显示（原版）" },
+    //     description: "注意：如果选择按住alt显示，那么需要按住alt再移动鼠标到新的地块来显示浮窗",
+    //     defaultValue: 2
+    // )]
+    // public static int MapBlockMouseTipStat = 2;
 
     [ModSetting("地块浮窗-显示人物列表", description: "")]
     public static bool MapBlockMouseTipCharList = true;
-
-    [SliderModSetting(
-        "地块浮窗-高亮较多资源",
-        minValue: 0,
-        maxValue: 150,
-        defaultValue: 100,
-        description: "在地块浮窗中将指定数目以上的资源以不同颜色显示，为0则不生效"
-    )]
-    public static int MapBlockMouseTipHighlightResourceNumber = 100;
-
+    
     [ModSetting("地块浮窗-显示坐标", description: "")]
     public static bool ShowPosAndId = true;
 
-    [ModSetting("功法浮窗-显示正逆练", description: "显示功法的正逆练效果")]
-    public static bool ShowCombatSkillSpecialEffect = true;
+    // [ModSetting("功法浮窗-显示正逆练", description: "显示功法的正逆练效果")]
+    // public static bool ShowCombatSkillSpecialEffect = true;
+    //
+    // [ModSetting("功法书浮窗-显示正逆练", description: "显示书籍所载功法的正逆练效果")]
+    // public static bool ShowBookSpecialEffect = true;
 
-    [ModSetting("功法书浮窗-显示正逆练", description: "显示书籍所载功法的正逆练效果")]
-    public static bool ShowBookSpecialEffect = true;
-
-    [ModSetting("功法/功法书浮窗-显示施展时间", description: "显示可施展功法的基本施展时间（施展速度为100%时的施展时间）")]
-    public static bool ShowCastTime = true;
-
-    [DropDownModSetting("功法/功法书浮窗-突出正逆练区别",
-        new[] { "始终关闭", "按住alt键时开启", "始终开启" },
+    // [ModSetting("功法/功法书浮窗-显示施展时间", description: "显示可施展功法的基本施展时间（施展速度为100%时的施展时间）")]
+    // public static bool ShowCastTime = true;
+    //
+    [DropDownModSetting("功法浮窗-突出正逆练区别",
+        new[] { "关闭", "开启" },
         defaultValue: 1,
         description: "标红正练特效与逆练特效之间的区别")]
     public static int HintEffectDiff = 1;
 
-    [ModSetting("功法书浮窗-显示五行属性", description: "显示功法书对应功法的五行属性")]
-    public static bool ShowBookFiveElements = true;
+    // [ModSetting("功法书浮窗-显示五行属性", description: "显示功法书对应功法的五行属性")]
+    // public static bool ShowBookFiveElements = true;
 
-    [ModSetting("功法书浮窗-显示学习进度", description: "开启正逆练显示时生效，显示功法书籍的读书、修炼进度，目前显示位置不太好，不喜欢可以关闭")]
-    public static bool ShowLearningProgress = true;
-    
+    // [ModSetting("功法书浮窗-显示学习进度", description: "开启正逆练显示时生效，显示功法书籍的读书、修炼进度，目前显示位置不太好，不喜欢可以关闭")]
+    // public static bool ShowLearningProgress = true;
+    //
     [DropDownModSetting("人物浮窗样式", new[] { "原版", "Mod版" }, defaultValue: 1, description: "部分新加人物浮窗强制为Mod版")]
     public static int MouseTipCharStyle = 1;
 
