@@ -1,4 +1,5 @@
-﻿using MynahBaseModBase;
+﻿using MynahBaseModBackend;
+using MynahBaseModBase;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace MynahMoreInfoBackend;
@@ -34,5 +35,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
     {
         base.OnModSettingUpdate();
         MynahBaseModBackend.MynahBaseModBackend.OnModSettingUpdate(this);
+        
     }
 }

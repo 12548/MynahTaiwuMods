@@ -1,50 +1,66 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <LangVersion>10</LangVersion>
         <Nullable>warnings</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <PlatformTarget>x64</PlatformTarget>
+        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MynahBaseModBackend\MynahBaseModBackend.csproj" />
-      <ProjectReference Include="..\MynahBaseModBase\MynahBaseModBase.csproj" />
+        <ProjectReference Include="..\MynahBaseModBackend\MynahBaseModBackend.csproj"/>
+        <ProjectReference Include="..\MynahBaseModBase\MynahBaseModBase.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="0Harmony">
-        <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\0Harmony.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-      <Reference Include="GameData">
-        <HintPath>$(TAIWU_PATH)\Backend\GameData.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-      <Reference Include="TaiwuModdingLib">
-        <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-      <Reference Include="Taiwu_EventPackage_CharacterInteraction_Main">
-        <HintPath>$(TAIWU_PATH)\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Main.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-      <Reference Include="Taiwu_EventPackage_CharacterInteraction_Study">
-        <HintPath>$(TAIWU_PATH)\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Study.dll</HintPath>
-      </Reference>
+        <Reference Include="0Harmony">
+            <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\0Harmony.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GameData">
+            <HintPath>$(TAIWU_PATH)\Backend\GameData.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GameData.Shared">
+            <HintPath>$(TAIWU_PATH)\Backend\GameData.Shared.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GameData.Utilities">
+            <HintPath>$(TAIWU_PATH)\Backend\GameData.Utilities.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GameData.Utilities.Structure">
+            <HintPath>$(TAIWU_PATH)\Backend\GameData.Utilities.Structure.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GameData.ArchiveData">
+            <HintPath>$(TAIWU_PATH)\Backend\GameData.ArchiveData.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="TaiwuModdingLib">
+            <HintPath>$(TAIWU_PATH)\The Scroll of Taiwu_Data\Managed\TaiwuModdingLib.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Taiwu_EventPackage_CharacterInteraction_Main">
+            <HintPath>$(TAIWU_PATH)\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Main.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Taiwu_EventPackage_CharacterInteraction_Study">
+            <HintPath>$(TAIWU_PATH)\Event\EventLib\Taiwu_EventPackage_CharacterInteraction_Study.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="AfterBuild.ps1">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <Content Include="AfterBuild.ps1">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="pwsh AfterBuild.ps1 2871621277 $(OutDir)" />
+        <Exec Command="pwsh AfterBuild.ps1 2871621277 $(OutDir)"/>
     </Target>
 
 </Project>

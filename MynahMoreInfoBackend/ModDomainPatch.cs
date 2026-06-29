@@ -164,7 +164,7 @@ public class ModDomainPatch
             var displayItems = items
                 .Where(it => it.Key.ItemType is > ItemType.Invalid and < ItemType.Count)
                 .OrderByDescending(it => ItemTemplateHelper.GetGrade(it.Key.ItemType, it.Key.TemplateId))
-                .ThenByDescending(it => it.Price)
+                .ThenByDescending(it => it.Value) // TODO 不确定Price变成啥了，之后再仔细看看
                 .Take(ModEntry.ShowNpcGoodItemsCount)
                 .ToList();
 
@@ -179,6 +179,8 @@ public class ModDomainPatch
         var availableLifeSkillList = new List<int>();
         retValue["AvailableLifeSkills"] = availableLifeSkillList;
 
+        
+        
         __result = Json.Serialize(retValue);
 
         // AdaptableLog.Info($"Result Set: {__result}");

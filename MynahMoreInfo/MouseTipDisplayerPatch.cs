@@ -10,7 +10,7 @@ public class MouseTipDisplayerPatch
     // /// <summary>
     // /// 检查地块浮窗是否应该显示
     // /// </summary>
-    // [HarmonyPrefix, HarmonyPatch(typeof(TooltipInvoker), "ShowTips")]
+    // [HarmonyPrefix, HarmonyPatch(typeof(TooltipInvoker), (nameof(TooltipInvoker.ShowTips)))]
     // static bool ShowTipsPrefix(TooltipInvoker __instance, ref bool __result, ArgumentBox ___RuntimeParam)
     // {
     //     if (___RuntimeParam != null && ___RuntimeParam.Get("_mmi_require_alt", out bool requireAlt))

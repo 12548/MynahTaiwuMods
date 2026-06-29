@@ -17,6 +17,7 @@ public class Util
         if (mouseTipDisplayer != null) return mouseTipDisplayer;
         obj.AddComponent<TooltipInvoker>();
         mouseTipDisplayer = obj.GetComponent<TooltipInvoker>();
+        mouseTipDisplayer.PresetParam ??= new string[] { };
 
         return mouseTipDisplayer;
     }

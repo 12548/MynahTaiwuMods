@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using FrameWork;
+using Game.Views.MapBlockCharList;
+using GameData.Domains.Character.Display;
 using HarmonyLib;
 using UnityEngine;
 
@@ -14,34 +16,42 @@ namespace MynahMoreInfo;
 [SuppressMessage("ReSharper", "UnusedMember.Local")]
 public class UI_MapBlockCharListPatch
 {
-    [HarmonyPatch(typeof(MapBlockCharNormal), "Refresh")]
-    [HarmonyPostfix]
-    static void MapBlockCharNormalRefreshPostfix(
-        // bool canInteract,
-        // CharacterDisplayData characterDisplayData,
-        MapBlockCharNormal __instance)
-    {
-        if (ModEntry.MTC_MapBlockCharList == false) return;
+    // [HarmonyPatch(typeof(MapBlockChar), "Refresh")]
+    // [HarmonyPostfix]
+    // static void MapBlockCharNormalRefreshPostfix(
+    //     // bool canInteract,
+    //     // CharacterDisplayData characterDisplayData,
+    //     MapBlockCharNormal __instance)
+    // {
+    //     if (ModEntry.MTC_MapBlockCharList == false) return;
+    //
+    //     var charId = __instance.CharId;
+    //     Transform transform = __instance.transform;
+    //
+    //     EnableMouseTipChar(charId, transform);
+    // }
 
-        var charId = __instance.CharId;
-        Transform transform = __instance.transform;
-
-        EnableMouseTipChar(charId, transform);
-    }
-
-    [HarmonyPatch(typeof(MapBlockCharGrave), "Refresh")]
+    [HarmonyPatch(typeof(MapBlockChar), nameof(MapBlockChar.Set), typeof(IMapBlockCharHolder), typeof(GraveDisplayData))]
     [HarmonyPostfix]
     static void MapBlockCharGraveRefreshPostfix(
-        // bool canInteract,
-        // CharacterDisplayData characterDisplayData,
-        MapBlockCharGrave __instance)
+        GraveDisplayData graveDisplayData,
+        MapBlockChar __instance)
     {
-        if (ModEntry.MTC_MapBlockCharList == false) return;
-
-        var charId = __instance._graveDisplayData.Id;
-        Transform transform = __instance.transform;
-
-        EnableMouseTipChar(charId, transform);
+        if(graveDisplayData == null) return;
+        Debug.Log($"SetAsGrave {graveDisplayData.Id}");
+        
+        if (!ModEntry.MTC_MapBlockCharList) return;
+        var charId = graveDisplayData.Id;
+        Util.EnableMouseTipCharacter(__instance.displayer, charId, true);
+    }
+    
+    [HarmonyPatch(typeof(MapBlockChar), nameof(MapBlockChar.Set), typeof(IMapBlockCharHolder), typeof(CharacterDisplayData), typeof(bool), typeof(bool))]
+    [HarmonyPostfix]
+    static void MapBlockCharGravePostfix(
+        MapBlockChar __instance)
+    {
+        // 避免被坟墓覆盖，这里改回来
+        __instance.displayer.Type = TipType.CharacterOnMapBlock;
     }
 
     private static void EnableMouseTipChar(int charId, Transform transform)
@@ -74,5 +84,4 @@ public class UI_MapBlockCharListPatch
             Debug.Log(e);
         }
     }
-    
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Config;
@@ -11,6 +12,7 @@ using GameData.Serializer;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MynahMoreInfo;
 
@@ -105,18 +107,25 @@ public class MouseTipMapBlockPatch
                     }
                 }
 
-                if (__instance.isActiveAndEnabled)
+                try
                 {
-                    var charListLayout = GetCharListLayout(__instance, adventureLayout);
+                    if (__instance.isActiveAndEnabled)
+                    {
+                        var charListLayout = GetCharListLayout(__instance, adventureLayout);
 
-                    var subTitle = charListLayout.Find("SubtitleLayout/SubTitle");
-                    subTitle.GetComponent<TextMeshProUGUI>().text = "人物列表";
-                    var content = charListLayout.Find("DescLayout/Desc");
-                    // content.GetComponent<TextMeshProUGUI>().text = stringBuilder.ToString();
-                    MouseTip_Util.SetMultiLineAutoHeightText(content.GetComponent<TextMeshProUGUI>(),
-                        stringBuilder.ToString());
+                        var subTitle = charListLayout.Find("SubtitleLayout/SubTitle");
+                        subTitle.GetComponent<TextMeshProUGUI>().text = "人物列表";
+                        var content = charListLayout.Find("DescLayout/Desc");
+                        // content.GetComponent<TextMeshProUGUI>().text = stringBuilder.ToString();
+                        MouseTip_Util.SetMultiLineAutoHeightText(content.GetComponent<TextMeshProUGUI>(),
+                            stringBuilder.ToString());
 
-                    charListLayout.gameObject.SetActive(true);
+                        charListLayout.gameObject.SetActive(true);
+                    }
+                }
+                catch (Exception _)
+                {
+                    // ignored
                 }
             });
     }

@@ -15,11 +15,12 @@ namespace MynahMoreInfo;
 public class MouseTipManagerPatch
 {
 
-    [HarmonyPrefix, HarmonyPatch(typeof(TooltipManager), "ShowTips")]
+    [HarmonyPrefix, HarmonyPatch(typeof(TooltipManager), (nameof(TooltipManager.ShowTips)))]
     public static bool ShowTipsPrefix(ref TipType type,
         ref ArgumentBox argsBox)
     {
-        Debug.Log($"[MynahMoreInfo] ShowTipsPrefix");
+        if (type == TipType.SimpleWide && argsBox.Get("_mmi_charId", out int charid) && charid < 0) return false;
+
         if (type != TipType.Character && type != TipType.CharacterComplete && type != TipType.CharacterOnMapBlock && type != TipType.LifeCombatSkillValue) return true;
 
         int charId = 0;
@@ -28,12 +29,24 @@ public class MouseTipManagerPatch
         {
             return true;
         }
+        if (argsBox.Get<CharacterDisplayDataForTooltip>("Data", out var data))
+        {
+            // if (ModEntry.MouseTipCharStyle == 1)
+            // {
+            //     charId = data.Id;
+            //     argsBox.Set("CharId", data.Id);
+            // }
+            // else
+            // {
+                return true;
+            // }
+        }
         
         if (argsBox.Get("_mmi_no_replace", out bool _))
         {
             return true;
-        } 
-        
+        }
+
         if(!argsBox.Get("charId", out charId) || charId < 0)
         {
             if(!argsBox.Get("CharId", out charId) || charId < 0)

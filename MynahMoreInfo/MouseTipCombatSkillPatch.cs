@@ -4,6 +4,7 @@ using System.Linq;
 using Config;
 using CSharpDiff.Converters;
 using CSharpDiff.Diffs;
+using FrameWork;
 using Game.Views.MouseTips;
 using GameData.Domains.CombatSkill;
 using HarmonyLib;
@@ -85,44 +86,53 @@ public static class MouseTipCombatSkillPatch
         // bool flag1 = !(nullable.GetValueOrDefault() == num & nullable.HasValue);
     }
 
-// [HarmonyPostfix]
-    // [HarmonyPatch(typeof(MouseTipCombatSkill), "RefreshCombatSkillPanel")]
-    // public static void Postfix(MouseTipCombatSkill __instance)
-    // {
-    //     if (!ModEntry.ShowCombatSkillSpecialEffect) return;
-    //     if (__instance == null) return;
-    //     var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
-    //
-    //     var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
-    //
-    //     if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
-    //     {
-    //         return;
-    //     }
-    //
-    //     CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
-    //     // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
-    //     var flag = combatSkillDisplayData.EffectType != -1;
-    //
-    //     specialEffectGameObject.SetActive(true);
-    //     if (true) // flag
-    //     {
-    //         var flag4 = combatSkillDisplayData.EffectType == 0;
-    //         ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
-    //     }
-    //
-    //     ShowCastTime(__instance, __instance._configData);
-    //
-    //     if (ModEntry.ShowLearningProgress)
-    //     {
-    //         var s = GetCombatSkillReadingProgressString(combatSkillDisplayData);
-    //         var desc = $"{__instance._configData.Desc}\n{s}";
-    //         MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
-    //     }
-    //
-    //     var element = __instance.Element;
-    //     element?.ShowAfterRefresh();
-    // }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TooltipCombatSkill), nameof(TooltipCombatSkill.RefreshDataDependentInfo))]
+    public static void TooltipCombatSkillPostfix(TooltipCombatSkill __instance)
+    {
+        if (__instance == null) return;
+        // var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
+    
+        // var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
+        //
+        // if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
+        // {
+        //     return;
+        // }
+    
+        CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
+        // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
+        var flag = combatSkillDisplayData.EffectType != -1;
+    
+        // specialEffectGameObject.SetActive(true);
+        // if (true) // flag
+        // {
+        //     var flag4 = combatSkillDisplayData.EffectType == 0;
+        //     ShowAllSpecialEffects(specialEffectGameObject, __instance._configData, flag, flag4);
+        // }
+        //
+        // ShowCastTime(__instance, __instance._configData);
+    
+        if (ModEntry.ShowLearningProgress || ModEntry.ShowCastTime)
+        {
+            var s = "";
+
+            if (ModEntry.ShowLearningProgress)
+            {
+                s += GetCombatSkillReadingProgressString(combatSkillDisplayData);
+            }
+
+            if (ModEntry.ShowCastTime && __instance._configData.PrepareTotalProgress > 0)
+            {
+                s += $" 基本施展时间：{(__instance._configData.PrepareTotalProgress / 7200.0):0.##}秒";
+            }
+            var desc = $"{__instance._configData.Desc}\n{s}";
+            MouseTip_Util.SetMultiLineAutoHeightText(__instance.descText, desc);
+        }
+    
+        var element = __instance.Element;
+        element?.ShowAfterRefresh();
+    }
     //
     // [HarmonyPatch(typeof(MouseTipCombatSkill), "UpdateOnlyTemplateData")]
     // [HarmonyPostfix]
