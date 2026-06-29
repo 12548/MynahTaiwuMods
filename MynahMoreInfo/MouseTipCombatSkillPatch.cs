@@ -5,6 +5,7 @@ using Config;
 using CSharpDiff.Converters;
 using CSharpDiff.Diffs;
 using FrameWork;
+using Game.Views.Combat;
 using Game.Views.MouseTips;
 using GameData.Domains.CombatSkill;
 using HarmonyLib;
@@ -25,6 +26,14 @@ public static class MouseTipCombatSkillPatch
         // sbyte effectType = __instance._combatSkillDisplayData.EffectType;
         // int? nullable = effectType.HasValue ? new int?((int) effectType.GetValueOrDefault()) : new int();
         // bool flag1 = !(nullable.GetValueOrDefault() == num & nullable.HasValue);
+        
+        var uiCombat = UIElement.Combat.UiBaseAs<ViewCombat>();
+        
+        if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
         
         string specialEffectDesc1 = __instance.rightDirectEffectDescText.text;
         string specialEffectDesc2 = __instance.rightReverseEffectDescText.text;
@@ -93,12 +102,12 @@ public static class MouseTipCombatSkillPatch
         if (__instance == null) return;
         // var specialEffectGameObject = __instance.CGet<GameObject>("SpecialEffect");
     
-        // var uiCombat = UIElement.Combat.UiBaseAs<UI_Combat>();
-        //
-        // if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
-        // {
-        //     return;
-        // }
+        var uiCombat = UIElement.Combat.UiBaseAs<ViewCombat>();
+        
+        if (uiCombat != null && uiCombat.gameObject.activeInHierarchy)
+        {
+            return;
+        }
     
         CombatSkillDisplayData combatSkillDisplayData = __instance._combatSkillDisplayData;
         // Serializer.Deserialize(dataPool, offset, ref combatSkillDisplayData);
