@@ -118,27 +118,27 @@
         <Publicize Include="Assembly-CSharp" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="CharacterNameClickLinkHandlerPatch.cs" />
         <Compile Include="Components\SpecialEffectDisplayer.cs" />
-        <Compile Include="EventWindowCharacterPatch.cs" />
-        <Compile Include="GroupCallBuilder.cs" />
         <Compile Include="MiniJSON\Json.cs" />
-        <Compile Include="MouseTipBookPatch.cs" />
-        <Compile Include="MouseTipCharacterPatch.cs" />
-        <Compile Include="MouseTipCombatSkillPatch.cs" />
-        <Compile Include="MouseTipDisplayerPatch.cs" />
-        <Compile Include="MouseTipManagerPatch.cs" />
-        <Compile Include="MouseTipMapBlockPatch.cs" />
-        <Compile Include="MouseTipSimpleWidePatch.cs" />
         <Compile Include="MynahMoreInfo.cs" />
+        <Compile Include="patches\CharacterNameClickLinkHandlerPatch.cs" />
+        <Compile Include="patches\EventWindowCharacterPatch.cs" />
+        <Compile Include="patches\MouseTipBookPatch.cs" />
+        <Compile Include="patches\MouseTipCharacterPatch.cs" />
+        <Compile Include="patches\MouseTipCombatSkillPatch.cs" />
+        <Compile Include="patches\MouseTipDisplayerPatch.cs" />
+        <Compile Include="patches\MouseTipManagerPatch.cs" />
+        <Compile Include="patches\MouseTipMapBlockPatch.cs" />
+        <Compile Include="patches\MouseTipSimpleWidePatch.cs" />
+        <Compile Include="patches\ResidentViewPatch.cs" />
+        <Compile Include="patches\TMPTextSpriteHelperPatch.cs" />
+        <Compile Include="patches\UIBottomPatch.cs" />
+        <Compile Include="patches\UICombatSkillTreePatch.cs" />
+        <Compile Include="patches\UI_MapBlockCharListPatch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="ResidentViewPatch.cs" />
         <Compile Include="SpriteSheet\SpriteAssetManager.cs" />
-        <Compile Include="TMPTextSpriteHelperPatch.cs" />
-        <Compile Include="UIBottomPatch.cs" />
-        <Compile Include="UICombatSkillTreePatch.cs" />
-        <Compile Include="UI_MapBlockCharListPatch.cs" />
-        <Compile Include="Util.cs" />
+        <Compile Include="utils\GroupCallBuilder.cs" />
+        <Compile Include="utils\Util.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\CSharpDiff\CSharpDiff.csproj">

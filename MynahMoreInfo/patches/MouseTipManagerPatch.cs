@@ -1,15 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using FrameWork;
+﻿using FrameWork;
 using GameData.Domains.Character.Display;
 using HarmonyLib;
-using UnityEngine;
-using UnityEngine.EventSystems;
 
 // ReSharper disable RedundantAssignment
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public class MouseTipManagerPatch

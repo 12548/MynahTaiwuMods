@@ -2,9 +2,10 @@
 using Game.Views.Bottom;
 using GameData.Utilities;
 using HarmonyLib;
+using MynahMoreInfo.utils;
 using UnityEngine;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public class UIBottomPatch

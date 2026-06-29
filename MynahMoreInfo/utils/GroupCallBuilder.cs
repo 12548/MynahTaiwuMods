@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameData.Utilities;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.utils;
 
 public class GroupCallBuilder
 {

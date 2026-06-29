@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Config;
 using CSharpDiff.Converters;
 using CSharpDiff.Diffs;
-using FrameWork;
 using Game.Views.Combat;
 using Game.Views.MouseTips;
 using GameData.Domains.CombatSkill;
 using HarmonyLib;
-using MynahMoreInfo.Components;
-using TMPro;
-using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public static class MouseTipCombatSkillPatch

@@ -1,8 +1,8 @@
-﻿using FrameWork.UISystem.UIElements;
-using Game.Components.Character.LifeRecord;
+﻿using Game.Components.Character.LifeRecord;
 using HarmonyLib;
+using MynahMoreInfo.utils;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public class CharacterNameClickLinkHandlerPatch

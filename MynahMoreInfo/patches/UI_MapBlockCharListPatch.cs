@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using FrameWork;
 using Game.Views.MapBlockCharList;
 using GameData.Domains.Character.Display;
 using HarmonyLib;
+using MynahMoreInfo.utils;
 using UnityEngine;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 [SuppressMessage("ReSharper", "InconsistentNaming")]

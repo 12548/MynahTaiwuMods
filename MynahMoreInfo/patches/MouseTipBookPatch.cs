@@ -1,18 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Config;
 using FrameWork;
 using Game.Views.MouseTips.Item;
 using GameData.Domains;
 using GameData.Domains.CombatSkill;
-using GameData.Domains.Item.Display;
 using GameData.Serializer;
 using HarmonyLib;
-using TMPro;
-using UnityEngine;
 using CombatSkillType = Config.CombatSkillType;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public class MouseTipBookPatch

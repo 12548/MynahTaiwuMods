@@ -1,8 +1,6 @@
-﻿using FrameWork;
-using HarmonyLib;
-using UnityEngine;
+﻿using HarmonyLib;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public class MouseTipDisplayerPatch

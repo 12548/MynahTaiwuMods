@@ -1,7 +1,7 @@
 ﻿using FrameWork;
 using UnityEngine;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.utils;
 
 public class Util
 {

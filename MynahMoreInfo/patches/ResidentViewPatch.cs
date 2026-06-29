@@ -2,9 +2,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using HarmonyLib;
+using MynahMoreInfo.utils;
 using UICommon.Character.Elements;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

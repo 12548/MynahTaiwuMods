@@ -13,16 +13,16 @@ using GameData.Domains.Character.Display;
 using GameData.Domains.Item;
 using GameData.Domains.Mod;
 using GameData.Serializer;
-using GameData.Utilities;
 using HarmonyLib;
 using JetBrains.Annotations;
 using MiniJSON;
+using MynahMoreInfo.utils;
 using TMPro;
 using UICommon.Character.Elements;
 using UnityEngine;
 using LifeSkillType = Config.LifeSkillType;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch(typeof(MouseTipSimpleWide), "Init")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

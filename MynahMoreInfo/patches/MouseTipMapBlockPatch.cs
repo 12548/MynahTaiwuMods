@@ -14,7 +14,7 @@ using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch(typeof(Game.Views.MouseTips.MouseTipMapBlock), "Refresh")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]

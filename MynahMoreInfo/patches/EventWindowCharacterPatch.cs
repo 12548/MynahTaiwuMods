@@ -1,10 +1,11 @@
 ﻿using System.Reflection;
 using GameData.Domains.Character.Display;
 using HarmonyLib;
+using MynahMoreInfo.utils;
 using UnityEngine;
 using EWC = Game.Components.EventWindow.EventWindowCharacter;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public class EventWindowCharacterPatch

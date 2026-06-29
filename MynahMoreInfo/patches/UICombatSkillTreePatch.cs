@@ -1,7 +1,7 @@
 ﻿using Game.Views.CombatSkillTree;
 using HarmonyLib;
 
-namespace MynahMoreInfo;
+namespace MynahMoreInfo.patches;
 
 [HarmonyPatch]
 public static class UICombatSkillTreePatch
