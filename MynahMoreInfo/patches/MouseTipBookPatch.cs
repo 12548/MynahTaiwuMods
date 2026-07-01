@@ -109,13 +109,20 @@ public class MouseTipBookPatch
                     __instance.commonArea.textMaterial.text = 
                         fiveElementsStr + __instance.commonArea.textMaterial.text;
                 }
+                
+                if (ModEntry.ShowLearningProgress)
+                {
+                    var progressString = MouseTipCombatSkillPatch.GetCombatSkillReadingProgressString(combatSkillDisplayData);
+                    __instance.commonArea.textDesc.text += $"\n{progressString}";
+                }
 
                 var castTime = combatSkillItem.PrepareTotalProgress;
                 if (ModEntry.ShowCastTime && castTime > 0)
                 {
                     __instance.commonArea.textDesc.text += $"\n基本施展时间：{(castTime / 7200.0):0.##}秒";
                 }
-    
+
+                
                 // if (true) // flag
                 // {
                 //     var flag4 = combatSkillDisplayData.EffectType == 0;
@@ -128,16 +135,6 @@ public class MouseTipBookPatch
                 //     //
                 // }
                 //
-                // if (ModEntry.ShowLearningProgress)
-                // {
-                //     var s = MouseTipCombatSkillPatch.GetCombatSkillReadingProgressString(combatSkillDisplayData);
-                //     var pracStr = combatSkillDisplayData.PracticeLevel < 0
-                //         ? "未习得"
-                //         : $"修习程度：{combatSkillDisplayData.PracticeLevel}%";
-                //
-                //     var desc = $"{skillBookItem.Desc}\n{s}\n{pracStr}";
-                //     MouseTip_Util.SetMultiLineAutoHeightText(__instance.CGet<TextMeshProUGUI>("Desc"), desc);
-                // }
             });
     
         EasyPool.Free(list);
