@@ -51,6 +51,9 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
 
     [ModSetting("功法-显示学习进度", description: "显示功法所对应书籍的读书进度")]
     public static bool ShowLearningProgress = true;
+    
+    [ModSetting("功法浮窗-显示周天真气进度获取值", description: "显示内功功法的基本周天真气进度获取值(无加成时的数值)")]
+    public static bool ShowENAP = true;
     //
     [DropDownModSetting("人物浮窗样式", new[] { "原版", "Mod版" }, defaultValue: 1, description: "部分新加人物浮窗强制为Mod版")]
     public static int MouseTipCharStyle = 1;

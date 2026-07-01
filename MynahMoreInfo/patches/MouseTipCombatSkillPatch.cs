@@ -115,20 +115,42 @@ public static class MouseTipCombatSkillPatch
         //
         // ShowCastTime(__instance, __instance._configData);
     
-        if (ModEntry.ShowLearningProgress || ModEntry.ShowCastTime)
+        if (ModEntry.ShowLearningProgress || ModEntry.ShowCastTime || ModEntry.ShowENAP)
         {
-            var s = "";
+            List<string> strList = new List<string>();
+            strList.Add(__instance._configData.Desc);
 
             if (ModEntry.ShowLearningProgress)
             {
-                s += GetCombatSkillReadingProgressString(combatSkillDisplayData);
+                strList.Add(GetCombatSkillReadingProgressString(combatSkillDisplayData));
             }
 
             if (ModEntry.ShowCastTime && __instance._configData.PrepareTotalProgress > 0)
             {
-                s += $" 基本施展时间：{(__instance._configData.PrepareTotalProgress / 7200.0):0.##}秒";
+                strList.Add($"基本施展时间：{(__instance._configData.PrepareTotalProgress / 7200.0):0.##}秒");
             }
-            var desc = $"{__instance._configData.Desc}\n{s}";
+
+            if (ModEntry.ShowENAP)
+            {
+                var enap = __instance._configData.ExtraNeiliAllocationProgress;
+                if (enap.Any(it => it >= 0))
+                {
+                    var s = "基本周天真气进度：";
+                    for (var i = 0; i < 4; i++)
+                    {
+                        var min = enap[i];
+                        var delta = enap[4];
+                        var s1 = (delta > 0) ? $"{min}~{min + delta}" : min.ToString();
+                        if (min > 0 || delta > 0)
+                        {
+                            List<string> titles = ["催破", "轻灵", "护体", "奇窍"];
+                            s += $" {titles[i]}{s1}";
+                        }
+                    }
+                    strList.Add(s);
+                }
+            }
+            var desc = strList.Join(delimiter: "\n");
             MouseTip_Util.SetMultiLineAutoHeightText(__instance.descText, desc);
         }
     
