@@ -49,7 +49,7 @@ public partial class ModEntry : TaiwuRemakeHarmonyPlugin
     [ModSetting("功法书浮窗-显示五行属性", description: "显示功法书对应功法的五行属性")]
     public static bool ShowBookFiveElements = true;
 
-    [ModSetting("功法-显示学习进度", description: "显示功法所对应书籍的读书进度")]
+    [ModSetting("功法/功法书浮窗-显示学习进度", description: "显示功法所对应书籍的读书进度")]
     public static bool ShowLearningProgress = true;
     
     [ModSetting("功法浮窗-显示周天真气进度获取值", description: "显示内功功法的基本周天真气进度获取值(无加成时的数值)")]

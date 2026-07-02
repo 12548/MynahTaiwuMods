@@ -6,6 +6,7 @@ using Game.Views.Combat;
 using Game.Views.MouseTips;
 using GameData.Domains.CombatSkill;
 using HarmonyLib;
+using UnityEngine;
 
 namespace MynahMoreInfo.patches;
 
